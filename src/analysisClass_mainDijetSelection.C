@@ -8,6 +8,7 @@
 #include <TVector2.h>
 #include <TVector3.h>
 
+
 analysisClass::analysisClass(string * inputList, string * cutFile, string * treeName, string * outputFileName, string * cutEfficFile)
   :baseClass(inputList, cutFile, treeName, outputFileName, cutEfficFile)
 {
@@ -63,6 +64,25 @@ analysisClass::analysisClass(string * inputList, string * cutFile, string * tree
     JetCorrector = new FactorizedJetCorrector(vPar); assert(JetCorrector);
     JetCorrector_data = new FactorizedJetCorrector(vPar_data); assert(JetCorrector_data);
   }
+
+  //load btag scale factors
+  bcalib = new BTagCalibration("CSVv2", "data/bTag_MC_ScalingFactors/CSVv2_ichep.csv");
+
+  //medium WP
+  breader_medium = new BTagCalibrationReader(BTagEntry::OP_MEDIUM,  // operating point
+					     "central",             // central sys type
+					     {"up", "down"});      // other sys types
+  breader_medium->load(*bcalib,                // calibration instance
+		       BTagEntry::FLAV_B,    // btag flavour
+		       "comb");
+  //tight WP
+  breader_tight = new BTagCalibrationReader(BTagEntry::OP_TIGHT,  // operating point
+					    "central",             // central sys type
+					    {"up", "down"});      // other sys types
+  breader_tight->load(*bcalib,                // calibration instance
+		      BTagEntry::FLAV_B,    // btag flavour
+		      "comb");
+  
   
   std::cout << "analysisClass::analysisClass(): ends " << std::endl;
 }
@@ -119,6 +139,15 @@ void analysisClass::Loop()
      sprintf(name_histoHLT,"h_mjj_HLTpass_%s",HLTname[i]);
      h_mjj_HLTpass[i]= new TH1F(name_histoHLT,"",103,massBoundaries);
    }
+
+   //book histos for btagged analysis
+   TH1F* histo_mjj_btag0_m = new TH1F("histo_mjj_btag0_m","histo_mjj_btag0_m",10000,0,10000);
+   TH1F* histo_mjj_btag1_m = new TH1F("histo_mjj_btag1_m","histo_mjj_btag1_m",10000,0,10000);
+   TH1F* histo_mjj_btag2_m = new TH1F("histo_mjj_btag2_m","histo_mjj_btag2_m",10000,0,10000);
+   TH1F* histo_mjj_btag0_t = new TH1F("histo_mjj_btag0_t","histo_mjj_btag0_t",10000,0,10000);
+   TH1F* histo_mjj_btag1_t = new TH1F("histo_mjj_btag1_t","histo_mjj_btag1_t",10000,0,10000);
+   TH1F* histo_mjj_btag2_t = new TH1F("histo_mjj_btag2_t","histo_mjj_btag2_t",10000,0,10000);
+
   
 
    /////////initialize variables
@@ -455,6 +484,7 @@ void analysisClass::Loop()
 	   }
        }   
 
+
      double MJJAK4 = 0; 
      double DeltaEtaJJAK4 = 0;
      double DeltaPhiJJAK4 = 0;
@@ -631,36 +661,122 @@ void analysisClass::Loop()
      
      // optional call to fill a skim with the full content of the input roottuple
      //if( passedCut("nJetFinal") ) fillSkimTree();
-     if( passedCut("PassJSON")
-	 && passedCut("nVtx") 
-	 && passedCut("IdTight_j1")
-	 && passedCut("IdTight_j2")
-	 && passedCut("nJet")
-	 && passedCut("pTWJ_j1")
-	 && passedCut("etaWJ_j1")
-	 && passedCut("pTWJ_j2")
-	 && passedCut("etaWJ_j2")
-	 && getVariableValue("deltaETAjj") <  getPreCutValue1("DetaJJforTrig") ){
 
-       h_mjj_HLTpass[0] -> Fill(MJJWide); 
-       
-       if(isData && triggerResult->size()>10) // only run on data
-	 {
-	   if(triggerResult->at(3)) h_mjj_HLTpass[1] -> Fill(MJJWide); //PFHT475
-	   if(triggerResult->at(3) && triggerResult->at(0)) h_mjj_HLTpass[2] -> Fill(MJJWide); //PFHT800
-	   if(triggerResult->at(3) && triggerResult->at(10)) h_mjj_HLTpass[3] -> Fill(MJJWide); //PFHT650MJJ900
-	   if(triggerResult->at(3) && (triggerResult->at(0) || triggerResult->at(10))) h_mjj_HLTpass[4] -> Fill(MJJWide); //PFHT800 && PFHT650MJJ900
-	   if(triggerResult->at(0)) h_mjj_HLTpass[5] -> Fill(MJJWide); //PFHT800 without PFHT475
+     bool fullAnalysis = ( passedCut("PassJSON")
+			   && passedCut("nVtx") 
+			   && passedCut("IdTight_j1")
+			   && passedCut("IdTight_j2")
+			   && passedCut("nJet")
+			   && passedCut("pTWJ_j1")
+			   && passedCut("etaWJ_j1")
+			   && passedCut("pTWJ_j2")
+			   && passedCut("etaWJ_j2")
+			   && getVariableValue("deltaETAjj") <  getPreCutValue1("DetaJJforTrig") );
+     if (fullAnalysis)
+       {
+	 h_mjj_HLTpass[0] -> Fill(MJJWide); 
+	 
+	 if(isData && triggerResult->size()>10) // only run on data
+	   {
+	     if(triggerResult->at(3)) h_mjj_HLTpass[1] -> Fill(MJJWide); //PFHT475
+	     if(triggerResult->at(3) && triggerResult->at(0)) h_mjj_HLTpass[2] -> Fill(MJJWide); //PFHT800
+	     if(triggerResult->at(3) && triggerResult->at(10)) h_mjj_HLTpass[3] -> Fill(MJJWide); //PFHT650MJJ900
+	     if(triggerResult->at(3) && (triggerResult->at(0) || triggerResult->at(10))) h_mjj_HLTpass[4] -> Fill(MJJWide); //PFHT800 && PFHT650MJJ900
+	     if(triggerResult->at(0)) h_mjj_HLTpass[5] -> Fill(MJJWide); //PFHT800 without PFHT475
+	     
+	     if(triggerResult->size()>16) //not called in old ntuples used for 65 pb-1 publication (Francesco, 11/09/2015)
+	       {
+		 if(triggerResult->at(16)) h_mjj_HLTpass[6] -> Fill(MJJWide); //Mu45Eta2p1
+		 if(triggerResult->at(16) && triggerResult->at(0)) h_mjj_HLTpass[7] -> Fill(MJJWide); //Mu45Eta2p1 AND PFHT800
+	       }
+	   }
+	 //####################################################################################
+	 //######################### BTAGGED PART OF THE ANALYSIS #############################
+	 //####################################################################################
+	 int njetsm = 0;
+	 int njetst = 0;
+	 
+	 double evtWeightBtagM = 1.;
+	 double evtWeightBtagT = 1.;
 
-	   if(triggerResult->size()>16) //not called in old ntuples used for 65 pb-1 publication (Francesco, 11/09/2015)
-	     {
-	       if(triggerResult->at(16)) h_mjj_HLTpass[6] -> Fill(MJJWide); //Mu45Eta2p1
-	       if(triggerResult->at(16) && triggerResult->at(0)) h_mjj_HLTpass[7] -> Fill(MJJWide); //Mu45Eta2p1 AND PFHT800
-	     }
-	 }
-       //std::cout << "triggerResult->at(3) = " << triggerResult->at(3) << "  triggerResult->at(0) = " << triggerResult->at(0) << "  triggerResult->at(5) = " << triggerResult->at(5) << std::endl;
-     }
+	 int nExpBtag = 0;
 
+	 std::vector<double> SFAK4M;
+	 std::vector<double> SFAK4T;
+
+	 //JET1 MEDIUM
+	 if (getVariableValue("jetCSVAK4_j1") > getPreCutValue1("CSVv2M"))
+	   {
+	     ++njetsm;
+	     if(!isData)
+	       SFAK4M.push_back( breader_medium->eval_auto_bounds("central",
+								  BTagEntry::FLAV_B,
+								  ak4j1.Eta(),
+								  ak4j1.Pt()));
+	   }
+	 //JET2 MEDIUM
+	 if (getVariableValue("jetCSVAK4_j2") > getPreCutValue1("CSVv2M"))
+	   {
+	     ++njetsm;
+	     if(!isData)
+	       SFAK4M.push_back( breader_medium->eval_auto_bounds("central",
+								  BTagEntry::FLAV_B,
+								  ak4j2.Eta(),
+								  ak4j2.Pt()));
+	   }
+
+	 //JET1 TIGHT
+	 if (getVariableValue("jetCSVAK4_j1") > getPreCutValue1("CSVv2T"))
+	   {
+	     ++njetst;
+	     if(!isData)
+	       SFAK4T.push_back( breader_tight->eval_auto_bounds("central",
+								 BTagEntry::FLAV_B,
+								 ak4j1.Eta(),
+								 ak4j1.Pt()));
+	   }
+	 //JET2 TIGHT
+	 if (getVariableValue("jetCSVAK4_j2") > getPreCutValue1("CSVv2T"))
+	   {
+	     ++njetst;
+	     if(!isData)
+	       SFAK4T.push_back( breader_tight->eval_auto_bounds("central",
+								 BTagEntry::FLAV_B,
+								 ak4j2.Eta(),
+								 ak4j2.Pt()));
+	   }
+
+
+
+	 if(!isData)
+	   {
+	     if(hFlavourAK4->at(sortedJetIdx[0]) == 5)
+	       ++nExpBtag;
+	     if(hFlavourAK4->at(sortedJetIdx[1]) == 5)
+	       ++nExpBtag;
+
+	     evtWeightBtagM = bTagEventWeight(SFAK4M, nExpBtag);
+	     evtWeightBtagT = bTagEventWeight(SFAK4T, nExpBtag);
+	   }
+
+
+	 //fill histos in categories
+	 if (njetsm == 1)
+	   histo_mjj_btag1_m->Fill(MJJWide * evtWeightBtagM);
+	 else if (njetsm == 2)
+	   histo_mjj_btag2_m->Fill(MJJWide * evtWeightBtagM);
+	 else
+	   histo_mjj_btag0_m->Fill(MJJWide * evtWeightBtagM);
+
+	 if (njetst == 1)
+	   histo_mjj_btag1_t->Fill(MJJWide * evtWeightBtagT);
+	 else if (njetst == 2)
+	   histo_mjj_btag2_t->Fill(MJJWide * evtWeightBtagT);
+	 else
+	   histo_mjj_btag0_t->Fill(MJJWide * evtWeightBtagT);
+       }
+
+     
      // optional call to fill a skim with a subset of the variables defined in the cutFile (use flag SAVE)
      if( passedAllPreviousCuts("mjj") && passedCut("mjj") ) 
        {
@@ -717,6 +833,14 @@ void analysisClass::Loop()
      h_mjj_HLTpass[i]->Write();
    }
 
+   //write histos for btagged analysis
+   histo_mjj_btag0_m->Write();
+   histo_mjj_btag1_m->Write();
+   histo_mjj_btag2_m->Write();
+   histo_mjj_btag0_t->Write();
+   histo_mjj_btag1_t->Write();
+   histo_mjj_btag2_t->Write();
+
    // h_nVtx->Write();
    // h_trueVtx->Write();
    // h_nJetFinal->Write();
@@ -735,4 +859,69 @@ void analysisClass::Loop()
    // //one could also do:   const TH1F& h = getHisto_noCuts_or_skim// and use h
 
    std::cout << "analysisClass::Loop() ends" <<std::endl;   
-   }
+}
+
+
+
+// ------------ method that calculates the event weight based on the number of b-tagged jets in MC and the expected number of b-tags among the two leading jets  ------------
+double
+analysisClass::bTagEventWeight(const vector<double>& SFsForBTaggedJets, const unsigned int nBTags)
+{
+  if( SFsForBTaggedJets.size() > 2 )
+    {
+      std::cout << "Only two leading jets are considered. Hence, the number of b-tagged jets cannot exceed 2.";
+      return 1;
+    }
+  if( nBTags > 2 )
+    {
+      std::cout << "Only two leading jets are considered. Hence, the number of b-tags cannot exceed 2.";
+      return 1;
+    }
+  /*
+    ##################################################################
+    Event weight matrix:
+    ------------------------------------------------------------------
+    nBTags\b-tagged jets  |    0        1             2
+    ------------------------------------------------------------------
+      0                   |    1      1-SF      (1-SF1)(1-SF2)
+                          |
+      1                   |    0       SF    SF1(1-SF2)+(1-SF1)SF2
+                          |
+      2                   |    0        0           SF1SF2
+    ##################################################################
+  */
+  
+  if( nBTags > SFsForBTaggedJets.size() ) return 0;
+
+  if( nBTags==0 && SFsForBTaggedJets.size()==0 ) return 1;
+
+  double weight = 0;
+
+  if( SFsForBTaggedJets.size()==1 )
+    {
+      double SF = SFsForBTaggedJets.at(0);
+
+      for( unsigned int i=0; i<=1; ++i )
+	{
+	  if( i != nBTags ) continue;
+
+	  weight += pow(SF,i)*pow(1-SF,1-i);
+	}
+    }
+  else if( SFsForBTaggedJets.size()==2 )
+    {
+      double SF1 = SFsForBTaggedJets.at(0);
+      double SF2 = SFsForBTaggedJets.at(1);
+    
+      for( unsigned int i=0; i<=1; ++i )
+	{
+	  for( unsigned int j=0; j<=1; ++j )
+	    {
+	      if( (i+j) != nBTags ) continue;
+
+	      weight += pow(SF1,i)*pow(1-SF1,1-i)*pow(SF2,j)*pow(1-SF2,1-j);
+	    }
+	}
+    }
+  return weight;
+}
