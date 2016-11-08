@@ -7,6 +7,8 @@ from array import array
 import numpy as np
 import sys, os, math
 
+usage = """usage: python python/bTag_dqm.py -c config/bTag.cfg -b BTag2016_dqm"""
+
 
 massBins_list = [1, 3, 6, 10, 16, 23, 31, 40, 50, 61, 74, 88, 103, 119, 137, 156, 176, 197, 220, 244, 270, 296, 325, 354, 386, 419, 453, 489, 526, 565, 606, 649, 693, 740, 788, 838, 890, 944, 1000, 1058, 1118, 1181, 1246, 1313, 1383, 1455, 1530, 1607, 1687, 1770, 1856, 1945, 2037, 2132, 2231, 2332, 2438, 2546, 2659, 2775, 2895, 3019, 3147, 3279, 3416, 3558, 3704, 3854, 4010, 4171, 4337, 4509, 4686, 4869, 5058, 5253, 5455, 5663, 5877, 6099, 6328, 6564, 6808, 7060, 7320, 7589, 7866, 8152, 8447, 8752, 9067, 9391, 9726, 10072, 10430, 10798, 11179, 11571, 11977, 12395, 12827, 13272, 13732, 14000]
 
@@ -37,15 +39,22 @@ def customRebin(histo):
     return hNew
 
 
-def setRecoStyle(histo):
-    histo.SetMarkerColor(rt.kRed)
-    histo.SetLineColor(rt.kRed)
+def setBinning(histos):
+    for k,h in histos.iteritems():
+        if 'mjj' in k:
+            hNew = customRebin(h)
+            histos[k] = hNew
 
+
+def setRecoStyle(histos):
+    for k,h in histos.iteritems():
+        h.SetMarkerColor(rt.kRed)
+        h.SetLineColor(rt.kRed)
 
 def setCaloStyle(histo):
-    histo.SetMarkerColor(rt.kBlack)
-    histo.SetLineColor(rt.kBlack)
-
+    for k,h in histos.iteritems():
+        h.SetMarkerColor(rt.kBlack)
+        h.SetLineColor(rt.kBlack)
 
 def computeRatio(h1,h2):
 
@@ -79,8 +88,35 @@ def computeRatio(h1,h2):
     return ratio
 
 
-def overlayAndPrint(reco, calo):
-    outFolder = "images"
+
+def simplePrint(histos, outFolder):
+    if not os.path.exists(outFolder):
+        os.makedirs(outFolder)
+
+    for k,h in histos.iteritems():
+        cc = rt.TCanvas();
+        cc.SetGridx()
+        cc.SetGridy()
+        if ('mjj' in k or 'pt' in k) and not 'eff' in k:
+            cc.SetLogy()
+
+        h.Draw()
+
+        #custom ranges
+        rt.gPad.Update()
+        if 'eff_mjj_btag0' in k:
+            h.GetPaintedGraph().GetYaxis().SetRangeUser(0,1)
+        elif 'eff_mjj_btag1' in k:
+            h.GetPaintedGraph().GetYaxis().SetRangeUser(0,0.6)
+        elif 'eff_mjj_btag2' in k:
+            h.GetPaintedGraph().GetYaxis().SetRangeUser(0,0.1)
+
+        cc.Print(outFolder+"/"+k+".pdf","pdf")
+
+
+
+
+def overlayAndPrint(reco, calo, outFolder):
     if not os.path.exists(outFolder):
         os.makedirs(outFolder)
 
@@ -151,10 +187,71 @@ def overlayAndPrint(reco, calo):
         ratioHisto.Delete()
 
 
+def fillEfficiency(histoList):
+    #PT
+    eff_pt_j1_btag_loose = rt.TEfficiency(histoList['pt_j1_btag_loose'],histoList['pt_j1'])
+    eff_pt_j1_btag_loose.SetName("eff_pt_j1_btag_loose")
+    eff_pt_j2_btag_loose = rt.TEfficiency(histoList['pt_j2_btag_loose'],histoList['pt_j2'])
+    eff_pt_j2_btag_loose.SetName("eff_pt_j2_btag_loose")
+    eff_pt_j1_btag_medium = rt.TEfficiency(histoList['pt_j1_btag_medium'],histoList['pt_j1'])
+    eff_pt_j1_btag_medium.SetName("eff_pt_j1_btag_medium")
+    eff_pt_j2_btag_medium = rt.TEfficiency(histoList['pt_j2_btag_medium'],histoList['pt_j2'])
+    eff_pt_j2_btag_medium.SetName("eff_pt_j2_btag_medium")
+    histoList[eff_pt_j1_btag_loose.GetName()] = eff_pt_j1_btag_loose
+    histoList[eff_pt_j2_btag_loose.GetName()] = eff_pt_j2_btag_loose
+    histoList[eff_pt_j1_btag_medium.GetName()] = eff_pt_j1_btag_medium
+    histoList[eff_pt_j2_btag_medium.GetName()] = eff_pt_j2_btag_medium
+            
+    #MJJ
+    eff_mjj_btag0_loose = rt.TEfficiency(histoList['mjj_btag0_loose'],histoList['mjj'])
+    eff_mjj_btag0_loose.SetName("eff_mjj_btag0_loose")
+    eff_mjj_btag1_loose = rt.TEfficiency(histoList['mjj_btag1_loose'],histoList['mjj'])
+    eff_mjj_btag1_loose.SetName("eff_mjj_btag1_loose")
+    eff_mjj_btag2_loose = rt.TEfficiency(histoList['mjj_btag2_loose'],histoList['mjj'])
+    eff_mjj_btag2_loose.SetName("eff_mjj_btag2_loose")
+    histoList[eff_mjj_btag0_loose.GetName()] = eff_mjj_btag0_loose
+    histoList[eff_mjj_btag1_loose.GetName()] = eff_mjj_btag1_loose
+    histoList[eff_mjj_btag2_loose.GetName()] = eff_mjj_btag2_loose
+    
+    eff_mjj_btag0_medium = rt.TEfficiency(histoList['mjj_btag0_medium'],histoList['mjj'])
+    eff_mjj_btag0_medium.SetName("eff_mjj_btag0_medium")
+    eff_mjj_btag1_medium = rt.TEfficiency(histoList['mjj_btag1_medium'],histoList['mjj'])
+    eff_mjj_btag1_medium.SetName("eff_mjj_btag1_medium")
+    eff_mjj_btag2_medium = rt.TEfficiency(histoList['mjj_btag2_medium'],histoList['mjj'])
+    eff_mjj_btag2_medium.SetName("eff_mjj_btag2_medium")
+    histoList[eff_mjj_btag0_medium.GetName()] = eff_mjj_btag0_medium
+    histoList[eff_mjj_btag1_medium.GetName()] = eff_mjj_btag1_medium
+    histoList[eff_mjj_btag2_medium.GetName()] = eff_mjj_btag2_medium  
+        
+        
+
+
 if __name__ == '__main__':
 
-    inputDataFile = rt.TFile("histo_dqm.root")
+    ###################################################################
+    parser = OptionParser(usage=usage)
+    parser.add_option('-c','--config',dest="config",type="string",default="config/bTag.cfg",
+                  help="Name of the config file to use")
+    parser.add_option('-b','--box',dest="box", default="BTag2016_dqm",type="string",
+                  help="box name")
     
+    rt.RooMsgService.instance().setGlobalKillBelow(rt.RooFit.FATAL)
+
+    (options,args) = parser.parse_args()
+
+    cfg = Config.Config(options.config)
+    box = options.box
+
+    inputDataHistos     = cfg.getVariables(box,"inputDataHistos")
+    outFolder           = cfg.getVariables(box,"outputFolder")
+    
+    ###################################################################
+
+    #set style and plot
+    rt.gROOT.SetBatch()
+    setTDRStyle.setTDRStyle()
+
+    inputDataFile = rt.TFile(inputDataHistos)
     names = [k.GetName() for k in inputDataFile.GetListOfKeys()]
 
     recoList = {}
@@ -175,99 +272,31 @@ if __name__ == '__main__':
             caloList[hist.replace('_calo','')] = myTH1
 
 
-    #compute efficiency
-    #PT
-    eff_pt_j1_btag_loose_calo = rt.TEfficiency(caloList['pt_j1_btag_loose'],caloList['pt_j1'])
-    eff_pt_j1_btag_loose_calo.SetName("eff_pt_j1_btag_loose")
-    eff_pt_j2_btag_loose_calo = rt.TEfficiency(caloList['pt_j2_btag_loose'],caloList['pt_j2'])
-    eff_pt_j2_btag_loose_calo.SetName("eff_pt_j2_btag_loose")
-    eff_pt_j1_btag_medium_calo = rt.TEfficiency(caloList['pt_j1_btag_medium'],caloList['pt_j1'])
-    eff_pt_j1_btag_medium_calo.SetName("eff_pt_j1_btag_medium")
-    eff_pt_j2_btag_medium_calo = rt.TEfficiency(caloList['pt_j2_btag_medium'],caloList['pt_j2'])
-    eff_pt_j2_btag_medium_calo.SetName("eff_pt_j2_btag_medium")
-    caloList[eff_pt_j1_btag_loose_calo.GetName()] = eff_pt_j1_btag_loose_calo
-    caloList[eff_pt_j2_btag_loose_calo.GetName()] = eff_pt_j2_btag_loose_calo
-    caloList[eff_pt_j1_btag_medium_calo.GetName()] = eff_pt_j1_btag_medium_calo
-    caloList[eff_pt_j2_btag_medium_calo.GetName()] = eff_pt_j2_btag_medium_calo
+    doCalo = len(caloList) > 0
+    doReco = len(recoList) > 0
 
-    eff_pt_j1_btag_loose_reco = rt.TEfficiency(recoList['pt_j1_btag_loose'],recoList['pt_j1'])
-    eff_pt_j1_btag_loose_reco.SetName("eff_pt_j1_btag_loose")
-    eff_pt_j2_btag_loose_reco = rt.TEfficiency(recoList['pt_j2_btag_loose'],recoList['pt_j2'])
-    eff_pt_j2_btag_loose_reco.SetName("eff_pt_j2_btag_loose")
-    eff_pt_j1_btag_medium_reco = rt.TEfficiency(recoList['pt_j1_btag_medium'],recoList['pt_j1'])
-    eff_pt_j1_btag_medium_reco.SetName("eff_pt_j1_btag_medium")
-    eff_pt_j2_btag_medium_reco = rt.TEfficiency(recoList['pt_j2_btag_medium'],recoList['pt_j2'])
-    eff_pt_j2_btag_medium_reco.SetName("eff_pt_j2_btag_medium")
-    recoList[eff_pt_j1_btag_loose_reco.GetName()] = eff_pt_j1_btag_loose_reco
-    recoList[eff_pt_j2_btag_loose_reco.GetName()] = eff_pt_j2_btag_loose_reco
-    recoList[eff_pt_j1_btag_medium_reco.GetName()] = eff_pt_j1_btag_medium_reco
-    recoList[eff_pt_j2_btag_medium_reco.GetName()] = eff_pt_j2_btag_medium_reco
+    if not doCalo and not doReco:
+        print "no plots found"
+        exit
+
+    
+    if doCalo:
+        setBinning(caloList)
+        fillEfficiency(caloList)
+        setCaloStyle(caloList)
+
+    if doReco:
+        setBinning(recoList)
+        fillEfficiency(recoList)
+        setRecoStyle(recoList)
 
 
-
-    #rebin for Mjj
-    for k,h in caloList.iteritems():
-        if 'mjj' in k:
-            hNew = customRebin(h)
-            caloList[k] = hNew
-    for k,h in recoList.iteritems():
-        if 'mjj' in k:
-            hNew = customRebin(h)
-            recoList[k] = hNew
-
-
-    #MJJ calo
-    eff_mjj_btag0_loose_calo = rt.TEfficiency(caloList['mjj_btag0_loose'],caloList['mjj'])
-    eff_mjj_btag0_loose_calo.SetName("eff_mjj_btag0_loose")
-    eff_mjj_btag1_loose_calo = rt.TEfficiency(caloList['mjj_btag1_loose'],caloList['mjj'])
-    eff_mjj_btag1_loose_calo.SetName("eff_mjj_btag1_loose")
-    eff_mjj_btag2_loose_calo = rt.TEfficiency(caloList['mjj_btag2_loose'],caloList['mjj'])
-    eff_mjj_btag2_loose_calo.SetName("eff_mjj_btag2_loose")
-    caloList[eff_mjj_btag0_loose_calo.GetName()] = eff_mjj_btag0_loose_calo
-    caloList[eff_mjj_btag1_loose_calo.GetName()] = eff_mjj_btag1_loose_calo
-    caloList[eff_mjj_btag2_loose_calo.GetName()] = eff_mjj_btag2_loose_calo
-
-    eff_mjj_btag0_medium_calo = rt.TEfficiency(caloList['mjj_btag0_medium'],caloList['mjj'])
-    eff_mjj_btag0_medium_calo.SetName("eff_mjj_btag0_medium")
-    eff_mjj_btag1_medium_calo = rt.TEfficiency(caloList['mjj_btag1_medium'],caloList['mjj'])
-    eff_mjj_btag1_medium_calo.SetName("eff_mjj_btag1_medium")
-    eff_mjj_btag2_medium_calo = rt.TEfficiency(caloList['mjj_btag2_medium'],caloList['mjj'])
-    eff_mjj_btag2_medium_calo.SetName("eff_mjj_btag2_medium")
-    caloList[eff_mjj_btag0_medium_calo.GetName()] = eff_mjj_btag0_medium_calo
-    caloList[eff_mjj_btag1_medium_calo.GetName()] = eff_mjj_btag1_medium_calo
-    caloList[eff_mjj_btag2_medium_calo.GetName()] = eff_mjj_btag2_medium_calo
-
-    #MJJ reco
-    eff_mjj_btag0_loose_reco = rt.TEfficiency(recoList['mjj_btag0_loose'],recoList['mjj'])
-    eff_mjj_btag0_loose_reco.SetName("eff_mjj_btag0_loose")
-    eff_mjj_btag1_loose_reco = rt.TEfficiency(recoList['mjj_btag1_loose'],recoList['mjj'])
-    eff_mjj_btag1_loose_reco.SetName("eff_mjj_btag1_loose")
-    eff_mjj_btag2_loose_reco = rt.TEfficiency(recoList['mjj_btag2_loose'],recoList['mjj'])
-    eff_mjj_btag2_loose_reco.SetName("eff_mjj_btag2_loose")
-    recoList[eff_mjj_btag0_loose_reco.GetName()] = eff_mjj_btag0_loose_reco
-    recoList[eff_mjj_btag1_loose_reco.GetName()] = eff_mjj_btag1_loose_reco
-    recoList[eff_mjj_btag2_loose_reco.GetName()] = eff_mjj_btag2_loose_reco
-
-    eff_mjj_btag0_medium_reco = rt.TEfficiency(recoList['mjj_btag0_medium'],recoList['mjj'])
-    eff_mjj_btag0_medium_reco.SetName("eff_mjj_btag0_medium")
-    eff_mjj_btag1_medium_reco = rt.TEfficiency(recoList['mjj_btag1_medium'],recoList['mjj'])
-    eff_mjj_btag1_medium_reco.SetName("eff_mjj_btag1_medium")
-    eff_mjj_btag2_medium_reco = rt.TEfficiency(recoList['mjj_btag2_medium'],recoList['mjj'])
-    eff_mjj_btag2_medium_reco.SetName("eff_mjj_btag2_medium")
-    recoList[eff_mjj_btag0_medium_reco.GetName()] = eff_mjj_btag0_medium_reco
-    recoList[eff_mjj_btag1_medium_reco.GetName()] = eff_mjj_btag1_medium_reco
-    recoList[eff_mjj_btag2_medium_reco.GetName()] = eff_mjj_btag2_medium_reco
-
-
-    #set style and plot
-    rt.gROOT.SetBatch()
-    setTDRStyle.setTDRStyle()
-
-    for k,h in recoList.iteritems():
-        setRecoStyle(h)
-    for k,h in caloList.iteritems():
-        setCaloStyle(h)
-
-    overlayAndPrint(recoList,caloList)
+    if doCalo and doReco:
+        overlayAndPrint(recoList,caloList,outFolder)
+    elif doCalo:
+        simplePrint(caloList,outFolder)
+    elif doReco:
+        simplePrint(recoList,outFolder)
+    
     
     

@@ -14,7 +14,7 @@ gROOT.SetBatch(kTRUE)
 ################# configuration ######################
 sqrtS = 13000.
 #lumiValue = 4411 #[pb]
-lumiValue = 7202 #[pb]
+lumiValue = 20057 #[pb]
 showCrossSection = 1 #1=cross section [pb] , 0=number of events/GeV
 #drawSignalShapeAlsoAlone = 1
 fixedRange = 1 #1=YES , 0=NO  (the option works only if showCrossSection=1; otherwise=0)
@@ -26,7 +26,7 @@ else:
     lumi = 1
 #massMin = 453
 #massMax = 2037
-massMin = 1058
+massMin = 1300
 massMax = 7866 
 blindRegionMassMin = 0
 #blindRegionMassMin = 649
@@ -159,8 +159,8 @@ def main():
     #old
     # background model
     norm = RooRealVar('norm', 'norm', dataInt, 0.0, 1.0e9)
-    p1 = RooRealVar('p1', 'p1', 10 , 0., 100.0)
-    p2 = RooRealVar('p2', 'p2', 5  , 0., 60.0)
+    p1 = RooRealVar('p1', 'p1', 10 , -10., 100.0)
+    p2 = RooRealVar('p2', 'p2', 5  , 0., 50.0)
     p3 = RooRealVar('p3', 'p3', 0   -10.0, 10.0)
     #p3.setConstant
     background = RooGenericPdf('background','(pow(1-@0/%.1f,@1)/pow(@0/%.1f,@2+@3*log(@0/%.1f)))'%(sqrtS,sqrtS,sqrtS),RooArgList(mjj,p1,p2,p3))
@@ -293,8 +293,8 @@ def main():
     # plot
     h_background = convertFunctionToHisto(background,"h_background",N_massBins,massBins)
     h_fit_residual_vs_mass = TH1D("h_fit_residual_vs_mass","h_fit_residual_vs_mass",N_massBins,massBins)
-    list_chi2AndNdf_background = calculateChi2AndFillResiduals(g_data,h_background,h_fit_residual_vs_mass,0)
-    drawAndSavePlot_background(g_data,h_background,h_fit_residual_vs_mass,outputLabel, list_chi2AndNdf_background, list_parameter)
+    list_chi2AndNdf_background = calculateChi2AndFillResiduals(g_data,h_background,h_fit_residual_vs_mass,1)
+    drawAndSavePlot_background(g_data,h_background,h_fit_residual_vs_mass,outputLabel, list_chi2AndNdf_background, list_parameter, box)
 
     # h_fit_residual_vs_mass_unbinned = TH1D("h_fit_residual_vs_mass_unbinned",
     #                                        "h_fit_residual_vs_mass_unbinned",
@@ -423,7 +423,7 @@ def calculateChi2AndFillResiduals(data_obs_TGraph_,background_hist_,hist_fit_res
     return [chi2_FullRangeAll, ndf_FullRangeAll, chi2_PlotRangeAll, ndf_PlotRangeAll, chi2_PlotRangeNonZero, ndf_PlotRangeNonZero, chi2_PlotRangeMinNumEvents, ndf_PlotRangeMinNumEvents]
 
 
-def drawAndSavePlot_background(data_obs_TGraph_,background_TH1_,hist_fit_residual_vsMass_,outputLabel_, list_chi2AndNdf_, list_parameter_):
+def drawAndSavePlot_background(data_obs_TGraph_,background_TH1_,hist_fit_residual_vsMass_,outputLabel_, list_chi2AndNdf_, list_parameter_, box):
 
     global minY, maxY
 
@@ -440,8 +440,10 @@ def drawAndSavePlot_background(data_obs_TGraph_,background_TH1_,hist_fit_residua
     #pad_1.SetPad(0.01,0.26,0.99,0.98) #FIXME
     pad_1.SetPad(0.01,0.36,0.99,0.98)
     pad_1.SetLogy()
-    #for high mass
-    #pad_1.SetLogx()
+
+
+    if 'PF' in box :
+        pad_1.SetLogx()
 
     pad_1.SetRightMargin(0.05)
     pad_1.SetTopMargin(0.05)
@@ -498,7 +500,7 @@ def drawAndSavePlot_background(data_obs_TGraph_,background_TH1_,hist_fit_residua
     data_obs_TGraph_.Draw("P E0 SAME")
 
     #draw text
-    pave_general = TPaveText(0.566772,0.794229,0.83557,0.940972,"NDC")
+    pave_general = TPaveText(0.666772,0.794229,0.83557,0.940972,"NDC")
     pave_general.AddText("background fit")
     pave_general.SetFillColor(0)
     pave_general.SetLineColor(1)
@@ -515,7 +517,12 @@ def drawAndSavePlot_background(data_obs_TGraph_,background_TH1_,hist_fit_residua
     pave_sel.SetFillColor(0)
     pave_sel.SetBorderSize(0)
     pave_sel.SetFillStyle(0)
-    pave_sel.AddText(0.5,1.2,"Wide Calo Jets")
+
+    if 'PF' in box:
+        pave_sel.AddText(0.5,1.2,"Wide PF Jets")
+    else:
+        pave_sel.AddText(0.5,1.2,"Wide Calo Jets")
+
     pave_sel.AddText(0.5,0.5,str(massMin)+" < m_{jj} < "+str(massMax))
     pave_sel.AddText(0.5,0.,"|#eta| < 2.5, |#Delta#eta| < 1.3")
     pave_sel.Draw("SAME")
@@ -551,7 +558,7 @@ def drawAndSavePlot_background(data_obs_TGraph_,background_TH1_,hist_fit_residua
     # pave_toy.Draw("SAME")
 
     #draw legend
-    leg = TLegend(0.5564991,0.58,0.9203575,0.835812)
+    leg = TLegend(0.6564991,0.58,0.9203575,0.835812)
     leg.SetTextSize(0.03546853)
     leg.SetLineColor(0)
     leg.SetLineStyle(1)
@@ -580,17 +587,20 @@ def drawAndSavePlot_background(data_obs_TGraph_,background_TH1_,hist_fit_residua
     pad_2.SetGridx()
     pad_2.SetGridy()
 
-    #for high mass
-    #pad_2.SetLogx()
 
-    vFrame2 = pad_2.DrawFrame(pad_1.GetUxmin(), -range_residual, pad_1.GetUxmax(), +range_residual)    
+    if 'PF' in box:
+        pad_2.SetLogx()
+
+
+
+    vFrame2 = pad_2.DrawFrame(massMin, -range_residual, massMax, +range_residual)    
     vFrame2.SetTitle("")
     vFrame2.SetXTitle(xaxisTitle)
     vFrame2.GetXaxis().SetTitleSize(0.06)
     vFrame2.SetYTitle(yaxisTitle_secondary)
     vFrame2.GetYaxis().SetTitleSize(0.12)
     vFrame2.GetYaxis().SetTitleOffset(0.40)
-    #vFrame2.GetYaxis().SetLabelSize(0.09)
+    vFrame2.GetYaxis().SetLabelSize(0.05)
     vFrame2.GetXaxis().SetTitleSize(0.15)
     vFrame2.GetXaxis().SetTitleOffset(0.90)
     vFrame2.GetXaxis().SetLabelSize(0.06)
@@ -604,11 +614,26 @@ def drawAndSavePlot_background(data_obs_TGraph_,background_TH1_,hist_fit_residua
     hist_fit_residual_vsMass_.SetLineColor(1)
     hist_fit_residual_vsMass_.Draw("SAME HIST")
 
+
+    if 'PF' in box:
+        vFrame2.SetXTitle("Dijet Mass [TeV]")
+
+        xLab = TLatex()
+        xLab.SetTextAlign(22)
+        xLab.SetTextFont(42)
+        xLab.SetTextSize(2*0.05)
+
+        xLab.DrawLatex(2000, -4, "2")
+        xLab.DrawLatex(3000, -4, "3")
+        xLab.DrawLatex(4000, -4, "4")
+        xLab.DrawLatex(5000, -4, "5")
+        xLab.DrawLatex(6000, -4, "6")
+        xLab.DrawLatex(7000, -4, "7")
+        xLab.DrawLatex(8000, -4, "8")
+
+
     line = TLine(massMin,0,massMax,0)
     line.Draw("")
-
-    #draw pad
-    #pad_2.RedrawAxis()
 
     #============
 
