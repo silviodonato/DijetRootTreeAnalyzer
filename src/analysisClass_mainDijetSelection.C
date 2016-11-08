@@ -147,6 +147,9 @@ void analysisClass::Loop()
    TH1F* h_mjj_btag0_t = new TH1F("h_mjj_btag0_t","h_mjj_btag0_t",10000,0,10000);
    TH1F* h_mjj_btag1_t = new TH1F("h_mjj_btag1_t","h_mjj_btag1_t",10000,0,10000);
    TH1F* h_mjj_btag2_t = new TH1F("h_mjj_btag2_t","h_mjj_btag2_t",10000,0,10000);
+   TH1F* h_mjj_btag0_mt = new TH1F("h_mjj_btag0_mt","h_mjj_btag0_mt",10000,0,10000);
+   TH1F* h_mjj_btag1_mt = new TH1F("h_mjj_btag1_mt","h_mjj_btag1_mt",10000,0,10000);
+   TH1F* h_mjj_btag2_mt = new TH1F("h_mjj_btag2_mt","h_mjj_btag2_mt",10000,0,10000);
 
   
 
@@ -701,31 +704,43 @@ void analysisClass::Loop()
 	 
 	 double evtWeightBtagM = 1.;
 	 double evtWeightBtagT = 1.;
+	 double evtWeightBtagMT = 1.;
 
 	 int nExpBtag = 0;
 
 	 std::vector<double> SFAK4M;
 	 std::vector<double> SFAK4T;
+	 std::vector<double> SFAK4MT;
 
 	 //JET1 MEDIUM
 	 if (getVariableValue("jetCSVAK4_j1") > getPreCutValue1("CSVv2M"))
 	   {
 	     ++njetsm;
 	     if(!isData)
-	       SFAK4M.push_back( breader_medium->eval_auto_bounds("central",
-								  BTagEntry::FLAV_B,
-								  ak4j1.Eta(),
-								  ak4j1.Pt()));
+	       {
+		 double tmpSF = breader_medium->eval_auto_bounds("central",
+								 BTagEntry::FLAV_B,
+								 ak4j1.Eta(),
+								 ak4j1.Pt());
+		 
+		 SFAK4M.push_back(tmpSF);				  
+		 SFAK4MT.push_back(tmpSF);
+	       }
 	   }
 	 //JET2 MEDIUM
 	 if (getVariableValue("jetCSVAK4_j2") > getPreCutValue1("CSVv2M"))
 	   {
 	     ++njetsm;
 	     if(!isData)
-	       SFAK4M.push_back( breader_medium->eval_auto_bounds("central",
-								  BTagEntry::FLAV_B,
-								  ak4j2.Eta(),
-								  ak4j2.Pt()));
+	       {
+		 
+		 double tmpSF = breader_medium->eval_auto_bounds("central",
+								 BTagEntry::FLAV_B,
+								 ak4j2.Eta(),
+								 ak4j2.Pt());
+		 SFAK4M.push_back(tmpSF);
+		 SFAK4MT.push_back(tmpSF);
+	       }
 	   }
 
 	 //JET1 TIGHT
@@ -733,20 +748,30 @@ void analysisClass::Loop()
 	   {
 	     ++njetst;
 	     if(!isData)
-	       SFAK4T.push_back( breader_tight->eval_auto_bounds("central",
+	       {
+		 double tmpSF =  breader_tight->eval_auto_bounds("central",
 								 BTagEntry::FLAV_B,
 								 ak4j1.Eta(),
-								 ak4j1.Pt()));
+								 ak4j1.Pt());
+
+		 SFAK4T.push_back(tmpSF);
+		 SFAK4MT[0] = tmpSF;
+	       }
 	   }
 	 //JET2 TIGHT
 	 if (getVariableValue("jetCSVAK4_j2") > getPreCutValue1("CSVv2T"))
 	   {
 	     ++njetst;
 	     if(!isData)
-	       SFAK4T.push_back( breader_tight->eval_auto_bounds("central",
-								 BTagEntry::FLAV_B,
-								 ak4j2.Eta(),
-								 ak4j2.Pt()));
+	       {
+		 double tmpSF = breader_tight->eval_auto_bounds("central",
+								BTagEntry::FLAV_B,
+								ak4j2.Eta(),
+								ak4j2.Pt());
+
+		 SFAK4T.push_back(tmpSF);
+		 SFAK4MT[1] = tmpSF;
+	       }
 	   }
 
 
@@ -760,6 +785,7 @@ void analysisClass::Loop()
 
 	     evtWeightBtagM = bTagEventWeight(SFAK4M, nExpBtag);
 	     evtWeightBtagT = bTagEventWeight(SFAK4T, nExpBtag);
+	     evtWeightBtagMT = bTagEventWeight(SFAK4MT, nExpBtag);
 	   }
 
 
@@ -777,6 +803,14 @@ void analysisClass::Loop()
 	   h_mjj_btag2_t->Fill(MJJWide * evtWeightBtagT);
 	 else
 	   h_mjj_btag0_t->Fill(MJJWide * evtWeightBtagT);
+
+	 if (njetsm == 2 && njetst==1)
+	   h_mjj_btag2_mt->Fill(MJJWide * evtWeightBtagMT);
+	 else if (njetst==1)
+	   h_mjj_btag1_mt->Fill(MJJWide * evtWeightBtagMT);
+	 else
+	   h_mjj_btag0_mt->Fill(MJJWide * evtWeightBtagMT);
+
 
        } //end full analysis including deltaEta
 
@@ -844,6 +878,9 @@ void analysisClass::Loop()
    h_mjj_btag0_t->Write();
    h_mjj_btag1_t->Write();
    h_mjj_btag2_t->Write();
+   h_mjj_btag0_mt->Write();
+   h_mjj_btag1_mt->Write();
+   h_mjj_btag2_mt->Write();
 
    // h_nVtx->Write();
    // h_trueVtx->Write();
