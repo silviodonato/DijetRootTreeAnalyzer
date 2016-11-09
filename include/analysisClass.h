@@ -15,6 +15,9 @@
 #include "fastjet/PseudoJet.hh"
 
 #include <boost/shared_ptr.hpp>
+
+#include "IOV.h" // For interval-of-validity JEC
+
 // typedefs
 typedef boost::shared_ptr<fastjet::ClusterSequence>  ClusterSequencePtr;
 typedef boost::shared_ptr<fastjet::JetDefinition>    JetDefPtr;
@@ -57,7 +60,7 @@ private :
   BTagCalibration        *bcalib;
   BTagCalibrationReader  *breader_medium;
   BTagCalibrationReader  *breader_tight;
-  
+  jec::IOV *iov;
 };
 
 #endif

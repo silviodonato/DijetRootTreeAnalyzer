@@ -9,6 +9,7 @@
 #include <TVector3.h>
 
 
+
 analysisClass::analysisClass(string * inputList, string * cutFile, string * treeName, string * outputFileName, string * cutEfficFile)
   :baseClass(inputList, cutFile, treeName, outputFileName, cutEfficFile)
 {
@@ -23,46 +24,86 @@ analysisClass::analysisClass(string * inputList, string * cutFile, string * tree
     fjJetDefinition = JetDefPtr( new fastjet::JetDefinition(fastjet::kt_algorithm, rParam) );
   else 
     fjJetDefinition = JetDefPtr( new fastjet::JetDefinition(fastjet::cambridge_algorithm, rParam) );
+    
 
   // For JECs
   if( int(getPreCutValue1("useJECs"))==1 )
   {
     std::cout << "Reapplying JECs on the fly" << std::endl;
+    std::cout << "Using IOV implementation for periodic JEC..." << std::endl;
+    
+    // Using IOV JEC now. Now that's 2016. See include/IOV.h for changing versions.
+    // Note that the IOV implementation can be used with just one JEC if wanted. Juska.
+    
+    /*
+   Ranges for 2016 run periods from DAS as of 4 Nov 16.
+   Periods with no certified luminosity are omitted.
+   B-v2: 273150 - 275376
+   C-v2: 276282 - 276279
+   D-v2: 276315 - 276653
+   E-v2: 276824 - 277420
+   F-v1: 277816 - 278808
+   G-v1: 278816 - 280385
+   H-v2: 282807 - 283885
+   List obtained with commands like this:
+   [juska@lxplus069 workdir]$ das_client.py --query='run dataset=/JetHT/Run2016H-PromptReco-v2/MINIAOD' --limit 0
+    */
 
+    
+    iov = new jec::IOV("AK4PFchs");
+    iov->add("BCD",273150,276823,true); // Using start-1 of run E instead as upper
+    iov->add("E",276824,277815,true);  // Use start-1 of run F instead as upper
+    iov->add("F",277816,278801,true); // Note the division before F dataset ends as instructed by JEC group
+    iov->add("p2",278802,999999,true); // V8p2 for part of F and all of G and H
+    
+    JetCorrector_data = new FactorizedJetCorrector(); // Will be filled later
+        
+    // MC JEC done the old way for convenience. Should be updated to V8.
+    // Uncertainties also from a single file for now. My best guess was to use V8p2.
+    
+    
     std::string L1Path = "data/Spring16_25nsV3_MC/Spring16_25nsV3_MC_L1FastJet_AK4PFchs.txt";
     std::string L2Path = "data/Spring16_25nsV3_MC/Spring16_25nsV3_MC_L2Relative_AK4PFchs.txt";
     std::string L3Path = "data/Spring16_25nsV3_MC/Spring16_25nsV3_MC_L3Absolute_AK4PFchs.txt";
+    /*
     std::string L1DATAPath = "data/Spring16_25nsV6_DATA/Spring16_25nsV6_DATA_L1FastJet_AK4PFchs.txt";
     std::string L2DATAPath = "data/Spring16_25nsV6_DATA/Spring16_25nsV6_DATA_L2Relative_AK4PFchs.txt"; 
     std::string L3DATAPath = "data/Spring16_25nsV6_DATA/Spring16_25nsV6_DATA_L3Absolute_AK4PFchs.txt";
     std::string L2L3ResidualPath = "data/Spring16_25nsV6_DATA/Spring16_25nsV6_DATA_L2L3Residual_AK4PFchs.txt";
 
+    */
+    
     //uncertainty
-    unc = new JetCorrectionUncertainty("data/Spring16_25nsV6_DATA/Spring16_25nsV6_DATA_Uncertainty_AK4PFchs.txt");
-        
+    unc = new JetCorrectionUncertainty("data/Spring16_V8_DATA/Spring16_25nsV8p2_DATA_Uncertainty_AK4PFchs.txt");
+    
+    
     L1Par = new JetCorrectorParameters(L1Path);
     L2Par = new JetCorrectorParameters(L2Path);
     L3Par = new JetCorrectorParameters(L3Path);
+    /*
     L1DATAPar = new JetCorrectorParameters(L1DATAPath);
     L2DATAPar = new JetCorrectorParameters(L2DATAPath);
     L3DATAPar = new JetCorrectorParameters(L3DATAPath);
     L2L3Residual = new JetCorrectorParameters(L2L3ResidualPath);
-
+    */
 
     std::vector<JetCorrectorParameters> vPar;
-    std::vector<JetCorrectorParameters> vPar_data;
     vPar.push_back(*L1Par);
     vPar.push_back(*L2Par);
     vPar.push_back(*L3Par);
-   
+
+    /*   
     //residuals are applied only to data
+    std::vector<JetCorrectorParameters> vPar_data;
     vPar_data.push_back(*L1DATAPar);
     vPar_data.push_back(*L2DATAPar);
     vPar_data.push_back(*L3DATAPar);
     vPar_data.push_back(*L2L3Residual);
+    */
 
     JetCorrector = new FactorizedJetCorrector(vPar); assert(JetCorrector);
-    JetCorrector_data = new FactorizedJetCorrector(vPar_data); assert(JetCorrector_data);
+    //JetCorrector_data = new FactorizedJetCorrector(vPar_data); assert(JetCorrector_data);
+    
   }
 
   //load btag scale factors
@@ -222,7 +263,9 @@ void analysisClass::Loop()
 	     JetCorrector->setJetPt(jetPtAK4->at(j)/jetJecAK4->at(j)); //pTraw
 	     JetCorrector->setJetA(jetAreaAK4->at(j));
 	     JetCorrector->setRho(rho);
-
+	     
+        JetCorrector_data = iov->get(runNo); // Get IOV dependent JEC
+        
   	     JetCorrector_data->setJetEta(jetEtaAK4->at(j));
 	     JetCorrector_data->setJetPt(jetPtAK4->at(j)/jetJecAK4->at(j)); //pTraw
 	     JetCorrector_data->setJetA(jetAreaAK4->at(j));
@@ -235,7 +278,7 @@ void analysisClass::Loop()
 	     if (isData == 1) correction = JetCorrector_data->getCorrection();
 	     else correction = JetCorrector->getCorrection();
 	     //nominal_correction=correction;
-	     //old_correction = jetJecAK4->at(j);
+	     //old_correction = jetJecAK4->at(j);u
 	     //}
 	     //JEC uncertainties
 	     unc->setJetEta(jetEtaAK4->at(j));
@@ -535,7 +578,9 @@ void analysisClass::Loop()
        
        fillVariableWithValue( "jetJecAK4_j1", jecFactors[sortedJetIdx[0]] );
        fillVariableWithValue( "jetJecUncAK4_j1", jecUncertainty[sortedJetIdx[0]] );
-       fillVariableWithValue( "jetCSVAK4_j1", jetCSVAK4->at(sortedJetIdx[0]) );
+       
+       // Commented out until variable appears to big trees. Juska.
+       //fillVariableWithValue( "jetCSVAK4_j1", jetCSVAK4->at(sortedJetIdx[0]) );
        //jetID
        fillVariableWithValue( "neutrHadEnFrac_j1", jetNhfAK4->at(sortedJetIdx[0]));
        fillVariableWithValue( "chargedHadEnFrac_j1", jetChfAK4->at(sortedJetIdx[0]));
@@ -557,7 +602,8 @@ void analysisClass::Loop()
        //fillVariableWithValue( "jetPtAK4matchCaloJet_j2", jetPtAK4matchCaloJet->at(sortedJetIdx[1]));
        fillVariableWithValue( "jetJecAK4_j2", jecFactors[sortedJetIdx[1]]); 
        fillVariableWithValue( "jetJecUncAK4_j2", jecUncertainty[sortedJetIdx[1]] );
-       fillVariableWithValue( "jetCSVAK4_j2", jetCSVAK4->at(sortedJetIdx[1]) );
+       // Commented out until variable appears to big trees. Juska.
+       //fillVariableWithValue( "jetCSVAK4_j2", jetCSVAK4->at(sortedJetIdx[1]) );
        //jetID
        fillVariableWithValue( "neutrHadEnFrac_j2", jetNhfAK4->at(sortedJetIdx[1]));
        fillVariableWithValue( "chargedHadEnFrac_j2", jetChfAK4->at(sortedJetIdx[1]));
