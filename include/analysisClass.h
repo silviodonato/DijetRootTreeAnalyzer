@@ -34,6 +34,7 @@ public :
   void Loop();
 private :
   double bTagEventWeight(const vector<double>& SFsForBTaggedJets, const unsigned int nBTags);
+  void fillTriggerPlots(TH1F* h_mjj_HLTpass[], double MJJWide);
 
   ClusterSequencePtr  fjClusterSeq, fjClusterSeq_shift;
   JetDefPtr           fjJetDefinition;

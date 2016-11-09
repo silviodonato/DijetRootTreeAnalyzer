@@ -131,13 +131,19 @@ void analysisClass::Loop()
      10798, 11179, 11571, 11977, 12395, 12827, 13272, 13732, 14000};
 
    
-   char* HLTname[50] = {"noTrig","PFHT475","PFHT800","PFHT900","PFHT650MJJ900","PFHT800_OR_PFHT650MJJ900","PFHT800_noPFHT475", 
-                        "Mu45Eta2p1", "PFHT800AndMu45Eta2p1"};
+   char* HLTname[50]    = {"noTrig","PFHT475","PFHT800","PFHT900","PFHT650MJJ900","PFHT800_OR_PFHT650MJJ900","PFHT800_noPFHT475", 
+			   "Mu45Eta2p1", "PFHT800AndMu45Eta2p1"};
+
    TH1F* h_mjj_HLTpass[9];
+   TH1F* h_mjj_HLTpass_bb[9];
    char name_histoHLT[50];
+   char name_histoHLT_bb[50];
    for (int i=0; i<9; i++){  
      sprintf(name_histoHLT,"h_mjj_HLTpass_%s",HLTname[i]);
      h_mjj_HLTpass[i]= new TH1F(name_histoHLT,"",103,massBoundaries);
+
+     sprintf(name_histoHLT_bb,"h_mjj_HLTpass_bb_%s",HLTname[i]);
+     h_mjj_HLTpass_bb[i]= new TH1F(name_histoHLT_bb,"",103,massBoundaries);
    }
 
    //book histos for btagged analysis
@@ -678,24 +684,12 @@ void analysisClass::Loop()
      if (fullAnalysis)
        {
 	 h_mjj_HLTpass[0] -> Fill(MJJWide); //noTrig
-	 
+
 	 if(isData && triggerResult->size()>10) // only run on data
-	   {
-	     if(triggerResult->at(triggerMap_.find("HLT_PFHT475_v*")->second)) h_mjj_HLTpass[1] -> Fill(MJJWide);
-	     if(triggerResult->at(triggerMap_.find("HLT_PFHT475_v*")->second) && triggerResult->at(triggerMap_.find("HLT_PFHT800_v*")->second)) h_mjj_HLTpass[2] -> Fill(MJJWide); //PFHT800
-	     //if(triggerResult->at(triggerMap_.find("HLT_PFHT475_v*")->second) && triggerResult->at(triggerMap_.find("HLT_PFHT900_v*")->second)) h_mjj_HLTpass[3] -> Fill(MJJWide); //PFHT900
-	     if(triggerResult->at(triggerMap_.find("HLT_PFHT475_v*")->second) && triggerResult->at(triggerMap_.find("HLT_PFHT650_WideJetMJJ900DEtaJJ1p5_v*")->second)) h_mjj_HLTpass[4] -> Fill(MJJWide); //PFHT650MJJ900
-	     if(triggerResult->at(triggerMap_.find("HLT_PFHT475_v*")->second) && 
-		(triggerResult->at(triggerMap_.find("HLT_PFHT800_v*")->second) || triggerResult->at(triggerMap_.find("HLT_PFHT650_WideJetMJJ900DEtaJJ1p5_v*")->second)))
-	       h_mjj_HLTpass[5] -> Fill(MJJWide); //PFHT800 || PFHT650MJJ900
-	     if(triggerResult->at(triggerMap_.find("HLT_PFHT800_v*")->second)) h_mjj_HLTpass[6] -> Fill(MJJWide); //PFHT800 without PFHT475
-	     
-	     if(triggerResult->size()>16) //not called in old ntuples used for 65 pb-1 publication (Francesco, 11/09/2015)
-	       {
-		 if(triggerResult->at(triggerMap_.find("HLT_Mu45_eta2p1_v*")->second)) h_mjj_HLTpass[7] -> Fill(MJJWide); //Mu45Eta2p1
-		 if(triggerResult->at(triggerMap_.find("HLT_Mu45_eta2p1_v*")->second) && triggerResult->at(triggerMap_.find("HLT_PFHT800_v*")->second)) h_mjj_HLTpass[8] -> Fill(MJJWide); //Mu45Eta2p1 AND PFHT800
-	       }
-	   }
+	   fillTriggerPlots(h_mjj_HLTpass,MJJWide);
+	 
+	 
+
 	 //####################################################################################
 	 //######################### BTAGGED PART OF THE ANALYSIS #############################
 	 //####################################################################################
@@ -805,7 +799,11 @@ void analysisClass::Loop()
 	   h_mjj_btag0_t->Fill(MJJWide * evtWeightBtagT);
 
 	 if (njetsm == 2 && njetst==1)
-	   h_mjj_btag2_mt->Fill(MJJWide * evtWeightBtagMT);
+	   {
+	     h_mjj_btag2_mt->Fill(MJJWide * evtWeightBtagMT);
+	     if(isData && triggerResult->size()>10) // only run on data
+	       fillTriggerPlots(h_mjj_HLTpass_bb,MJJWide);
+	   }
 	 else if (njetst==1)
 	   h_mjj_btag1_mt->Fill(MJJWide * evtWeightBtagMT);
 	 else
@@ -869,6 +867,7 @@ void analysisClass::Loop()
    //////////write histos 
    for (int i=0; i<8; i++){
      h_mjj_HLTpass[i]->Write();
+     h_mjj_HLTpass_bb[i]->Write();
    }
 
    //write histos for btagged analysis
@@ -965,4 +964,24 @@ analysisClass::bTagEventWeight(const vector<double>& SFsForBTaggedJets, const un
 	}
     }
   return weight;
+}
+
+
+void
+analysisClass::fillTriggerPlots(TH1F* h_mjj_HLTpass[], double MJJWide)
+{
+  if(triggerResult->at(triggerMap_.find("HLT_PFHT475_v*")->second)) h_mjj_HLTpass[1] -> Fill(MJJWide);
+  if(triggerResult->at(triggerMap_.find("HLT_PFHT475_v*")->second) && triggerResult->at(triggerMap_.find("HLT_PFHT800_v*")->second)) h_mjj_HLTpass[2] -> Fill(MJJWide); //PFHT800
+  //if(triggerResult->at(triggerMap_.find("HLT_PFHT475_v*")->second) && triggerResult->at(triggerMap_.find("HLT_PFHT900_v*")->second)) h_mjj_HLTpass[3] -> Fill(MJJWide); //PFHT900
+  if(triggerResult->at(triggerMap_.find("HLT_PFHT475_v*")->second) && triggerResult->at(triggerMap_.find("HLT_PFHT650_WideJetMJJ900DEtaJJ1p5_v*")->second)) h_mjj_HLTpass[4] -> Fill(MJJWide); //PFHT650MJJ900
+  if(triggerResult->at(triggerMap_.find("HLT_PFHT475_v*")->second) && 
+     (triggerResult->at(triggerMap_.find("HLT_PFHT800_v*")->second) || triggerResult->at(triggerMap_.find("HLT_PFHT650_WideJetMJJ900DEtaJJ1p5_v*")->second)))
+    h_mjj_HLTpass[5] -> Fill(MJJWide); //PFHT800 || PFHT650MJJ900
+  if(triggerResult->at(triggerMap_.find("HLT_PFHT800_v*")->second)) h_mjj_HLTpass[6] -> Fill(MJJWide); //PFHT800 without PFHT475
+  
+  if(triggerResult->size()>16) //not called in old ntuples used for 65 pb-1 publication (Francesco, 11/09/2015)
+    {
+      if(triggerResult->at(triggerMap_.find("HLT_Mu45_eta2p1_v*")->second)) h_mjj_HLTpass[7] -> Fill(MJJWide); //Mu45Eta2p1
+      if(triggerResult->at(triggerMap_.find("HLT_Mu45_eta2p1_v*")->second) && triggerResult->at(triggerMap_.find("HLT_PFHT800_v*")->second)) h_mjj_HLTpass[8] -> Fill(MJJWide); //Mu45Eta2p1 AND PFHT800
+    }
 }
