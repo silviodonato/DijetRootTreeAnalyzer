@@ -15,6 +15,9 @@
 #include "fastjet/PseudoJet.hh"
 
 #include <boost/shared_ptr.hpp>
+
+#include "IOV.h" // For interval-of-validity JEC
+
 // typedefs
 typedef boost::shared_ptr<fastjet::ClusterSequence>  ClusterSequencePtr;
 typedef boost::shared_ptr<fastjet::JetDefinition>    JetDefPtr;
@@ -49,6 +52,7 @@ private :
   FactorizedJetCorrector *JetCorrector_data;
   FactorizedJetCorrector *JetCorrector_dataHLT;
   JetCorrectionUncertainty *unc;
+  jec::IOV *iov;
 };
 
 #endif

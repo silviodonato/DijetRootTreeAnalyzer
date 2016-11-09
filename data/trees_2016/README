@@ -67,10 +67,26 @@ eos/cms/store/group/phys_exotica/dijet/Dijet13TeV/woodson/reduced_skims/Scouting
 eos/cms/store/group/phys_exotica/dijet/Dijet13TeV/woodson/reduced_skims/ScoutingCaloCommissioning2016_JEC_CaloL1L2L3_PFL2L3Residual_BiasCorrected_Golden7640pb_20160709_235848/*reduced_skim.root
 
 === RECO ===
-For full 2016 dataset so far with latest JEC, please use dataset 1
+For full 2016 dataset so far with latest JEC, please use dataset 2
 
 =========================
 (Most recent production first)
+
+++++
+      2) Run2016BtoH Full Certified PromptReco Production 'moriond16 v0'
+++++
+
+JEC:
+Spring16 25nsV8 with interval-of-validity implementation for different JEC for different runs.
+See src/analysisClass_mainDijetSelection.C and include/IOV.h for full details on the used JEC.
+
+Luminosity: 33583 /pb
+processed_jsons/processedlumis_moriond16_v0_promptreco_9Nov16.json
+(used cert JSON mask from 28Oct16. Lacking 15/pb from that.)
+
+File location:
+/afs/cern.ch/user/j/juska/eos/cms/store/group/phys_exotica/dijet/Dijet13TeV/juska/moriond16_red_cert_v0/moriond16_v0_33fb_1nd_s10_30fpj_20161108_004927/*skim.root
+
 
 ++++
       1) Run2016BtoF Full Certified Production 'Fall16 round1'
