@@ -107,13 +107,20 @@ if __name__ == '__main__':
 
     haddOutputs = []
 
-    
+    print "===>>>",options.mass
+    print "len(options.mass.split(','))", len(options.mass.split(','))
+    print "list(eval(options.mass))", list(eval(options.mass))
+
     if len(options.mass.split(','))==1:
         massIterable = [options.mass]
     else:
         massIterable = list(eval(options.mass))
     for massPoint in massIterable:
         
+
+        print "MASSPOINT", massPoint
+
+
         if doSignificance and doHybridNew:
             if not glob.glob(getFileName("higgsCombineSignif",massPoint,boxInput,model,lumi,directory,"HybridNew",0)): continue
             print "INFO: opening %s"%(getFileName("higgsCombineSignif",massPoint,boxInput,model,lumi,directory,"HybridNew",0))
@@ -137,17 +144,21 @@ if __name__ == '__main__':
 
         try:
             if tFile.InheritsFrom("TFile") is False:
+                print 'tFile.InheritsFrom("TFile") is False'
                 continue
         except:
+            print 'EXCEPTION'
             continue
-            
+
         limit = tFile.Get("limit")
         try:
             if limit.InheritsFrom("TTree") is False: 
+                print 'limit.InheritsFrom("TTree") is False'
                 tFile.cd()
                 tFile.Close()
                 continue
         except:
+            print 'EXCEPTION'
             tFile.cd()
             tFile.Close()
             continue
@@ -156,6 +167,7 @@ if __name__ == '__main__':
             tFile.Close()
             continue
         if not (doSignificance or bayes) and limit.GetEntries() < 5: 
+            print 'limit.GetEntries() < 5'
             tFile.cd()
             tFile.Close()
             continue
@@ -164,8 +176,11 @@ if __name__ == '__main__':
         entry = elist.Next()
         limit.GetEntry(entry)
         limits = []
+
         while True:
-            if entry == -1: break
+            if entry == -1: 
+                print 'entry == -1'
+                break
             limit.GetEntry(entry)
                 
             if doSignificance:
