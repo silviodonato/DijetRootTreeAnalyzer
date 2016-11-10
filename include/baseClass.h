@@ -128,7 +128,7 @@ class Optimize {
 class baseClass : public rootNtupleClass {
   public :
   map<string, bool> combCutName_passed_;
-
+  map<string,int> triggerMap_;
   int passJSON(int run, int ls, bool isData);
   double getPileupWeight ( int npileup, bool this_is_data );
   void setPileupWeight ( double weight ) { PileupWeight_ = weight; } 
@@ -204,6 +204,8 @@ class baseClass : public rootNtupleClass {
   TFile * output_root_;
 
   private :
+  void getHltMap(char*);
+
   int nOptimizerCuts_;
   string * configFile_;
   string * outputFileName_;

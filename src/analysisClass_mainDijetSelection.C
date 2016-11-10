@@ -105,6 +105,25 @@ analysisClass::analysisClass(string * inputList, string * cutFile, string * tree
     //JetCorrector_data = new FactorizedJetCorrector(vPar_data); assert(JetCorrector_data);
     
   }
+
+  //load btag scale factors
+  bcalib = new BTagCalibration("CSVv2", "data/bTag_MC_ScalingFactors/CSVv2_ichep.csv");
+
+  //medium WP
+  breader_medium = new BTagCalibrationReader(BTagEntry::OP_MEDIUM,  // operating point
+					     "central",             // central sys type
+					     {"up", "down"});      // other sys types
+  breader_medium->load(*bcalib,                // calibration instance
+		       BTagEntry::FLAV_B,    // btag flavour
+		       "comb");
+  //tight WP
+  breader_tight = new BTagCalibrationReader(BTagEntry::OP_TIGHT,  // operating point
+					    "central",             // central sys type
+					    {"up", "down"});      // other sys types
+  breader_tight->load(*bcalib,                // calibration instance
+		      BTagEntry::FLAV_B,    // btag flavour
+		      "comb");
+  
   
   std::cout << "analysisClass::analysisClass(): ends " << std::endl;
 }
@@ -152,15 +171,33 @@ void analysisClass::Loop()
      4686, 4869, 5058, 5253, 5455, 5663, 5877, 6099, 6328, 6564, 6808, 7060, 7320, 7589, 7866, 8152, 8447, 8752, 9067, 9391, 9726, 10072, 10430, 
      10798, 11179, 11571, 11977, 12395, 12827, 13272, 13732, 14000};
 
+   
+   char* HLTname[50]    = {"noTrig","PFHT475","PFHT800","PFHT900","PFHT650MJJ900","PFHT800_OR_PFHT650MJJ900","PFHT800_noPFHT475", 
+			   "Mu45Eta2p1", "PFHT800AndMu45Eta2p1"};
 
-   char* HLTname[50] = {"noTrig","PFHT475","PFHT800","PFHT650MJJ900","PFHT800_OR_PFHT650MJJ900","PFHT800_noPFHT475", 
-                        "Mu45Eta2p1", "PFHT800AndMu45Eta2p1"};
-   TH1F* h_mjj_HLTpass[8];
+   TH1F* h_mjj_HLTpass[9];
+   TH1F* h_mjj_HLTpass_bb[9];
    char name_histoHLT[50];
-   for (int i=0; i<8; i++){  
+   char name_histoHLT_bb[50];
+   for (int i=0; i<9; i++){  
      sprintf(name_histoHLT,"h_mjj_HLTpass_%s",HLTname[i]);
      h_mjj_HLTpass[i]= new TH1F(name_histoHLT,"",103,massBoundaries);
+
+     sprintf(name_histoHLT_bb,"h_mjj_HLTpass_bb_%s",HLTname[i]);
+     h_mjj_HLTpass_bb[i]= new TH1F(name_histoHLT_bb,"",103,massBoundaries);
    }
+
+   //book histos for btagged analysis
+   TH1F* h_mjj_btag0_m = new TH1F("h_mjj_btag0_m","h_mjj_btag0_m",10000,0,10000);
+   TH1F* h_mjj_btag1_m = new TH1F("h_mjj_btag1_m","h_mjj_btag1_m",10000,0,10000);
+   TH1F* h_mjj_btag2_m = new TH1F("h_mjj_btag2_m","h_mjj_btag2_m",10000,0,10000);
+   TH1F* h_mjj_btag0_t = new TH1F("h_mjj_btag0_t","h_mjj_btag0_t",10000,0,10000);
+   TH1F* h_mjj_btag1_t = new TH1F("h_mjj_btag1_t","h_mjj_btag1_t",10000,0,10000);
+   TH1F* h_mjj_btag2_t = new TH1F("h_mjj_btag2_t","h_mjj_btag2_t",10000,0,10000);
+   TH1F* h_mjj_btag0_mt = new TH1F("h_mjj_btag0_mt","h_mjj_btag0_mt",10000,0,10000);
+   TH1F* h_mjj_btag1_mt = new TH1F("h_mjj_btag1_mt","h_mjj_btag1_mt",10000,0,10000);
+   TH1F* h_mjj_btag2_mt = new TH1F("h_mjj_btag2_mt","h_mjj_btag2_mt",10000,0,10000);
+
   
 
    /////////initialize variables
@@ -499,6 +536,7 @@ void analysisClass::Loop()
 	   }
        }   
 
+
      double MJJAK4 = 0; 
      double DeltaEtaJJAK4 = 0;
      double DeltaPhiJJAK4 = 0;
@@ -541,8 +579,7 @@ void analysisClass::Loop()
        fillVariableWithValue( "jetJecAK4_j1", jecFactors[sortedJetIdx[0]] );
        fillVariableWithValue( "jetJecUncAK4_j1", jecUncertainty[sortedJetIdx[0]] );
        
-       // Commented out until variable appears to big trees. Juska.
-       //fillVariableWithValue( "jetCSVAK4_j1", jetCSVAK4->at(sortedJetIdx[0]) );
+       fillVariableWithValue( "jetCSVAK4_j1", jetCSVAK4->at(sortedJetIdx[0]) );
        //jetID
        fillVariableWithValue( "neutrHadEnFrac_j1", jetNhfAK4->at(sortedJetIdx[0]));
        fillVariableWithValue( "chargedHadEnFrac_j1", jetChfAK4->at(sortedJetIdx[0]));
@@ -564,8 +601,7 @@ void analysisClass::Loop()
        //fillVariableWithValue( "jetPtAK4matchCaloJet_j2", jetPtAK4matchCaloJet->at(sortedJetIdx[1]));
        fillVariableWithValue( "jetJecAK4_j2", jecFactors[sortedJetIdx[1]]); 
        fillVariableWithValue( "jetJecUncAK4_j2", jecUncertainty[sortedJetIdx[1]] );
-       // Commented out until variable appears to big trees. Juska.
-       //fillVariableWithValue( "jetCSVAK4_j2", jetCSVAK4->at(sortedJetIdx[1]) );
+       fillVariableWithValue( "jetCSVAK4_j2", jetCSVAK4->at(sortedJetIdx[1]) );
        //jetID
        fillVariableWithValue( "neutrHadEnFrac_j2", jetNhfAK4->at(sortedJetIdx[1]));
        fillVariableWithValue( "chargedHadEnFrac_j2", jetChfAK4->at(sortedJetIdx[1]));
@@ -627,48 +663,49 @@ void analysisClass::Loop()
      fillVariableWithValue("HTAK4",HTak4);
      fillVariableWithValue("ptHat",ptHat);
 
-     // Trigger
      int NtriggerBits = triggerResult->size();
-     if( NtriggerBits > 0 && isData)
-       fillVariableWithValue("passHLT_PFHT800",triggerResult->at(0));// HLT_PFHT800_v*    
+     // if( NtriggerBits > 0 && isData )
+     //   fillVariableWithValue("passHLT_PFHT900",triggerResult->at(triggerMap_.find("HLT_PFHT900_v*")->second));
      if( NtriggerBits > 1 && isData)
-       fillVariableWithValue("passHLT_PFHT650",triggerResult->at(1));// HLT_PFHT650_v*    
-     if( NtriggerBits > 3 && isData)
-       fillVariableWithValue("passHLT_PFHT475",triggerResult->at(3));// HLT_PFHT475_v*    
-     if( NtriggerBits > 8 && isData)
-       fillVariableWithValue("passHLT_PFHT200",triggerResult->at(8));// HLT_PFHT200_v*   
+       fillVariableWithValue("passHLT_PFHT800",triggerResult->at(triggerMap_.find("HLT_PFHT800_v*")->second));
+     if( NtriggerBits > 2 && isData)
+       fillVariableWithValue("passHLT_PFHT650",triggerResult->at(triggerMap_.find("HLT_PFHT650_v*")->second));
+     if( NtriggerBits > 4 && isData)
+       fillVariableWithValue("passHLT_PFHT475",triggerResult->at(triggerMap_.find("HLT_PFHT475_v*")->second));
      if( NtriggerBits > 9 && isData)
-       fillVariableWithValue("passHLT_PFHT650MJJ950",triggerResult->at(9));// HLT_PFHT650_WideJetMJJ950DEtaJJ1p5_v*        
+       fillVariableWithValue("passHLT_PFHT200",triggerResult->at(triggerMap_.find("HLT_PFHT200_v*")->second));
      if( NtriggerBits > 10 && isData)
-       fillVariableWithValue("passHLT_PFHT650MJJ900",triggerResult->at(10));// HLT_PFHT650_WideJetMJJ900DEtaJJ1p5_v*        
+       fillVariableWithValue("passHLT_PFHT650MJJ950",triggerResult->at(triggerMap_.find("HLT_PFHT650_WideJetMJJ950DEtaJJ1p5_v*")->second));
      if( NtriggerBits > 11 && isData)
-       fillVariableWithValue("passHLT_PFJET500",triggerResult->at(11));// HLT_PFJET500_v*    
+       fillVariableWithValue("passHLT_PFHT650MJJ900",triggerResult->at(triggerMap_.find("HLT_PFHT650_WideJetMJJ900DEtaJJ1p5_v*")->second));
      if( NtriggerBits > 12 && isData)
-       fillVariableWithValue("passHLT_PFJET450",triggerResult->at(12));// HLT_PFJET450_v*    
-     if( NtriggerBits > 16 && isData)
-       fillVariableWithValue("passHLT_Mu45",triggerResult->at(16));// HLT_Mu45Eta2p1_v*    
+       fillVariableWithValue("passHLT_PFJET500",triggerResult->at(triggerMap_.find("HLT_PFJet500_v*")->second));
+     if( NtriggerBits > 13 && isData)
+       fillVariableWithValue("passHLT_PFJET450",triggerResult->at(triggerMap_.find("HLT_PFJet450_v*")->second));
      if( NtriggerBits > 17 && isData)
-       fillVariableWithValue("passHLT_AK8DiPFJet280200TrimMass30Btag",triggerResult->at(17));// HLT_AK8DiPFJet280_200_TrimMass30_BTagCSV0p45_v*    
+       fillVariableWithValue("passHLT_Mu45",triggerResult->at(triggerMap_.find("HLT_Mu45_eta2p1_v*")->second));
      if( NtriggerBits > 18 && isData)
-       fillVariableWithValue("passHLT_AK8PFHT600TriMass50Btag",triggerResult->at(18));// HLT_AK8PFHT600_TrimR0p1PT0p03Mass50_BTagCSV0p45_v*    
+       fillVariableWithValue("passHLT_AK8DiPFJet280200TrimMass30Btag",triggerResult->at(triggerMap_.find("HLT_AK8DiPFJet280_200_TrimMass30_BTagCSV0p45_v*")->second));
      if( NtriggerBits > 19 && isData)
-       fillVariableWithValue("passHLT_AK8PFHT700TriMass50",triggerResult->at(19));// HLT_AK8PFHT700_TrimR0p1PT0p03Mass50_v*   
+       fillVariableWithValue("passHLT_AK8PFHT600TriMass50Btag",triggerResult->at(triggerMap_.find("HLT_AK8PFHT600_TrimR0p1PT0p03Mass50_BTagCSV0p45_v*")->second));
      if( NtriggerBits > 20 && isData)
-       fillVariableWithValue("passHLT_AK8PFJet360TrimMass50",triggerResult->at(20));// HLT_AK8PFJet360_TrimMass30_v*   
+       fillVariableWithValue("passHLT_AK8PFHT700TriMass50",triggerResult->at(triggerMap_.find("HLT_AK8PFHT700_TrimR0p1PT0p03Mass50_v*")->second));
      if( NtriggerBits > 21 && isData)
-       fillVariableWithValue("passHLT_CaloJet500NoJetID",triggerResult->at(21));// HLT_CaloJet500_NoJetID_v*  
+       fillVariableWithValue("passHLT_AK8PFJet360TrimMass50",triggerResult->at(triggerMap_.find("HLT_AK8PFJet360_TrimMass30_v*")->second));
      if( NtriggerBits > 22 && isData)
-       fillVariableWithValue("passHLT_DiPFJetAve300HFJEC",triggerResult->at(22));// HLT_DiPFJetAve300_HFJEC_v* 
+       fillVariableWithValue("passHLT_CaloJet500NoJetID",triggerResult->at(triggerMap_.find("HLT_CaloJet500_NoJetID_v*")->second));
      if( NtriggerBits > 23 && isData)
-       fillVariableWithValue("passHLT_DiPFJetAve500",triggerResult->at(23));// HLT_DiPFJetAve500_v*
+       fillVariableWithValue("passHLT_DiPFJetAve300HFJEC",triggerResult->at(triggerMap_.find("HLT_DiPFJetAve300_HFJEC_v*")->second));
      if( NtriggerBits > 24 && isData)
-       fillVariableWithValue("passHLT_PFHT400SixJet30Btag",triggerResult->at(24));// HLT_PFHT400_SixJet30_BTagCSV0p55_2PFBTagCSV0p72_v*
+       fillVariableWithValue("passHLT_DiPFJetAve500",triggerResult->at(triggerMap_.find("HLT_DiPFJetAve500_v*")->second));
      if( NtriggerBits > 25 && isData)
-       fillVariableWithValue("passHLT_PFHT450SixJet40Btag",triggerResult->at(25));// HLT_PFHT450_SixJet40_PFBTagCSV0p72_v*
+       fillVariableWithValue("passHLT_PFHT400SixJet30Btag",triggerResult->at(triggerMap_.find("HLT_PFHT400_SixJet30_BTagCSV0p55_2PFBTagCSV0p72_v*")->second));
      if( NtriggerBits > 26 && isData)
-       fillVariableWithValue("passHLT_PFHT750FourJetPt50",triggerResult->at(26));// HLT_PFHT750_4JetPt50_v*
+       fillVariableWithValue("passHLT_PFHT450SixJet40Btag",triggerResult->at(triggerMap_.find("HLT_PFHT450_SixJet40_PFBTagCSV0p72_v*")->second));
      if( NtriggerBits > 27 && isData)
-       fillVariableWithValue("passHLT_QuadPFJetVBF",triggerResult->at(27));// HLT_QuadPFJet_VBF_v*
+       fillVariableWithValue("passHLT_PFHT750FourJetPt50",triggerResult->at(triggerMap_.find("HLT_PFHT750_4JetPt50_v*")->second));
+     if( NtriggerBits > 28 && isData)
+       fillVariableWithValue("passHLT_QuadPFJetVBF",triggerResult->at(triggerMap_.find("HLT_QuadPFJet_VBF_v*")->second));
 
 
      // Evaluate cuts (but do not apply them)
@@ -676,36 +713,150 @@ void analysisClass::Loop()
      
      // optional call to fill a skim with the full content of the input roottuple
      //if( passedCut("nJetFinal") ) fillSkimTree();
-     if( passedCut("PassJSON")
-	 && passedCut("nVtx") 
-	 && passedCut("IdTight_j1")
-	 && passedCut("IdTight_j2")
-	 && passedCut("nJet")
-	 && passedCut("pTWJ_j1")
-	 && passedCut("etaWJ_j1")
-	 && passedCut("pTWJ_j2")
-	 && passedCut("etaWJ_j2")
-	 && getVariableValue("deltaETAjj") <  getPreCutValue1("DetaJJforTrig") ){
 
-       h_mjj_HLTpass[0] -> Fill(MJJWide); 
-       
-       if(isData && triggerResult->size()>10) // only run on data
-	 {
-	   if(triggerResult->at(3)) h_mjj_HLTpass[1] -> Fill(MJJWide); //PFHT475
-	   if(triggerResult->at(3) && triggerResult->at(0)) h_mjj_HLTpass[2] -> Fill(MJJWide); //PFHT800
-	   if(triggerResult->at(3) && triggerResult->at(10)) h_mjj_HLTpass[3] -> Fill(MJJWide); //PFHT650MJJ900
-	   if(triggerResult->at(3) && (triggerResult->at(0) || triggerResult->at(10))) h_mjj_HLTpass[4] -> Fill(MJJWide); //PFHT800 && PFHT650MJJ900
-	   if(triggerResult->at(0)) h_mjj_HLTpass[5] -> Fill(MJJWide); //PFHT800 without PFHT475
+     bool fullAnalysis = ( passedCut("PassJSON")
+			   && passedCut("nVtx") 
+			   && passedCut("IdTight_j1")
+			   && passedCut("IdTight_j2")
+			   && passedCut("nJet")
+			   && passedCut("pTWJ_j1")
+			   && passedCut("etaWJ_j1")
+			   && passedCut("pTWJ_j2")
+			   && passedCut("etaWJ_j2")
+			   && getVariableValue("deltaETAjj") <  getPreCutValue1("DetaJJforTrig") );
 
-	   if(triggerResult->size()>16) //not called in old ntuples used for 65 pb-1 publication (Francesco, 11/09/2015)
-	     {
-	       if(triggerResult->at(16)) h_mjj_HLTpass[6] -> Fill(MJJWide); //Mu45Eta2p1
-	       if(triggerResult->at(16) && triggerResult->at(0)) h_mjj_HLTpass[7] -> Fill(MJJWide); //Mu45Eta2p1 AND PFHT800
-	     }
-	 }
-       //std::cout << "triggerResult->at(3) = " << triggerResult->at(3) << "  triggerResult->at(0) = " << triggerResult->at(0) << "  triggerResult->at(5) = " << triggerResult->at(5) << std::endl;
-     }
+     if (fullAnalysis)
+       {
+	 h_mjj_HLTpass[0] -> Fill(MJJWide); //noTrig
 
+	 if(isData && triggerResult->size()>10) // only run on data
+	   fillTriggerPlots(h_mjj_HLTpass,MJJWide);
+	 
+	 
+
+	 //####################################################################################
+	 //######################### BTAGGED PART OF THE ANALYSIS #############################
+	 //####################################################################################
+	 int njetsm = 0;
+	 int njetst = 0;
+	 
+	 double evtWeightBtagM = 1.;
+	 double evtWeightBtagT = 1.;
+	 double evtWeightBtagMT = 1.;
+
+	 int nExpBtag = 0;
+
+	 std::vector<double> SFAK4M;
+	 std::vector<double> SFAK4T;
+	 std::vector<double> SFAK4MT;
+
+	 //JET1 MEDIUM
+	 if (getVariableValue("jetCSVAK4_j1") > getPreCutValue1("CSVv2M"))
+	   {
+	     ++njetsm;
+	     if(!isData)
+	       {
+		 double tmpSF = breader_medium->eval_auto_bounds("central",
+								 BTagEntry::FLAV_B,
+								 ak4j1.Eta(),
+								 ak4j1.Pt());
+		 
+		 SFAK4M.push_back(tmpSF);				  
+		 SFAK4MT.push_back(tmpSF);
+	       }
+	   }
+	 //JET2 MEDIUM
+	 if (getVariableValue("jetCSVAK4_j2") > getPreCutValue1("CSVv2M"))
+	   {
+	     ++njetsm;
+	     if(!isData)
+	       {
+		 
+		 double tmpSF = breader_medium->eval_auto_bounds("central",
+								 BTagEntry::FLAV_B,
+								 ak4j2.Eta(),
+								 ak4j2.Pt());
+		 SFAK4M.push_back(tmpSF);
+		 SFAK4MT.push_back(tmpSF);
+	       }
+	   }
+
+	 //JET1 TIGHT
+	 if (getVariableValue("jetCSVAK4_j1") > getPreCutValue1("CSVv2T"))
+	   {
+	     ++njetst;
+	     if(!isData)
+	       {
+		 double tmpSF =  breader_tight->eval_auto_bounds("central",
+								 BTagEntry::FLAV_B,
+								 ak4j1.Eta(),
+								 ak4j1.Pt());
+
+		 SFAK4T.push_back(tmpSF);
+		 SFAK4MT[0] = tmpSF;
+	       }
+	   }
+	 //JET2 TIGHT
+	 if (getVariableValue("jetCSVAK4_j2") > getPreCutValue1("CSVv2T"))
+	   {
+	     ++njetst;
+	     if(!isData)
+	       {
+		 double tmpSF = breader_tight->eval_auto_bounds("central",
+								BTagEntry::FLAV_B,
+								ak4j2.Eta(),
+								ak4j2.Pt());
+
+		 SFAK4T.push_back(tmpSF);
+		 SFAK4MT[1] = tmpSF;
+	       }
+	   }
+
+
+
+	 if(!isData)
+	   {
+	     if(hFlavourAK4->at(sortedJetIdx[0]) == 5)
+	       ++nExpBtag;
+	     if(hFlavourAK4->at(sortedJetIdx[1]) == 5)
+	       ++nExpBtag;
+
+	     evtWeightBtagM = bTagEventWeight(SFAK4M, nExpBtag);
+	     evtWeightBtagT = bTagEventWeight(SFAK4T, nExpBtag);
+	     evtWeightBtagMT = bTagEventWeight(SFAK4MT, nExpBtag);
+	   }
+
+
+	 //fill histos in categories
+	 if (njetsm == 1)
+	   h_mjj_btag1_m->Fill(MJJWide * evtWeightBtagM);
+	 else if (njetsm == 2)
+	   h_mjj_btag2_m->Fill(MJJWide * evtWeightBtagM);
+	 else
+	   h_mjj_btag0_m->Fill(MJJWide * evtWeightBtagM);
+
+	 if (njetst == 1)
+	   h_mjj_btag1_t->Fill(MJJWide * evtWeightBtagT);
+	 else if (njetst == 2)
+	   h_mjj_btag2_t->Fill(MJJWide * evtWeightBtagT);
+	 else
+	   h_mjj_btag0_t->Fill(MJJWide * evtWeightBtagT);
+
+	 if (njetsm == 2 && njetst==1)
+	   {
+	     h_mjj_btag2_mt->Fill(MJJWide * evtWeightBtagMT);
+	     if(isData && triggerResult->size()>10) // only run on data
+	       fillTriggerPlots(h_mjj_HLTpass_bb,MJJWide);
+	   }
+	 else if (njetst==1)
+	   h_mjj_btag1_mt->Fill(MJJWide * evtWeightBtagMT);
+	 else
+	   h_mjj_btag0_mt->Fill(MJJWide * evtWeightBtagMT);
+
+
+       } //end full analysis including deltaEta
+
+     
      // optional call to fill a skim with a subset of the variables defined in the cutFile (use flag SAVE)
      if( passedAllPreviousCuts("mjj") && passedCut("mjj") ) 
        {
@@ -760,7 +911,19 @@ void analysisClass::Loop()
    //////////write histos 
    for (int i=0; i<8; i++){
      h_mjj_HLTpass[i]->Write();
+     h_mjj_HLTpass_bb[i]->Write();
    }
+
+   //write histos for btagged analysis
+   h_mjj_btag0_m->Write();
+   h_mjj_btag1_m->Write();
+   h_mjj_btag2_m->Write();
+   h_mjj_btag0_t->Write();
+   h_mjj_btag1_t->Write();
+   h_mjj_btag2_t->Write();
+   h_mjj_btag0_mt->Write();
+   h_mjj_btag1_mt->Write();
+   h_mjj_btag2_mt->Write();
 
    // h_nVtx->Write();
    // h_trueVtx->Write();
@@ -780,4 +943,89 @@ void analysisClass::Loop()
    // //one could also do:   const TH1F& h = getHisto_noCuts_or_skim// and use h
 
    std::cout << "analysisClass::Loop() ends" <<std::endl;   
-   }
+}
+
+
+
+// ------------ method that calculates the event weight based on the number of b-tagged jets in MC and the expected number of b-tags among the two leading jets  ------------
+double
+analysisClass::bTagEventWeight(const vector<double>& SFsForBTaggedJets, const unsigned int nBTags)
+{
+  if( SFsForBTaggedJets.size() > 2 )
+    {
+      std::cout << "Only two leading jets are considered. Hence, the number of b-tagged jets cannot exceed 2.";
+      return 1;
+    }
+  if( nBTags > 2 )
+    {
+      std::cout << "Only two leading jets are considered. Hence, the number of b-tags cannot exceed 2.";
+      return 1;
+    }
+  /*
+    ##################################################################
+    Event weight matrix:
+    ------------------------------------------------------------------
+    nBTags\b-tagged jets  |    0        1             2
+    ------------------------------------------------------------------
+      0                   |    1      1-SF      (1-SF1)(1-SF2)
+                          |
+      1                   |    0       SF    SF1(1-SF2)+(1-SF1)SF2
+                          |
+      2                   |    0        0           SF1SF2
+    ##################################################################
+  */
+  
+  if( nBTags > SFsForBTaggedJets.size() ) return 0;
+
+  if( nBTags==0 && SFsForBTaggedJets.size()==0 ) return 1;
+
+  double weight = 0;
+
+  if( SFsForBTaggedJets.size()==1 )
+    {
+      double SF = SFsForBTaggedJets.at(0);
+
+      for( unsigned int i=0; i<=1; ++i )
+	{
+	  if( i != nBTags ) continue;
+
+	  weight += pow(SF,i)*pow(1-SF,1-i);
+	}
+    }
+  else if( SFsForBTaggedJets.size()==2 )
+    {
+      double SF1 = SFsForBTaggedJets.at(0);
+      double SF2 = SFsForBTaggedJets.at(1);
+    
+      for( unsigned int i=0; i<=1; ++i )
+	{
+	  for( unsigned int j=0; j<=1; ++j )
+	    {
+	      if( (i+j) != nBTags ) continue;
+
+	      weight += pow(SF1,i)*pow(1-SF1,1-i)*pow(SF2,j)*pow(1-SF2,1-j);
+	    }
+	}
+    }
+  return weight;
+}
+
+
+void
+analysisClass::fillTriggerPlots(TH1F* h_mjj_HLTpass[], double MJJWide)
+{
+  if(triggerResult->at(triggerMap_.find("HLT_PFHT475_v*")->second)) h_mjj_HLTpass[1] -> Fill(MJJWide);
+  if(triggerResult->at(triggerMap_.find("HLT_PFHT475_v*")->second) && triggerResult->at(triggerMap_.find("HLT_PFHT800_v*")->second)) h_mjj_HLTpass[2] -> Fill(MJJWide); //PFHT800
+  //if(triggerResult->at(triggerMap_.find("HLT_PFHT475_v*")->second) && triggerResult->at(triggerMap_.find("HLT_PFHT900_v*")->second)) h_mjj_HLTpass[3] -> Fill(MJJWide); //PFHT900
+  if(triggerResult->at(triggerMap_.find("HLT_PFHT475_v*")->second) && triggerResult->at(triggerMap_.find("HLT_PFHT650_WideJetMJJ900DEtaJJ1p5_v*")->second)) h_mjj_HLTpass[4] -> Fill(MJJWide); //PFHT650MJJ900
+  if(triggerResult->at(triggerMap_.find("HLT_PFHT475_v*")->second) && 
+     (triggerResult->at(triggerMap_.find("HLT_PFHT800_v*")->second) || triggerResult->at(triggerMap_.find("HLT_PFHT650_WideJetMJJ900DEtaJJ1p5_v*")->second)))
+    h_mjj_HLTpass[5] -> Fill(MJJWide); //PFHT800 || PFHT650MJJ900
+  if(triggerResult->at(triggerMap_.find("HLT_PFHT800_v*")->second)) h_mjj_HLTpass[6] -> Fill(MJJWide); //PFHT800 without PFHT475
+  
+  if(triggerResult->size()>16) //not called in old ntuples used for 65 pb-1 publication (Francesco, 11/09/2015)
+    {
+      if(triggerResult->at(triggerMap_.find("HLT_Mu45_eta2p1_v*")->second)) h_mjj_HLTpass[7] -> Fill(MJJWide); //Mu45Eta2p1
+      if(triggerResult->at(triggerMap_.find("HLT_Mu45_eta2p1_v*")->second) && triggerResult->at(triggerMap_.find("HLT_PFHT800_v*")->second)) h_mjj_HLTpass[8] -> Fill(MJJWide); //Mu45Eta2p1 AND PFHT800
+    }
+}
