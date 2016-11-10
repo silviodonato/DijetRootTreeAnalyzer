@@ -205,11 +205,17 @@ def main(options,args):
             signalDsName = 'inputs/ResonanceShapes_%s_13TeV_CaloScouting_Spring16.root'%model
         elif box=='PFDijet2016':
             signalDsName = 'inputs/ResonanceShapes_%s_13TeV_Spring16.root'%model
+        elif 'PFDijetbb2016' in box:
+            signalDsName = 'inputs/ResonanceShapes_%s_13TeV_Spring16.root'%model
             
         backgroundDsName = {'CaloDijet2015':'inputs/data_CaloScoutingHT_Run2015D_BiasCorrected_CaloDijet2015.root',
                             'CaloDijet2016':'inputs/data_CaloScoutingHT_Run2016BCD_NewBiasCorrectedFlat_Golden12910pb_CaloDijet2016.root',
-                            'PFDijet2016':'inputs/data_PFRECOHT_Run2016BCD_Golden12910pb_PFDijet2016.root',
-                            'CaloDijet20152016':'inputs/data_CaloScoutingHT_Run2015D2016B_CaloDijet20152016.root'
+                            #'PFDijet2016':'inputs/data_PFRECOHT_Run2016BCD_Golden12910pb_PFDijet2016.root',
+                            'CaloDijet20152016':'inputs/data_CaloScoutingHT_Run2015D2016B_CaloDijet20152016.root',
+                            'PFDijet2016':'inputs/20fb_btag.root',
+                            'PFDijetbb20160mt':'inputs/20fb_btag.root',
+                            'PFDijetbb20161mt':'inputs/20fb_btag.root',
+                            'PFDijetbb20162mt':'inputs/20fb_btag.root'
                             }
 
         blindString = ''
@@ -360,6 +366,7 @@ if __name__ == '__main__':
 
 
     (options,args) = parser.parse_args()
+
 
     if options.jobs:
         submit_jobs(options,args)

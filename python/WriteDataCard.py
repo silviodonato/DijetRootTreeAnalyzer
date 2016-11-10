@@ -356,6 +356,7 @@ if __name__ == '__main__':
     signalFileName = ''
     model = options.model
     massPoint = options.mass
+    histoName = cfg.getVariables(box, "histoName")
 
     myTH1 = None
     for f in args:
@@ -365,10 +366,8 @@ if __name__ == '__main__':
             else:
                 rootFile = rt.TFile(f)                
                 names = [k.GetName() for k in rootFile.GetListOfKeys()]
-                if 'h_mjj_HLTpass_HT250_1GeVbin' in names:
-                    myTH1 = rootFile.Get('h_mjj_HLTpass_HT250_1GeVbin')
-                elif 'mjj_gev' in names:
-                    myTH1 = rootFile.Get('mjj_gev')
+                if histoName in names:
+                    myTH1 = rootFile.Get(histoName)
                     myTH1.Print('v')
 
     w = rt.RooWorkspace("w"+box)

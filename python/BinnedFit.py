@@ -48,7 +48,7 @@ def effFit(pdf, data, conditionalObs):
     fr = m2.save()
     return fr
 
-0
+
 
 def simFit(pdf, data, fitRange, effPdf, effData, conditionalObs):
     

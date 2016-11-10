@@ -26,7 +26,7 @@ else:
     lumi = 1
 #massMin = 453
 #massMax = 2037
-massMin = 1300
+massMin = 1181
 massMax = 7866 
 blindRegionMassMin = 0
 #blindRegionMassMin = 649
@@ -160,7 +160,7 @@ def main():
     # background model
     norm = RooRealVar('norm', 'norm', dataInt, 0.0, 1.0e9)
     p1 = RooRealVar('p1', 'p1', 10 , -10., 100.0)
-    p2 = RooRealVar('p2', 'p2', 5  , 0., 50.0)
+    p2 = RooRealVar('p2', 'p2', 5  , 0., 60.0)
     p3 = RooRealVar('p3', 'p3', 0   -10.0, 10.0)
     #p3.setConstant
     background = RooGenericPdf('background','(pow(1-@0/%.1f,@1)/pow(@0/%.1f,@2+@3*log(@0/%.1f)))'%(sqrtS,sqrtS,sqrtS),RooArgList(mjj,p1,p2,p3))
