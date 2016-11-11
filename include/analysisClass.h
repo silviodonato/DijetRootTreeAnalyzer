@@ -15,6 +15,9 @@
 #include "fastjet/PseudoJet.hh"
 
 #include <boost/shared_ptr.hpp>
+
+#include "IOV.h" // For interval-of-validity JEC
+
 // typedefs
 typedef boost::shared_ptr<fastjet::ClusterSequence>  ClusterSequencePtr;
 typedef boost::shared_ptr<fastjet::JetDefinition>    JetDefPtr;
@@ -22,6 +25,8 @@ typedef boost::shared_ptr<fastjet::JetDefinition>    JetDefPtr;
 #include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
 #include "CondFormats/JetMETObjects/interface/FactorizedJetCorrector.h"
 #include "CondFormats/JetMETObjects/interface/JetCorrectionUncertainty.h"
+#include "CondTools/BTau/interface/BTagCalibrationReader.h"
+#include "CondFormats/BTauObjects/interface/BTagCalibration.h"
 
 using namespace std;
 
@@ -31,6 +36,9 @@ public :
   virtual ~analysisClass();
   void Loop();
 private :
+  double bTagEventWeight(const vector<double>& SFsForBTaggedJets, const unsigned int nBTags);
+  void fillTriggerPlots(TH1F* h_mjj_HLTpass[], double MJJWide);
+
   ClusterSequencePtr  fjClusterSeq, fjClusterSeq_shift;
   JetDefPtr           fjJetDefinition;
   // For JECs
@@ -49,6 +57,10 @@ private :
   FactorizedJetCorrector *JetCorrector_data;
   FactorizedJetCorrector *JetCorrector_dataHLT;
   JetCorrectionUncertainty *unc;
+  BTagCalibration        *bcalib;
+  BTagCalibrationReader  *breader_medium;
+  BTagCalibrationReader  *breader_tight;
+  jec::IOV *iov;
 };
 
 #endif

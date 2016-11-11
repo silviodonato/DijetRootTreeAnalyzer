@@ -48,7 +48,7 @@ def effFit(pdf, data, conditionalObs):
     fr = m2.save()
     return fr
 
-0
+
 
 def simFit(pdf, data, fitRange, effPdf, effData, conditionalObs):
     
@@ -262,6 +262,7 @@ if __name__ == '__main__':
     noFit = options.noFit
     fitRegion = options.fitRegion
     plotRegion = options.plotRegion
+    histoName = cfg.getVariables(box, "histoName")
 
     if options.signalFileName==None:
         signalFileNames = []
@@ -289,10 +290,8 @@ if __name__ == '__main__':
         if f.lower().endswith('.root'):
             rootFile = rt.TFile(f)
             names = [k.GetName() for k in rootFile.GetListOfKeys()]
-            if 'h_mjj_HLTpass_HT250_1GeVbin' in names:
-                myTH1 = rootFile.Get('h_mjj_HLTpass_HT250_1GeVbin')
-            elif 'mjj_gev' in names:
-                myTH1 = rootFile.Get('mjj_gev')
+            if histoName in names:
+                myTH1 = rootFile.Get(histoName)
     if myTH1 is None:
         print "give a root file as input"
 

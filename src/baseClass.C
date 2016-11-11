@@ -157,6 +157,10 @@ int baseClass::readInputList()
 	  NBeforeSkim = getGlobalInfoNstart(pName);
 	  NBeforeSkim_ = NBeforeSkim_ + NBeforeSkim;
 	  STDOUT("Initial number of events: NBeforeSkim, NBeforeSkim_ = "<<NBeforeSkim<<", "<<NBeforeSkim_);
+
+	  //retrieve HLT paths names from the first file
+	  if(count_line == 1)
+	    getHltMap(pName);
 	}
 
       tree_ = chain;
@@ -1668,4 +1672,22 @@ void baseClass::fillTriggerVariable ( const char * hlt_path, const char* variabl
   int prescale = triggerPrescale(hlt_path);
   if ( triggerFired (hlt_path) ) fillVariableWithValue(variable_name, prescale      ) ; 
   else                           fillVariableWithValue(variable_name, prescale * -1 ) ;
+}
+
+void baseClass::getHltMap(char* fileName) {
+
+  STDOUT("getHltMap: " << fileName);
+  TFile *f = TFile::Open(fileName);
+  TH1F* triggerNames = (TH1F*)f->Get("dijets/TriggerNames");
+
+  if(!triggerNames)
+    {
+      STDOUT("TriggerNames histo not found");
+      return;
+    }
+
+  for (int ii=1; ii<=triggerNames->GetNbinsX();++ii)
+    triggerMap_[triggerNames->GetXaxis()->GetBinLabel(ii)] = ii-1;
+
+  return;
 }
