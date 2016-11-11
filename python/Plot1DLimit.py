@@ -30,8 +30,10 @@ def getThyXsecDict():
         f.close()
 
         thyXsecDict['AxigluonkNLO'] = {}
-        for (mass,thyXsec) in thyXsecDict['Axigluon'].iteritems():
-            thyXsecDict['AxigluonkNLO'][mass] = 1.08 * thyXsec
+    for (mass,thyXsec) in thyXsecDict['Axigluon'].iteritems():
+        thyXsecDict['AxigluonkNLO'][mass] = 1.08 * thyXsec
+    for (mass,thyXsec) in thyXsecDict['DM1GeV'].iteritems():
+        thyXsecDict['DM1GeV'][mass] = (5./6.) * thyXsec
     return thyXsecDict
 
 
@@ -289,7 +291,7 @@ if __name__ == '__main__':
         else:
             thyModelsToDraw = []
     elif options.model=='qq':        
-        if 'PF' in Box:
+        if 'PF' in options.box:
             thyModelsToDraw = ['AxigluonNLO','E6Diquark',"W'","Z'",'DM1GeV']            
         else:
             thyModelsToDraw = ['AxigluonkNLO','E6Diquark',"W'","Z'",'DM1GeV']            
@@ -350,16 +352,16 @@ if __name__ == '__main__':
         
     legendLabel = {'RSGravitonGG':'RS graviton (gg#rightarrowG#rightarrowgg)',
                    'RSGraviton':'RS graviton',
-                   'Axigluon': 'Axiguon/coloron',
-                   'AxigluonkNLO': 'Axiguon/coloron',
-                   'AxigluonNLO': 'Axiguon/coloron',
+                   'Axigluon':     'Axiguon/coloron      ',
+                   'AxigluonkNLO': 'Axiguon/coloron      ',
+                   'AxigluonNLO':  'Axiguon/coloron      ',
                    'E6Diquark':'Scalar diquark',
-                   'S8':'Color-octet scalar (k_{s}^{2} = 1/2)',
+                   'S8':'Color-octet scalar (k_{s}^{2} = 1/2) ',
                    #'S8':'Color-octet scalar',
                    'None': '',
                    "W'": "W'",
                    "Z'": "Z'",
-                   "DM1GeV": "DM Mediator",
+                   "DM1GeV": "DM mediator",
                     "String": "String",
                     "q*": "Excited quark",
                    'gg':'gluon-gluon',
@@ -411,9 +413,9 @@ if __name__ == '__main__':
     expectedLimit_plus2sigma = {}
     
     if options.doSignificance:
-        h_limit.SetTitle(" ;Resonance Mass [GeV];Local Significance n#sigma")
+        h_limit.SetTitle(" ;Resonance mass [GeV];Local significance n#sigma")
     else:
-        h_limit.SetTitle(" ;Resonance Mass [GeV]; #sigma B A [pb]")
+        h_limit.SetTitle(" ;Resonance mass [GeV]; #sigma #times #bf{#it{#Beta}} #times #bf{#it{#Alpha}} [pb]")
 
     for Box in Boxes:
         for model in models:
@@ -448,14 +450,18 @@ if __name__ == '__main__':
                 gr_expectedLimit[(Box,model)].SetLineColor(lineColor[model])
 
             gr_expectedLimit2sigma[(Box,model)] = rt.TGraphAsymmErrors(nPoints, gluinoMassArray[(Box,model)], expectedLimit[(Box,model)], gluinoMassArray_er[(Box,model)], gluinoMassArray_er[(Box,model)], expectedLimit_minus2sigma[(Box,model)], expectedLimit_plus2sigma[(Box,model)])
-            gr_expectedLimit2sigma[(Box,model)].SetLineColor(5)
-            gr_expectedLimit2sigma[(Box,model)].SetFillColor(5)
+            #gr_expectedLimit2sigma[(Box,model)].SetLineColor(5)
+            #gr_expectedLimit2sigma[(Box,model)].SetFillColor(5)
+            gr_expectedLimit2sigma[(Box,model)].SetLineColor(rt.kOrange)
+            gr_expectedLimit2sigma[(Box,model)].SetFillColor(rt.kOrange)
             gr_expectedLimit2sigma[(Box,model)].SetFillStyle(1001)
 
             gr_expectedLimit1sigma[(Box,model)] = rt.TGraphAsymmErrors(nPoints, gluinoMassArray[(Box,model)], expectedLimit[(Box,model)], gluinoMassArray_er[(Box,model)], gluinoMassArray_er[(Box,model)], expectedLimit_minus1sigma[(Box,model)], expectedLimit_plus1sigma[(Box,model)])
 
-            gr_expectedLimit1sigma[(Box,model)].SetLineColor(rt.kGreen-7)
-            gr_expectedLimit1sigma[(Box,model)].SetFillColor(rt.kGreen-7)
+            #gr_expectedLimit1sigma[(Box,model)].SetLineColor(rt.kGreen-7)
+            #gr_expectedLimit1sigma[(Box,model)].SetFillColor(rt.kGreen-7)
+            gr_expectedLimit1sigma[(Box,model)].SetLineColor(rt.kGreen+1)
+            gr_expectedLimit1sigma[(Box,model)].SetFillColor(rt.kGreen+1)
 
             if len(models)==1:
                 h_limit.Add(gr_expectedLimit2sigma[(Box,model)])
@@ -513,29 +519,35 @@ if __name__ == '__main__':
     l.SetTextSize(0.045)
     l.SetNDC()
     l.SetTextFont(62)
-    l.DrawLatex(0.17,0.92,"CMS")
+    #l.DrawLatex(0.17,0.92,"CMS")    
+    if len(Boxes)>1 and len(models)>1:
+        l.DrawLatex(0.3,0.77,"CMS")
+    elif len(Boxes)>1:
+        l.DrawLatex(0.41,0.835,"CMS")
+    else:
+        l.DrawLatex(0.2,0.835,"CMS")
         
     l.SetTextFont(52)
-    l.DrawLatex(0.28,0.92,"Preliminary")
+    #l.DrawLatex(0.28,0.92,"Preliminary")
     l.SetTextFont(42)
     #l.DrawLatex(0.65,0.92,"%.0f pb^{-1} (13 TeV)"%(options.lumi*1000))
     l.DrawLatex(0.63,0.92,"%.1f fb^{-1} (13 TeV)"%(options.lumi))
     
     if options.model=="gg":
         if len(Boxes)>1:
-            l.DrawLatex(0.3,0.79,"gluon-gluon")
+            l.DrawLatex(0.3,0.77,"gluon-gluon")
         else:
-            l.DrawLatex(0.3,0.835,"gluon-gluon")
+            l.DrawLatex(0.3,0.77,"gluon-gluon")
     elif options.model=="qg":        
         if len(Boxes)>1:
-            l.DrawLatex(0.3,0.79,"quark-gluon")
+            l.DrawLatex(0.3,0.77,"quark-gluon")
         else:
-            l.DrawLatex(0.3,0.835,"quark-gluon")
+            l.DrawLatex(0.3,0.77,"quark-gluon")
     elif options.model=="qq":
         if len(Boxes)>1:
-            l.DrawLatex(0.3,0.79,"quark-quark")
+            l.DrawLatex(0.3,0.77,"quark-quark")
         else:
-            l.DrawLatex(0.3,0.835,"quark-quark")
+            l.DrawLatex(0.3,0.77,"quark-quark")
     elif options.model=="gaus":
         l.SetTextSize(0.04)
         if len(Boxes)>1:
@@ -546,9 +558,9 @@ if __name__ == '__main__':
     elif options.model=="gaus10":
         l.SetTextSize(0.04)
         if len(Boxes)>1:
-            l.DrawLatex(0.2,0.79,"Gaussian, 10% width")
+            l.DrawLatex(0.3,0.79,"#splitline{Gaussian}{10% width}")
         else:            
-            l.DrawLatex(0.2,0.835,"Gaussian, 10% width")
+            l.DrawLatex(0.3,0.77,"#splitline{Gaussian}{10% width}")
         l.SetTextSize(0.045)
 
     #if options.bayes:
@@ -564,27 +576,30 @@ if __name__ == '__main__':
 
     if options.doSignificance:
         c.SetGridy()
-        leg = rt.TLegend(0.55,0.79,0.92,0.87)
+        leg = rt.TLegend(0.55,0.79,0.92,0.87)      
+    elif options.model =="gg_qg_qq" and options.box=="CaloDijet2016_PFDijet2016":
+        leg = rt.TLegend(0.19,0.17,0.57,0.35)        
     else:        
         leg = rt.TLegend(0.55,0.68,0.92,0.87)
     
     leg.SetTextFont(42)
     leg.SetFillColorAlpha(0,0)
     leg.SetLineColor(0)
-
+    if not options.doSignificance:
+        leg.SetHeader("95% CL limits")
     if len(models)==1:
         if options.doSignificance:
             leg.AddEntry(gr_observedLimit[(Box,model)], "Observed","lp")
         else:
-            leg.AddEntry(None,"95% CL limits","")
+            #leg.AddEntry(None,"95% CL limits","")
             #leg.AddEntry(None,"90% CL limits","")
             leg.AddEntry(gr_observedLimit[(Box,model)], "Observed","lp")
         if not options.doSignificance:
-            leg.AddEntry(gr_expectedLimit1sigma[(Box,model)], "Expected #pm 1#sigma","lf")    
+            leg.AddEntry(gr_expectedLimit1sigma[(Box,model)], "Expected #pm 1 s.d.","lf")    
         if not options.doSignificance:
-            leg.AddEntry(gr_expectedLimit2sigma[(Box,model)], "Expected #pm 2#sigma","lf")
+            leg.AddEntry(gr_expectedLimit2sigma[(Box,model)], "Expected #pm 2 s.d.","lf")
     else:
-        leg.AddEntry(None,"95% CL limits","")
+        #leg.AddEntry(None,"95% CL limits","")
         #leg.AddEntry(None,"90% CL limits","")
         for model in models:
             leg.AddEntry(gr_observedLimit[(Box,model)], legendLabel[model],"lp")
@@ -592,8 +607,18 @@ if __name__ == '__main__':
     leg.Draw("SAME")
         
     if len(thyModelsToDraw)>0 and not options.doSignificance:        
-        if options.model=="gg_qg_qq":
-            legThyModel = rt.TLegend(0.2,0.17,0.55,0.45)
+        if options.model =="gg_qg_qq" and options.box=="CaloDijet2016_PFDijet2016":
+            #legThyModel = rt.TLegend(0.2,0.17,0.55,0.45)
+            legThyModel = rt.TLegend(0.45,0.7,0.9,0.92)
+            legThyModel2 = rt.TLegend(0.55,0.54,0.9,0.7)            
+            legThyModel2.SetTextFont(42)
+            legThyModel2.SetFillColor(rt.kWhite)
+            legThyModel2.SetLineColor(rt.kWhite)
+            legThyModel2.SetFillColorAlpha(0,0)
+            legThyModel2.SetLineColorAlpha(0,0)
+        elif options.model =="gg":
+            #legThyModel = rt.TLegend(0.2,0.17,0.6,0.4)
+            legThyModel = rt.TLegend(0.2,0.17,0.7,0.4)
         else:
             legThyModel = rt.TLegend(0.2,0.17,0.55,0.4)
         legThyModel.SetTextFont(42)
@@ -604,9 +629,23 @@ if __name__ == '__main__':
         
         if model=='qq':
             legThyModel.AddEntry(None,"","")
-        for thyModel in thyModelsToDraw:
-            legThyModel.AddEntry(xsec_gr_nom[thyModel], legendLabel[thyModel],'l')
+        elif model=='gg':            
+            legThyModel.AddEntry(None,"","")
+            
+        for i, thyModel in enumerate(thyModelsToDraw):
+            if i>4:
+                try:
+                    legThyModel2.AddEntry(xsec_gr_nom[thyModel], legendLabel[thyModel],'l')
+                except:
+                    pass
+            else:
+                legThyModel.AddEntry(xsec_gr_nom[thyModel], legendLabel[thyModel],'l')
         legThyModel.Draw("same")
+        try:
+            legThyModel2.Draw("same")
+        except:
+            pass
+            
 
     for Box in Boxes:
         for model in models:    
@@ -621,7 +660,7 @@ if __name__ == '__main__':
 
 
     if 'PF' in Box or options.massMax>1600:
-        h_limit.GetXaxis().SetTitle('Resonance Mass [TeV]')
+        h_limit.GetXaxis().SetTitle('Resonance mass [TeV]')
         h_limit.GetXaxis().SetLabelOffset(1000)
         #h_fit_residual_vs_mass.GetXaxis().SetNoExponent()
         #h_fit_residual_vs_mass.GetXaxis().SetMoreLogLabels()    
@@ -643,8 +682,8 @@ if __name__ == '__main__':
         h_limit.GetXaxis().SetNdivisions(408,True)
 
     if options.box=="CaloDijet2016_PFDijet2016":
-        #line1 = rt.TLine(1600,1e4,1600,5e4)
-        line1 = rt.TLine(1600,1e-1,1600,1e5)
+        #line1 = rt.TLine(1600,1e4,1600,options.xsecMax)
+        line1 = rt.TLine(1600,1e-1,1600,options.xsecMax)
         line1.SetLineStyle(2)
         line1.SetLineWidth(2)
         line1.SetLineColor(rt.kGray+1)
@@ -657,16 +696,18 @@ if __name__ == '__main__':
         
           
         lab = rt.TLatex()
-        lab.SetTextSize(0.022)
+        lab.SetTextSize(0.035)
         lab.SetTextFont(42)
         lab.SetTextColor(rt.kGray+1)
-        lab.SetTextAlign(31)
-        lab.DrawLatex(1600-10,3e4,"#leftarrow")
-        lab.DrawLatex(1600-50,1.5e4,"Low Mass")
-        lab.SetTextAlign(11)
-        lab.DrawLatex(1600+10,3e4,"#rightarrow")
-        lab.DrawLatex(1600+50,1.5e4,"High Mass")
-        
+        lab.SetTextAlign(33)
+        lab.DrawLatex(1600-10,6e4,"#leftarrow")
+        lab.SetTextAlign(13)
+        lab.DrawLatex(1600+10,6e4,"#rightarrow") 
+        lab.SetTextAlign(23)
+        lab.DrawLatex(1600-400,3.5e4,"Low")
+        lab.DrawLatex(1600-400,1.2e4,"mass")
+        lab.DrawLatex(1600+400,3.5e4,"High")
+        lab.DrawLatex(1600+400,1.2e4,"mass")
         
 
     #c.SetLogx()    

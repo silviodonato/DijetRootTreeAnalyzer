@@ -21,7 +21,7 @@ def setStyle():
 
 def getBiasHistos(varName,toyTree):        
     
-    h = rt.TH1D('h_bias','h_bias',70,-4,4)
+    h = rt.TH1D('h_bias','h_bias',25,-4,4)
     toyTree.Project('h_bias','%s'%(varName))
 
     return h
@@ -36,11 +36,11 @@ def setHist(h_data,xTitle,yTitle,color=rt.kBlack):
     #h_data.GetXaxis().SetLabelOffset(0.16)
     h_data.GetXaxis().SetLabelSize(0.05)
     h_data.GetYaxis().SetLabelSize(0.05)
-    h_data.GetXaxis().SetTitleSize(0.05)
-    h_data.GetYaxis().SetTitleSize(0.05)
-    #h_data.GetXaxis().SetTitleOffset(0.8)
-    #h_data.GetYaxis().SetTitleOffset(0.7)
-    h_data.SetMaximum(90)
+    h_data.GetXaxis().SetTitleSize(0.06)
+    h_data.GetYaxis().SetTitleSize(0.06)
+    h_data.GetXaxis().SetTitleOffset(0.8)
+    h_data.GetYaxis().SetTitleOffset(1)
+    h_data.SetMaximum(200)
     #h_data.SetMinimum(2e-1)
     return h_data
 
@@ -67,6 +67,7 @@ def print1DBias(c,rootFile,h,func,printName,xTitle,yTitle,lumiLabel="",boxLabel=
         #graph.SetLineWidth(2)
         #graph.Draw("same")
         h.Fit(func,"mle")
+        #h.Fit(func,"")
         func.Draw("same")
     
 
@@ -75,8 +76,8 @@ def print1DBias(c,rootFile,h,func,printName,xTitle,yTitle,lumiLabel="",boxLabel=
     tLeg.SetLineColor(rt.kWhite)
     tLeg.SetLineWidth(0)
     tLeg.SetFillStyle(0)
-    tLeg.AddEntry(h,"#splitline{Toy data}{%s (%s GeV) #mu=%1.3f}"%(options.model, massPoint,rDict[int(massPoint)]),"lep")
-    tLeg.AddEntry(func,"#splitline{Gaussian fit}{mean = %+1.2f, std. = %1.2f}"%(func.GetParameter(1),func.GetParameter(2)),"l")
+    tLeg.AddEntry(h,"#splitline{Pseudodata}{%s (%s GeV) #mu=%1.3f}"%(options.model, massPoint,rDict[int(massPoint)]),"lep")
+    tLeg.AddEntry(func,"#splitline{Gaussian fit}{mean = %+1.2f, s.d. = %1.2f}"%(func.GetParameter(1),func.GetParameter(2)),"l")
             
     tLeg.Draw("same")
 
@@ -94,13 +95,13 @@ def print1DBias(c,rootFile,h,func,printName,xTitle,yTitle,lumiLabel="",boxLabel=
     l.SetTextFont(52)
     l.SetTextSize(0.045)
 
-    pdf_dict = {'modexp':'mod. exp.',
-                'atlas':'ATLAS func.',
-                'fourparam':'4-param. dijet',
-                'fiveparam':'5-param. dijet'
+    pdf_dict = {'modexp':'modified exp.',
+                'atlas':'5-par. ATLAS',
+                'fourparam':'dijet function',
+                'fiveparam':'5-par. dijet'
                 }
     l.DrawLatex(0.15,0.82,'gen. pdf = %s'%pdf_dict[options.genPdf])
-    l.DrawLatex(0.15,0.77,'fit. pdf = %s'%pdf_dict[options.fitPdf])
+    l.DrawLatex(0.15,0.77,'fit pdf = %s'%pdf_dict[options.fitPdf])
 
     c.cd()
     
@@ -175,7 +176,7 @@ if __name__ == '__main__':
         tdirectory = rootFile.GetDirectory(options.outDir)
         
     dataString = "Sim. Data"
-    eventsLabel = "Toy Datasets"    
+    eventsLabel = "Pseudodatasets"    
     x = array('d', cfg.getBinning(box)[0]) # mjj binning
     nBins = (len(x)-1)
     
@@ -185,7 +186,7 @@ if __name__ == '__main__':
     boxLabel = ''    
 
     graph = rt.TGraphErrors(len(massIterable(options.mass)))
-    histVsMass = rt.TH1D('histVsMass','histVsMass',100,massIterable(options.mass)[0]-100,massIterable(options.mass)[-1]+100)
+    histVsMass = rt.TH1D('histVsMass','histVsMass',100,int(massIterable(options.mass)[0])-100,int(massIterable(options.mass)[-1])+100)
     
     for i, massPoint in enumerate(massIterable(options.mass)):
         inputToyFile = '%s/mlfit%s_%s_lumi-%.3f_r-%.3f_%s_%s_%s.root'%(options.outDir,options.model,massPoint,(options.lumi/1000.),rDict[int(massPoint)],box,options.genPdf,options.fitPdf) 
@@ -197,23 +198,28 @@ if __name__ == '__main__':
         h_bias = getBiasHistos('(mu-%.3f)/muErr'%rDict[int(massPoint)],toyTree)
         
         gaus_func = rt.TF1("gaus_func","gaus(0)",-4,4)
-        gaus_func.SetParameter(0,30)
+        gaus_func.SetParameter(0,100)
         gaus_func.SetParameter(1,0)
         gaus_func.SetParameter(2,1)
-        print1DBias(c,tdirectory,h_bias,gaus_func,options.outDir+"/bias_%s_%s_lumi-%.3f_r-%.3f_%s_%s_%s.pdf"%(options.model,massPoint,(options.lumi/1000.),rDict[int(massPoint)],box,options.genPdf,options.fitPdf),"(#hat{#mu} - #mu)/#sigma_{#mu}",eventsLabel,lumiLabel,boxLabel,'',None)
+        print1DBias(c,tdirectory,h_bias,gaus_func,options.outDir+"/bias_%s_%s_lumi-%s_r-%s_%s_%s_%s.pdf"%(options.model,massPoint,('%.3f'%(options.lumi/1000.)).replace('.','p'),('%.3f'%rDict[int(massPoint)]).replace('.','p'),box,options.genPdf,options.fitPdf),"Bias (#hat{#mu} - #mu)/#sigma_{#mu}",eventsLabel,lumiLabel,boxLabel,'',None)
 
         graph.SetPoint(i, int(massPoint), 100.*gaus_func.GetParameter(1))
         #graph.SetPointError(i, 0, 100.*gaus_func.GetParameter(2))
         graph.SetPointError(i, 0, 100.*gaus_func.GetParError(1))
 
     histVsMass.Draw()
-    histVsMass.SetMinimum(-300)
-    histVsMass.SetMaximum(300)
+    histVsMass.SetMinimum(-130)
+    histVsMass.SetMaximum(130)
     histVsMass.SetLineColor(rt.kBlue)
     histVsMass.SetLineStyle(2)
-    histVsMass.SetYTitle("Bias [% of stat.+syst. unc.]")
-    histVsMass.GetYaxis().SetTitleOffset(1.5)
-    histVsMass.SetXTitle("Resonance Mass [GeV]")   
+    histVsMass.SetYTitle("Mean bias [% of stat.+syst. unc.]")
+    histVsMass.GetYaxis().SetTitleOffset(1)
+    histVsMass.GetXaxis().SetTitleOffset(0.9)
+    histVsMass.SetXTitle("%s resonance mass [GeV]"%options.model)
+    histVsMass.GetXaxis().SetTitleSize(0.06)
+    histVsMass.GetYaxis().SetTitleSize(0.06)
+    histVsMass.GetXaxis().SetLabelSize(0.05)
+    histVsMass.GetYaxis().SetLabelSize(0.05)
     graph.SetMarkerStyle(20)
     graph.SetMarkerSize(0.7)
     graph.Draw("pzsame")
@@ -234,15 +240,15 @@ if __name__ == '__main__':
     l.SetTextFont(52)
     l.SetTextSize(0.045)
 
-    pdf_dict = {'modexp':'mod. exp.',
-                'atlas':'ATLAS func.',
-                'fourparam':'4-param. dijet',
-                'fiveparam':'5-param. dijet'
+    pdf_dict = {'modexp':'modified exp.',
+                'atlas':'5-par. ATLAS',
+                'fourparam':'dijet function',
+                'fiveparam':'5-par. dijet'
                 }
     l.DrawLatex(0.15,0.82,'gen. pdf = %s'%pdf_dict[options.genPdf])
-    l.DrawLatex(0.15,0.77,'fit. pdf = %s'%pdf_dict[options.fitPdf])
+    l.DrawLatex(0.15,0.77,'fit pdf = %s'%pdf_dict[options.fitPdf])
     
 
-    c.Print("%s/biasVsMass_%s_lumi-%.3f_%s_%s_%s.pdf"%(options.outDir,options.model,(options.lumi/1000.),box,options.genPdf,options.fitPdf))
-    c.Print("%s/biasVsMass_%s_lumi-%.3f_%s_%s_%s.C"%(options.outDir,options.model,(options.lumi/1000.),box,options.genPdf,options.fitPdf))
+    c.Print("%s/biasVsMass_%s_lumi-%s_%s_%s_%s.pdf"%(options.outDir,options.model,('%.3f'%(options.lumi/1000.)).replace('.','p'),box,options.genPdf,options.fitPdf))
+    c.Print("%s/biasVsMass_%s_lumi-%s_%s_%s_%s.C"%(options.outDir,options.model,('%.3f'%(options.lumi/1000.)).replace('.','p'),box,options.genPdf,options.fitPdf))
  
