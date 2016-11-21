@@ -79,7 +79,7 @@ deltaETAjj           -inf           +inf               	-               -       
 mjj            	     -inf           +inf                -               -               1       10000 0 10000      SAVE
 mjj_shiftJEC         -inf           +inf                -               -               1       10000 0 10000      SAVE
 # no cut on these variables, just want to save histograms
-#passHLT_PFHT900	     -inf           +inf                -	        -	        1       2  0 2.	  	  SAVE
+passHLT_PFHT900	     -inf           +inf                -	        -	        1       2  0 2.	  	  SAVE
 passHLT_PFHT800	     -inf           +inf                -	        -	        1       2  0 2.	  	  SAVE
 passHLT_PFHT650	     -inf           +inf                -	        -	        1       2  0 2.	  	  SAVE
 passHLT_PFHT475	     -inf           +inf                -	        -	        1       2  0 2.	  	  SAVE

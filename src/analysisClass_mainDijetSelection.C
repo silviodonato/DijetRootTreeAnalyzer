@@ -51,10 +51,10 @@ analysisClass::analysisClass(string * inputList, string * cutFile, string * tree
 
     
     iov = new jec::IOV("AK4PFchs");
-    iov->add("BCD",273150,276823,true); // Using start-1 of run E instead as upper
-    iov->add("E",276824,277815,true);  // Use start-1 of run F instead as upper
-    iov->add("F",277816,278801,true); // Note the division before F dataset ends as instructed by JEC group
-    iov->add("p2",278802,999999,true); // V8p2 for part of F and all of G and H
+    // iov->add("BCD",273150,276823,true); // Using start-1 of run E instead as upper
+    // iov->add("E",276824,277815,true);  // Use start-1 of run F instead as upper
+    // iov->add("F",277816,278801,true); // Note the division before F dataset ends as instructed by JEC group
+    iov->add("p2",1,999999,true); // V8p2 for 29Sept ReReco (2016B --> 2016G) and for the last period of PromptReco (2016H)
     
     JetCorrector_data = new FactorizedJetCorrector(); // Will be filled later
         
@@ -664,8 +664,8 @@ void analysisClass::Loop()
      fillVariableWithValue("ptHat",ptHat);
 
      int NtriggerBits = triggerResult->size();
-     // if( NtriggerBits > 0 && isData )
-     //   fillVariableWithValue("passHLT_PFHT900",triggerResult->at(triggerMap_.find("HLT_PFHT900_v*")->second));
+     if( NtriggerBits > 0 && isData )
+       fillVariableWithValue("passHLT_PFHT900",triggerResult->at(triggerMap_.find("HLT_PFHT900_v*")->second));
      if( NtriggerBits > 1 && isData)
        fillVariableWithValue("passHLT_PFHT800",triggerResult->at(triggerMap_.find("HLT_PFHT800_v*")->second));
      if( NtriggerBits > 2 && isData)
@@ -1016,7 +1016,7 @@ analysisClass::fillTriggerPlots(TH1F* h_mjj_HLTpass[], double MJJWide)
 {
   if(triggerResult->at(triggerMap_.find("HLT_PFHT475_v*")->second)) h_mjj_HLTpass[1] -> Fill(MJJWide);
   if(triggerResult->at(triggerMap_.find("HLT_PFHT475_v*")->second) && triggerResult->at(triggerMap_.find("HLT_PFHT800_v*")->second)) h_mjj_HLTpass[2] -> Fill(MJJWide); //PFHT800
-  //if(triggerResult->at(triggerMap_.find("HLT_PFHT475_v*")->second) && triggerResult->at(triggerMap_.find("HLT_PFHT900_v*")->second)) h_mjj_HLTpass[3] -> Fill(MJJWide); //PFHT900
+  if(triggerResult->at(triggerMap_.find("HLT_PFHT475_v*")->second) && triggerResult->at(triggerMap_.find("HLT_PFHT900_v*")->second)) h_mjj_HLTpass[3] -> Fill(MJJWide); //PFHT900
   if(triggerResult->at(triggerMap_.find("HLT_PFHT475_v*")->second) && triggerResult->at(triggerMap_.find("HLT_PFHT650_WideJetMJJ900DEtaJJ1p5_v*")->second)) h_mjj_HLTpass[4] -> Fill(MJJWide); //PFHT650MJJ900
   if(triggerResult->at(triggerMap_.find("HLT_PFHT475_v*")->second) && 
      (triggerResult->at(triggerMap_.find("HLT_PFHT800_v*")->second) || triggerResult->at(triggerMap_.find("HLT_PFHT650_WideJetMJJ900DEtaJJ1p5_v*")->second)))
