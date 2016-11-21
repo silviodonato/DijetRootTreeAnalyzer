@@ -8,7 +8,8 @@
 #JSON data/json/Cert_271036-276811_13TeV_PromptReco_Collisions16_JSON_22Jul16_ICHEP.txt #round8 topup
 #JSON data/json/Cert_271036-278808_13TeV_PromptReco_Collisions16_JSON_NoL1T_19Aug16.txt #fall16 round1 full
 #JSON data/json/Cert_271036-279931_13TeV_PromptReco_Collisions16_JSON_NoL1T_9Sep16_fall16_round2.txt #fall16 round2 topup
-JSON data/json/Cert_271036-283685_13TeV_PromptReco_Collisions16_JSON_NoL1T_28Oct16.txt #moriond16 v0 33/fb promptreco
+#JSON data/json/Cert_271036-283685_13TeV_PromptReco_Collisions16_JSON_NoL1T_28Oct16.txt #moriond16 v0 33/fb promptreco
+JSON data/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt #ReReco JSON
 
 #
 #############################     Example of file with list of cuts
