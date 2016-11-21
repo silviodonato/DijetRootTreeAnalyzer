@@ -693,18 +693,20 @@ void analysisClass::Loop()
      if( NtriggerBits > 21 && isData)
        fillVariableWithValue("passHLT_AK8PFJet360TrimMass50",triggerResult->at(triggerMap_.find("HLT_AK8PFJet360_TrimMass30_v*")->second));
      if( NtriggerBits > 22 && isData)
-       fillVariableWithValue("passHLT_CaloJet500NoJetID",triggerResult->at(triggerMap_.find("HLT_CaloJet500_NoJetID_v*")->second));
+       fillVariableWithValue("passHLT_AK8PFJet450",triggerResult->at(triggerMap_.find("HLT_AK8PFJet450_v*")->second));
      if( NtriggerBits > 23 && isData)
-       fillVariableWithValue("passHLT_DiPFJetAve300HFJEC",triggerResult->at(triggerMap_.find("HLT_DiPFJetAve300_HFJEC_v*")->second));
+       fillVariableWithValue("passHLT_CaloJet500NoJetID",triggerResult->at(triggerMap_.find("HLT_CaloJet500_NoJetID_v*")->second));
      if( NtriggerBits > 24 && isData)
-       fillVariableWithValue("passHLT_DiPFJetAve500",triggerResult->at(triggerMap_.find("HLT_DiPFJetAve500_v*")->second));
+       fillVariableWithValue("passHLT_DiPFJetAve300HFJEC",triggerResult->at(triggerMap_.find("HLT_DiPFJetAve300_HFJEC_v*")->second));
      if( NtriggerBits > 25 && isData)
-       fillVariableWithValue("passHLT_PFHT400SixJet30Btag",triggerResult->at(triggerMap_.find("HLT_PFHT400_SixJet30_BTagCSV0p55_2PFBTagCSV0p72_v*")->second));
+       fillVariableWithValue("passHLT_DiPFJetAve500",triggerResult->at(triggerMap_.find("HLT_DiPFJetAve500_v*")->second));
      if( NtriggerBits > 26 && isData)
-       fillVariableWithValue("passHLT_PFHT450SixJet40Btag",triggerResult->at(triggerMap_.find("HLT_PFHT450_SixJet40_PFBTagCSV0p72_v*")->second));
+       fillVariableWithValue("passHLT_PFHT400SixJet30Btag",triggerResult->at(triggerMap_.find("HLT_PFHT400_SixJet30_BTagCSV0p55_2PFBTagCSV0p72_v*")->second));
      if( NtriggerBits > 27 && isData)
-       fillVariableWithValue("passHLT_PFHT750FourJetPt50",triggerResult->at(triggerMap_.find("HLT_PFHT750_4JetPt50_v*")->second));
+       fillVariableWithValue("passHLT_PFHT450SixJet40Btag",triggerResult->at(triggerMap_.find("HLT_PFHT450_SixJet40_PFBTagCSV0p72_v*")->second));
      if( NtriggerBits > 28 && isData)
+       fillVariableWithValue("passHLT_PFHT750FourJetPt50",triggerResult->at(triggerMap_.find("HLT_PFHT750_4JetPt50_v*")->second));
+     if( NtriggerBits > 29 && isData)
        fillVariableWithValue("passHLT_QuadPFJetVBF",triggerResult->at(triggerMap_.find("HLT_QuadPFJet_VBF_v*")->second));
 
 

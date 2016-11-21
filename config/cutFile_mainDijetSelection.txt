@@ -93,6 +93,7 @@ passHLT_AK8DiPFJet280200TrimMass30Btag         -inf           +inf              
 passHLT_AK8PFHT600TriMass50Btag                -inf           +inf                -	        -	        1       2  0 2.	  	  SAVE
 passHLT_AK8PFHT700TriMass50         	       -inf           +inf                -	        -	        1       2  0 2.	  	  SAVE
 passHLT_AK8PFJet360TrimMass50         	       -inf           +inf                -	        -	        1       2  0 2.	  	  SAVE
+passHLT_AK8PFJet450			       -inf           +inf                -	        -	        1       2  0 2.	  	  SAVE
 passHLT_CaloJet500NoJetID       	       -inf           +inf                -	        -	        1       2  0 2.	  	  SAVE
 passHLT_DiPFJetAve300HFJEC      	       -inf           +inf                -	        -	        1       2  0 2.	  	  SAVE
 passHLT_DiPFJetAve500      		       -inf           +inf                -	        -	        1       2  0 2.	  	  SAVE
