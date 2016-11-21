@@ -829,31 +829,44 @@ void analysisClass::Loop()
 	   }
 
 
-	 //fill histos in categories
+	 //fill histos in categories and save branches
+	 double MJJWide_M =  MJJWide * evtWeightBtagM;
+	 double MJJWide_T =  MJJWide * evtWeightBtagT;
+	 double MJJWide_MT =  MJJWide * evtWeightBtagMT;
+
 	 if (njetsm == 1)
-	   h_mjj_btag1_m->Fill(MJJWide * evtWeightBtagM);
+	   h_mjj_btag1_m->Fill(MJJWide_M);
 	 else if (njetsm == 2)
-	   h_mjj_btag2_m->Fill(MJJWide * evtWeightBtagM);
+	   h_mjj_btag2_m->Fill(MJJWide_M);
 	 else
-	   h_mjj_btag0_m->Fill(MJJWide * evtWeightBtagM);
+	   h_mjj_btag0_m->Fill(MJJWide_M);
 
 	 if (njetst == 1)
-	   h_mjj_btag1_t->Fill(MJJWide * evtWeightBtagT);
+	   h_mjj_btag1_t->Fill(MJJWide_T);
 	 else if (njetst == 2)
-	   h_mjj_btag2_t->Fill(MJJWide * evtWeightBtagT);
+	   h_mjj_btag2_t->Fill(MJJWide_T);
 	 else
-	   h_mjj_btag0_t->Fill(MJJWide * evtWeightBtagT);
+	   h_mjj_btag0_t->Fill(MJJWide_T);
 
 	 if (njetsm == 2 && njetst==1)
 	   {
-	     h_mjj_btag2_mt->Fill(MJJWide * evtWeightBtagMT);
+	     h_mjj_btag2_mt->Fill(MJJWide_MT);
 	     if(isData && triggerResult->size()>10) // only run on data
 	       fillTriggerPlots(h_mjj_HLTpass_bb,MJJWide);
 	   }
 	 else if (njetst==1)
-	   h_mjj_btag1_mt->Fill(MJJWide * evtWeightBtagMT);
+	   h_mjj_btag1_mt->Fill(MJJWide_MT);
 	 else
-	   h_mjj_btag0_mt->Fill(MJJWide * evtWeightBtagMT);
+	   h_mjj_btag0_mt->Fill(MJJWide_MT);
+
+
+
+	 fillVariableWithValue("nBjets_m",njetsm);
+	 fillVariableWithValue("nBjets_t",njetst);
+	 fillVariableWithValue("evtBweight_m",evtWeightBtagM);
+	 fillVariableWithValue("evtBweight_t",evtWeightBtagT);
+	 fillVariableWithValue("evtBweight_mt",evtWeightBtagMT);
+	 
 
 
        } //end full analysis including deltaEta
