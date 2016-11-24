@@ -62,9 +62,9 @@ analysisClass::analysisClass(string * inputList, string * cutFile, string * tree
     // Uncertainties also from a single file for now. My best guess was to use V8p2.
     
     
-    std::string L1Path = "data/Spring16_25nsV3_MC/Spring16_25nsV3_MC_L1FastJet_AK4PFchs.txt";
-    std::string L2Path = "data/Spring16_25nsV3_MC/Spring16_25nsV3_MC_L2Relative_AK4PFchs.txt";
-    std::string L3Path = "data/Spring16_25nsV3_MC/Spring16_25nsV3_MC_L3Absolute_AK4PFchs.txt";
+    std::string L1Path = "data/Spring16_25nsV6_MC/Spring16_25nsV6_MC_L1FastJet_AK4PFchs.txt";
+    std::string L2Path = "data/Spring16_25nsV6_MC/Spring16_25nsV6_MC_L2Relative_AK4PFchs.txt";
+    std::string L3Path = "data/Spring16_25nsV6_MC/Spring16_25nsV6_MC_L3Absolute_AK4PFchs.txt";
     /*
     std::string L1DATAPath = "data/Spring16_25nsV6_DATA/Spring16_25nsV6_DATA_L1FastJet_AK4PFchs.txt";
     std::string L2DATAPath = "data/Spring16_25nsV6_DATA/Spring16_25nsV6_DATA_L2Relative_AK4PFchs.txt"; 
