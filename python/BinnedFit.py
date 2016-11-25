@@ -1055,15 +1055,16 @@ if __name__ == '__main__':
         yLab.SetTextAlign(32)
         yLab.SetTextSize(0.05)
         yLab.SetTextFont(42)
-        yLab.DrawLatex(1029, 10, "10^{4}")
-        yLab.DrawLatex(1029, 1, "10^{3}")
-        yLab.DrawLatex(1029, 0.1, "10^{2}")
-        yLab.DrawLatex(1029, 0.01, "10")
-        yLab.DrawLatex(1029, 0.001, "1")
-        yLab.DrawLatex(1029, 0.0001, "10^{#minus1}")
-        yLab.DrawLatex(1029, 0.00001, "10^{#minus2}")
-        yLab.DrawLatex(1029, 0.000001, "10^{#minus3}")
-        yLab.DrawLatex(1029, 0.0000001, "10^{#minus4}")
+        xM = 0.
+        yLab.DrawLatex(xM, 10, "10^{4}")
+        yLab.DrawLatex(xM, 1, "10^{3}")
+        yLab.DrawLatex(xM, 0.1, "10^{2}")
+        yLab.DrawLatex(xM, 0.01, "10")
+        yLab.DrawLatex(xM, 0.001, "1")
+        yLab.DrawLatex(xM, 0.0001, "10^{#minus1}")
+        yLab.DrawLatex(xM, 0.00001, "10^{#minus2}")
+        yLab.DrawLatex(xM, 0.000001, "10^{#minus3}")
+        yLab.DrawLatex(xM, 0.0000001, "10^{#minus4}")
 
         
         f_h2_log10_x_axis = rt.TF1("f_h2_log10_x_axis", "log10(x)", myRebinnedDensityTH1.GetXaxis().GetXmin(), myRebinnedDensityTH1.GetXaxis().GetXmax())
@@ -1243,7 +1244,7 @@ if __name__ == '__main__':
         g_signal_residuals.append(g_signal_residual)
         g_signal_residual.Draw("cxsame")
 
-    
+        
     #c.RedrawAxis() # request from David
     
     c.Print(options.outDir+"/fit_mjj_%s_%s.pdf"%(fitRegion.replace(',','_'),box))
