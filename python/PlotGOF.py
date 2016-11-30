@@ -29,8 +29,8 @@ def getGOFHistos(varName,toyTree):
     mean = htemp.GetMean()
     
     xmax = max(mean+3.*rms,var_data+1)
-    xmax = 60
-    #xmax = 100
+    #xmax = 60
+    xmax = 100
     
     xmin = int(max(0,htemp.GetXaxis().GetXmin()))
     xmin = 0
