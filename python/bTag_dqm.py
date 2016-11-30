@@ -32,7 +32,7 @@ def customRebin(histo):
             #print "LAST BIN is "+str(massMax)
         if (bin_boundary>=massMin and bin_boundary<=massMax):
             massBins_list_actual.append(bin_boundary)
-    print "===>>> Rebinning: ",histo.GetName(),massBins_list_actual
+    #print "===>>> Rebinning: ",histo.GetName(),massBins_list_actual
     massBins = array("d",massBins_list_actual)
     N_massBins = len(massBins)-1
     hNew = histo.Rebin(N_massBins, "hNew", massBins) 
@@ -44,6 +44,10 @@ def setBinning(histos):
         if 'mjj' in k:
             hNew = customRebin(h)
             histos[k] = hNew
+        elif 'pt' in k:
+            h.Rebin(4)
+        elif 'phi' in k:
+            h.SetMinimum(0)
 
 
 def setRecoStyle(histos):
@@ -110,6 +114,7 @@ def simplePrint(histos, outFolder):
             h.GetPaintedGraph().GetYaxis().SetRangeUser(0,0.6)
         elif 'eff_mjj_btag2' in k:
             h.GetPaintedGraph().GetYaxis().SetRangeUser(0,0.1)
+
 
         cc.Print(outFolder+"/"+k+".pdf","pdf")
 
@@ -189,29 +194,29 @@ def overlayAndPrint(reco, calo, outFolder):
 
 def fillEfficiency(histoList):
     #PT
-    eff_pt_j1_btag_loose = rt.TEfficiency(histoList['pt_j1_btag_loose'],histoList['pt_j1'])
-    eff_pt_j1_btag_loose.SetName("eff_pt_j1_btag_loose")
-    eff_pt_j2_btag_loose = rt.TEfficiency(histoList['pt_j2_btag_loose'],histoList['pt_j2'])
-    eff_pt_j2_btag_loose.SetName("eff_pt_j2_btag_loose")
+    eff_pt_j1_btag_tight = rt.TEfficiency(histoList['pt_j1_btag_tight'],histoList['pt_j1'])
+    eff_pt_j1_btag_tight.SetName("eff_pt_j1_btag_tight")
+    eff_pt_j2_btag_tight = rt.TEfficiency(histoList['pt_j2_btag_tight'],histoList['pt_j2'])
+    eff_pt_j2_btag_tight.SetName("eff_pt_j2_btag_tight")
     eff_pt_j1_btag_medium = rt.TEfficiency(histoList['pt_j1_btag_medium'],histoList['pt_j1'])
     eff_pt_j1_btag_medium.SetName("eff_pt_j1_btag_medium")
     eff_pt_j2_btag_medium = rt.TEfficiency(histoList['pt_j2_btag_medium'],histoList['pt_j2'])
     eff_pt_j2_btag_medium.SetName("eff_pt_j2_btag_medium")
-    histoList[eff_pt_j1_btag_loose.GetName()] = eff_pt_j1_btag_loose
-    histoList[eff_pt_j2_btag_loose.GetName()] = eff_pt_j2_btag_loose
+    histoList[eff_pt_j1_btag_tight.GetName()] = eff_pt_j1_btag_tight
+    histoList[eff_pt_j2_btag_tight.GetName()] = eff_pt_j2_btag_tight
     histoList[eff_pt_j1_btag_medium.GetName()] = eff_pt_j1_btag_medium
     histoList[eff_pt_j2_btag_medium.GetName()] = eff_pt_j2_btag_medium
             
     #MJJ
-    eff_mjj_btag0_loose = rt.TEfficiency(histoList['mjj_btag0_loose'],histoList['mjj'])
-    eff_mjj_btag0_loose.SetName("eff_mjj_btag0_loose")
-    eff_mjj_btag1_loose = rt.TEfficiency(histoList['mjj_btag1_loose'],histoList['mjj'])
-    eff_mjj_btag1_loose.SetName("eff_mjj_btag1_loose")
-    eff_mjj_btag2_loose = rt.TEfficiency(histoList['mjj_btag2_loose'],histoList['mjj'])
-    eff_mjj_btag2_loose.SetName("eff_mjj_btag2_loose")
-    histoList[eff_mjj_btag0_loose.GetName()] = eff_mjj_btag0_loose
-    histoList[eff_mjj_btag1_loose.GetName()] = eff_mjj_btag1_loose
-    histoList[eff_mjj_btag2_loose.GetName()] = eff_mjj_btag2_loose
+    eff_mjj_btag0_tight = rt.TEfficiency(histoList['mjj_btag0_tight'],histoList['mjj'])
+    eff_mjj_btag0_tight.SetName("eff_mjj_btag0_tight")
+    eff_mjj_btag1_tight = rt.TEfficiency(histoList['mjj_btag1_tight'],histoList['mjj'])
+    eff_mjj_btag1_tight.SetName("eff_mjj_btag1_tight")
+    eff_mjj_btag2_tight = rt.TEfficiency(histoList['mjj_btag2_tight'],histoList['mjj'])
+    eff_mjj_btag2_tight.SetName("eff_mjj_btag2_tight")
+    histoList[eff_mjj_btag0_tight.GetName()] = eff_mjj_btag0_tight
+    histoList[eff_mjj_btag1_tight.GetName()] = eff_mjj_btag1_tight
+    histoList[eff_mjj_btag2_tight.GetName()] = eff_mjj_btag2_tight
     
     eff_mjj_btag0_medium = rt.TEfficiency(histoList['mjj_btag0_medium'],histoList['mjj'])
     eff_mjj_btag0_medium.SetName("eff_mjj_btag0_medium")
