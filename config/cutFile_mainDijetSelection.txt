@@ -67,7 +67,7 @@ CSVv2T		    	       0.935		-		-		-		-1
 #
 #VariableName	      minValue1(<) maxValue1(>=)	minValue2(<)	maxValue2(>=)	level	histoNbinsMinMax  OptionalFlag
 #------------	      ------------ -------------	------------	-------------	-----	----------------  ------------
-PassJSON              -1            1                   -               -               0       2 -0.5 1.5        SAVE  
+PassJSON              0.5           1                   -               -               0       2 -0.5 1.5        SAVE  
 nVtx                  0             +inf                -               -               1       50  0 50	  SAVE
 IdTight_j1            0.5           1.5                 -               -               1       2  0 2.	  	  SAVE
 IdTight_j2            0.5           1.5                 -               -               1       2  0 2.	  	  SAVE
