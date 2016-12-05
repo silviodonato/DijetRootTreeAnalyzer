@@ -41,8 +41,10 @@ analysisClass::analysisClass(string * inputList, string * cutFile, string * tree
     std::string L3DATAPath = "data/80X_dataRun2_HLT_frozen_v12/80X_dataRun2_HLT_frozen_v12_L3Absolute_AK4CaloHLT.txt";
     // 76X 2015 data
     //std::string L2L3ResidualPath = "data/Fall15_25nsV2_DATA/Fall15_25nsV2_DATA_L2L3Residual_AK4PF.txt" ;
-    // 2016 data 
-    std::string L2L3ResidualPath = "data/Spring16_25nsV6_DATA/Spring16_25nsV6_DATA_L2L3Residual_AK4PF.txt";
+    // 2016 data for ICHEP
+    //std::string L2L3ResidualPath = "data/Spring16_25nsV6_DATA/Spring16_25nsV6_DATA_L2L3Residual_AK4PF.txt";
+    // 2016 data for Moriond
+    std::string L2L3ResidualPath = "data/Spring16_V8_DATA/Spring16_25nsV8p2_DATA_L2L3Residual_AK4PFchs.txt";
     
     L1Par = new JetCorrectorParameters(L1Path);
     L2Par = new JetCorrectorParameters(L2Path);
@@ -73,8 +75,10 @@ analysisClass::analysisClass(string * inputList, string * cutFile, string * tree
     //unc = new JetCorrectionUncertainty("data/Summer15_25nsV6_DATA/Summer15_25nsV6_DATA_Uncertainty_AK4PFchs.txt");
     // for 2015 CaloScouting
     //unc = new JetCorrectionUncertainty("data/Summer15_25nsV7_DATA/Summer15_25nsV7_DATA_Uncertainty_AK4PFchs.txt");
+    // for ICHEP 2016 CaloScouting 
+    //unc = new JetCorrectionUncertainty("data/Spring16_25nsV6_DATA/Spring16_25nsV6_DATA_Uncertainty_AK4PFchs.txt");
     // for 2016 CaloScouting
-    unc = new JetCorrectionUncertainty("data/Spring16_25nsV6_DATA/Spring16_25nsV6_DATA_Uncertainty_AK4PFchs.txt");
+    unc = new JetCorrectionUncertainty("data/Spring16_V8_DATA/Spring16_25nsV8p2_DATA_Uncertainty_AK4PFchs.txt");
 
   }
   
@@ -688,14 +692,26 @@ void analysisClass::Loop()
        {
 	 fillVariableWithValue("passHLT_CaloJet40_CaloScouting_PFScouting",triggerResult->at(0));// CaloJet40_CaloScouting_PFScouting
 	 fillVariableWithValue("passHLT_L1HTT_CaloScouting_PFScouting",triggerResult->at(2));// L1HTT_CaloScouting_PFScouting
-	 fillVariableWithValue("passHLT_CaloScoutingHT250",triggerResult->at(4));// CaloScoutingHT250
+	 fillVariableWithValue("passHLT_CaloScoutingHT250",triggerResult->at(4));// CaloScoutingHT250	 
+	 fillVariableWithValue("passHLT_PFScoutingHT450",triggerResult->at(8));
+	 fillVariableWithValue("passHLT_PFHT900",triggerResult->at(15));
+	 fillVariableWithValue("passHLT_PFHT800",triggerResult->at(16));
+	 fillVariableWithValue("passHLT_PFHT650MJJ950",triggerResult->at(25));
+	 fillVariableWithValue("passHLT_PFHT650MJJ900",triggerResult->at(26));
+	 fillVariableWithValue("passHLT_PFJET500",triggerResult->at(27));
+	 fillVariableWithValue("passHLT_PFJET450",triggerResult->at(28));
+	 fillVariableWithValue("passHLT_Mu45Eta2p1",triggerResult->at(32));
+	 fillVariableWithValue("passHLT_AK8PFHT700TriMass50",triggerResult->at(33));
+	 fillVariableWithValue("passHLT_AK8PFJet360TrimMass50",triggerResult->at(34));
+	 fillVariableWithValue("passHLT_CaloJet500NoJetID",triggerResult->at(35));
 
-	 fillVariableWithValue("passL1T_HTT120",l1Result->at(0));// 
-	 fillVariableWithValue("passL1T_HTT170",l1Result->at(1));// 
-	 fillVariableWithValue("passL1T_HTT200",l1Result->at(2));// 
-	 // fillVariableWithValue("passL1T_ZeroBias",l1Result->at(3));// 
-	 // fillVariableWithValue("passL1T_DoubleMu_10_3p5",l1Result->at(4));// 
-	 // fillVariableWithValue("passL1T_DoubleMu_12_5",l1Result->at(5));// 
+	 fillVariableWithValue("passL1T_HTT200",l1Result->at(0));// 
+	 fillVariableWithValue("passL1T_HTT240",l1Result->at(1));// 
+	 fillVariableWithValue("passL1T_HTT270",l1Result->at(2));//
+	 fillVariableWithValue("passL1T_HTT280",l1Result->at(3));//
+	 fillVariableWithValue("passL1T_HTT300",l1Result->at(4));//
+	 fillVariableWithValue("passL1T_HTT320",l1Result->at(5));//
+	 fillVariableWithValue("passL1T_ZeroBias",l1Result->at(6));//
        }
 
      // Evaluate cuts (but do not apply them)
