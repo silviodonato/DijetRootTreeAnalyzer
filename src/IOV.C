@@ -13,24 +13,24 @@ void IOV::add(string id, int runmin, int runmax, bool isdata) {
     }
     
     const char *s;
-    const char *dir = "data/Spring16_V8_DATA/";
-    const char *tag = "Spring16_25nsV8";
-    const char *dtype = "DATA";
+    const char *dir = "data/Spring16_23Sep2016V1_DATA/";
+    const char *tag = "Spring16_23Sep2016";
+    const char *dtype = "V1_DATA";
     const char *a = _algo.c_str();
 
     // L1FastJet for AK*PF, L1Offset for others
-    s = Form("%s%s%s_%s_L1FastJet_%s.txt",dir,tag,id.c_str(),dtype,a); cout<<s<<endl<<flush;
+    s = Form("%s%s%s%s_L1FastJet_%s.txt",dir,tag,id.c_str(),dtype,a); cout<<s<<endl<<flush;
     JetCorrectorParameters *par_l1 = new JetCorrectorParameters(s);
       //(_algo=="AK5PF" || _algo=="AK7PF" ?
       //new JetCorrectorParameters(Form("CondFormats/JetMETObjects/data/GR_R_42_V23_L1FastJet_%s.txt",a)) :
       //new JetCorrectorParameters(Form("CondFormats/JetMETObjects/data/GR_R_42_V23_L1Offset_%s.txt",a)));
       //
-    s = Form("%s%s%s_%s_L2Relative_%s.txt",dir,tag,id.c_str(),dtype,a); cout<<s<<endl<<flush;
+    s = Form("%s%s%s%s_L2Relative_%s.txt",dir,tag,id.c_str(),dtype,a); cout<<s<<endl<<flush;
     JetCorrectorParameters *par_l2 = new JetCorrectorParameters(s);
-    s = Form("%s%s%s_%s_L3Absolute_%s.txt",dir,tag,id.c_str(),dtype,a); cout<<s<<endl<<flush;
+    s = Form("%s%s%s%s_L3Absolute_%s.txt",dir,tag,id.c_str(),dtype,a); cout<<s<<endl<<flush;
     JetCorrectorParameters *par_l3 = new JetCorrectorParameters(s);
     //JetCorrectorParameters *par_l2l3res = new JetCorrectorParameters(Form("CondFormats/JetMETObjects/data/GR_R_42_V23_L2L3Residual_%s.txt",a));
-    s = Form("%s%s%s_%s_L2L3Residual_%s.txt",dir,tag,id.c_str(),dtype,a); cout<<s<<endl<<flush;
+    s = Form("%s%s%s%s_L2L3Residual_%s.txt",dir,tag,id.c_str(),dtype,a); cout<<s<<endl<<flush;
     // Switched off IOV handling for now (or not. Juska.)
       //Form("CondFormats/JetMETObjects/data/Jec_V14_%s_L2L3Residual_%s.txt",id.c_str(),a));
     JetCorrectorParameters *par_l2l3res = new JetCorrectorParameters(s);
