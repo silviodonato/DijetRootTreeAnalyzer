@@ -51,7 +51,7 @@ analysisClass::analysisClass(string * inputList, string * cutFile, string * tree
 
     
     iov = new jec::IOV("AK4PFchs");
-    iov->add("BCD",273150,276823,true); // Using start-1 of run E instead as upper
+    iov->add("BCD",1,276823,true); // Using start-1 of run E instead as upper
     iov->add("E",276824,277815,true);  // Use start-1 of run F instead as upper
     iov->add("F",277816,278801,true); // Note the division before F dataset ends as instructed by JEC group
     iov->add("GH",278802,999999,true); // same as V8p2 for 29Sept ReReco (2016B --> 2016G) and for the last period of PromptReco (2016H)
