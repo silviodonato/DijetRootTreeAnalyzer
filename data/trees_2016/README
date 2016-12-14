@@ -11,6 +11,55 @@ For data lumiSummary and corresponding luminosity calculated with brilcalc (http
 
 ====== DATA =====
 
+=== CaloScouting (36.4 /fb) ===
+
+/ScoutingCaloHT/Run2016B-v1/RAW
+/ScoutingCaloHT/Run2016B-v2/RAW
+/ScoutingCaloHT/Run2016C-v2/RAW
+/ScoutingCaloHT/Run2016D-v2/RAW
+/ScoutingCaloHT/Run2016E-v2/RAW
+/ScoutingCaloHT/Run2016F-v1/RAW
+/ScoutingCaloHT/Run2016G-v1/RAW
+/ScoutingCaloHT/Run2016H-v1/RAW
+/ScoutingCaloCommissioning/Run2016B-v1/RAW
+/ScoutingCaloCommissioning/Run2016B-v2/RAW
+/ScoutingCaloCommissioning/Run2016C-v2/RAW
+/ScoutingCaloCommissioning/Run2016D-v2/RAW
+/ScoutingCaloCommissioning/Run2016E-v2/RAW
+/ScoutingCaloCommissioning/Run2016F-v1/RAW
+/ScoutingCaloCommissioning/Run2016G-v1/RAW
+/ScoutingCaloCommissioning/Run2016H-v1/RAW
+
+Looser selection without DeltaEta cut: (pTWJ_j1 > 50, pTWj_j2 > 20, so we can save both with and without HLT->RECO bias corretion) and mjj > 300 (for CaloHT)
+JEC 80X_dataRun2_HLT_frozen_v12 AK4CALOHLT L1,L2,L3 + Spring16_25nsV8p2 AK4PF L2L3Residual + with and without *updated and flattened* HLT->RECO bias correction (from ICHEP result)
+
+Luminosity:
+DCSOnly: 37.282 /fb
+processed_jsons/processedLumis_CaloHT_BCDEFGH.json
+
+Golden: 36.410 /fb (PassJSON==1)
+processed_jsons/overlap_CaloHT_BCDEFGH.json
+
+File locations (CERN EOS):
+eos/cms/store/group/phys_exotica/dijet/Dijet13TeV/woodson/reduced_skims/ScoutingCaloHT2016BCD_JEC_CaloL1L2L3_PFL2L3Residual_NewBiasCorrectedFlat_Mjj300_Golden36410pb_20161206_021453/*reduced_skim.root
+eos/cms/store/group/phys_exotica/dijet/Dijet13TeV/woodson/reduced_skims/ScoutingCaloHT2016E_JEC_CaloL1L2L3_PFL2L3Residual_NewBiasCorrectedFlat_Mjj300_Golden36410pb_20161206_021524/*reduced_skim.root
+eos/cms/store/group/phys_exotica/dijet/Dijet13TeV/woodson/reduced_skims/ScoutingCaloHT2016F_JEC_CaloL1L2L3_PFL2L3Residual_NewBiasCorrectedFlat_Mjj300_Golden36410pb_20161206_021537/*reduced_skim.root
+eos/cms/store/group/phys_exotica/dijet/Dijet13TeV/woodson/reduced_skims/ScoutingCaloHT2016G_JEC_CaloL1L2L3_PFL2L3Residual_NewBiasCorrectedFlat_Mjj300_Golden36410pb_20161206_021547/*reduced_skim.root
+eos/cms/store/group/phys_exotica/dijet/Dijet13TeV/woodson/reduced_skims/ScoutingCaloHT2016H_JEC_CaloL1L2L3_PFL2L3Residual_NewBiasCorrectedFlat_Mjj300_Golden36410pb_20161206_021554/*reduced_skim.root
+
+eos/cms/store/group/phys_exotica/dijet/Dijet13TeV/woodson/reduced_skims/ScoutingCaloCommissioning2016BCD_JEC_CaloL1L2L3_PFL2L3Residual_NewBiasCorrectedFlat_Golden36410pb_20161206_021734/*reduced_skim.root
+eos/cms/store/group/phys_exotica/dijet/Dijet13TeV/woodson/reduced_skims/ScoutingCaloCommissioning2016E_JEC_CaloL1L2L3_PFL2L3Residual_NewBiasCorrectedFlat_Golden36410pb_20161206_021753/*reduced_skim.root
+eos/cms/store/group/phys_exotica/dijet/Dijet13TeV/woodson/reduced_skims/ScoutingCaloCommissioning2016F_JEC_CaloL1L2L3_PFL2L3Residual_NewBiasCorrectedFlat_Golden36410pb_20161206_022033/*reduced_skim.root
+eos/cms/store/group/phys_exotica/dijet/Dijet13TeV/woodson/reduced_skims/ScoutingCaloCommissioning2016G_JEC_CaloL1L2L3_PFL2L3Residual_NewBiasCorrectedFlat_Golden36410pb_20161206_022325/*reduced_skim.root
+eos/cms/store/group/phys_exotica/dijet/Dijet13TeV/woodson/reduced_skims/ScoutingCaloCommissioning2016H_JEC_CaloL1L2L3_PFL2L3Residual_NewBiasCorrectedFlat_Golden36410pb_20161206_022333/*reduced_skim.root
+
+hadded versions:
+eos/cms/store/group/phys_exotica/dijet/Dijet13TeV/woodson/reduced_skims/ScoutingCaloCommissioning2016BCD_JEC_CaloL1L2L3_PFL2L3Residual_NewBiasCorrectedFlat_Golden36410pb_20161206_021734.root
+eos/cms/store/group/phys_exotica/dijet/Dijet13TeV/woodson/reduced_skims/ScoutingCaloCommissioning2016E_JEC_CaloL1L2L3_PFL2L3Residual_NewBiasCorrectedFlat_Golden36410pb_20161206_021753.root
+eos/cms/store/group/phys_exotica/dijet/Dijet13TeV/woodson/reduced_skims/ScoutingCaloCommissioning2016F_JEC_CaloL1L2L3_PFL2L3Residual_NewBiasCorrectedFlat_Golden36410pb_20161206_022033.root
+eos/cms/store/group/phys_exotica/dijet/Dijet13TeV/woodson/reduced_skims/ScoutingCaloCommissioning2016G_JEC_CaloL1L2L3_PFL2L3Residual_NewBiasCorrectedFlat_Golden36410pb_20161206_022325.root
+eos/cms/store/group/phys_exotica/dijet/Dijet13TeV/woodson/reduced_skims/ScoutingCaloCommissioning2016H_JEC_CaloL1L2L3_PFL2L3Residual_NewBiasCorrectedFlat_Golden36410pb_20161206_022333.root
+
 === CaloScouting (12.9 /fb) ===
 
 /ScoutingCaloHT/Run2016B-v1/RAW
