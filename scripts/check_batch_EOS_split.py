@@ -10,6 +10,8 @@ import re
 # Warning: as of 14Jun16 this script cannot recognize all the problems with batch running.
 # It does not check if the output file is there, so some exotic lxbatch errors go unnoticed. Juska.
 
+# Modified script to check for output in eos: assumes eos directory is mounted in top-level directory: "eosmount eos"
+
 _checklog = False # Disable .log file check as they are not there anymore. Juska 14Jun16.
 
 usage = "usage: To be run from DijetRootTreeAnalyzer/ :  python scripts/check_batch_EOS_split.py -i batchDir -s storageDir"
@@ -73,38 +75,45 @@ for srcFile in out:
     #print rootfilereduced
 
 
-    if (_checklog):  
-        #check presence of logfile
-        proclog = subprocess.Popen(["ls %s" % opt.inputDir+"/"+logfile], stdout=subprocess.PIPE, shell=True)
-        (outlog, errlog) = proclog.communicate()
-        #print "len(outlog)="+str(len(outlog))
-        if len(outlog) == 0:
-            resubmit = 1
-            overallresubmit = 1
+    ## if (_checklog):  
+    ##     #check presence of logfile
+    ##     proclog = subprocess.Popen(["ls %s" % opt.inputDir+"/"+logfile], stdout=subprocess.PIPE, shell=True)
+    ##     (outlog, errlog) = proclog.communicate()
+    ##     #print "len(outlog)="+str(len(outlog))
+    ##     if len(outlog) == 0:
+    ##         resubmit = 1
+    ##         overallresubmit = 1
 
-    #check presence of crablogfile
-    proccrablog = subprocess.Popen(["ls %s" % opt.inputDir+"/"+crablogfile], stdout=subprocess.PIPE, shell=True)
-    (outcrablog, errcrablog) = proccrablog.communicate()
-    #print "len(outcrablog)="+str(len(outcrablog))
-    if len(outcrablog) == 0:
+    ## #check presence of crablogfile
+    ## proccrablog = subprocess.Popen(["ls %s" % opt.inputDir+"/"+crablogfile], stdout=subprocess.PIPE, shell=True)
+    ## (outcrablog, errcrablog) = proccrablog.communicate()
+    ## #print "len(outcrablog)="+str(len(outcrablog))
+    ## if len(outcrablog) == 0:
+    ##     resubmit = 1
+    ##     overallresubmit = 1
+
+    ## #check content of crablogfile
+    ## proccrablogcont = subprocess.Popen(["less %s" % opt.inputDir+"/"+crablogfile], stdout=subprocess.PIPE, shell=True)
+    ## (outcrablogcont, errcrablogcont) = proccrablogcont.communicate()
+    ## #print outcrablogcont
+    ## if ("Successfully completed." in outcrablogcont)==False:
+    ##     resubmit = 1
+    ##     overallresubmit = 1
+
+    #check presence of output file in EOS directory    
+    procroot = subprocess.Popen(["ls %s" % opt.storageDir+"/"+rootfilereduced], stdout=subprocess.PIPE, shell=True)
+    (outroot, errroot) = procroot.communicate()
+    if len(outroot) == 0:
         resubmit = 1
         overallresubmit = 1
-
-    #check content of crablogfile
-    proccrablogcont = subprocess.Popen(["less %s" % opt.inputDir+"/"+crablogfile], stdout=subprocess.PIPE, shell=True)
-    (outcrablogcont, errcrablogcont) = proccrablogcont.communicate()
-    #print outcrablogcont
-    if ("Successfully completed." in outcrablogcont)==False:
-        resubmit = 1
-        overallresubmit = 1
-
-    #check presence of output file in EOS directory
     
         
     if resubmit == 1:
         print "=== job "+numberOfJob+" should be resubmmitted"
         print outResub[int(numberOfJob)]
-        os.system(outResub[int(numberOfJob)])
+        #os.system(outResub[int(numberOfJob)])
+        #print 'source %s/%s'%(opt.inputDir,srcFile)
+        #os.system('source %s/%s'%(opt.inputDir,srcFile))
         toBeResubmitted += 1
 
         
