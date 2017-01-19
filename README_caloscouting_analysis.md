@@ -97,6 +97,7 @@ Instructions to run Calo Scouting Dijet Resonance Search from start to finish.
 Note it takes a long time to convert the tree into a RooDataSet for fitting. Since this only needs to be done once, you can repeat the fit with a file that contains only the RooDataSet (produced the first time you run the command above). This is helpful if you want to change the binning of the plot, etc.
 
 11. Refitting BCDEFG trigger-turn-on with RooDataSet
+
     ```sh
     python python/BinnedFit.py -b CaloDijet2016 -c config/dijet_turnon.config -t fits_2016_12_14/CaloDijet2016BCDEFG_Full_hltturnon/triggerData.root --fit-trigger -d fits_2016_12_14/CaloDijet2016BCDEFG_Full_hltturnon/ inputs/data_CaloScoutingHT_Run2016BCDEFGH_NoBiasCorr_Mjj300_Golden36410pb_CaloDijet2016.root  -l 27637  --run-min 0 --run-max 280385
     ```
