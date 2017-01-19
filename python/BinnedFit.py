@@ -217,6 +217,10 @@ if __name__ == '__main__':
                   help="Output directory to store cards")
     parser.add_option('-l','--lumi',dest="lumi", default=1.,type="float",
                   help="integrated luminosity in pb^-1")
+    parser.add_option('--run-min',dest="runMin", default=0,type="int",
+                  help="minimum run to consider for trigger efficiency")
+    parser.add_option('--run-max',dest="runMax", default=999999,type="int",
+                  help="maximum run to consider for trigger efficiency")
     parser.add_option('-b','--box',dest="box", default="CaloDijet",type="string",
                   help="box name")
     parser.add_option('--no-fit',dest="noFit",default=False,action='store_true',
@@ -334,15 +338,31 @@ if __name__ == '__main__':
         triggerFile = rt.TFile.Open(options.triggerDataFile)
         names = [k.GetName() for k in triggerFile.GetListOfKeys()]
         if 'triggerData' not in names:
-            tree = triggerFile.Get("rootTupleTree/tree")      
+            tree = triggerFile.Get("rootTupleTree/tree")    
+            tree.SetBranchStatus('*',0)        
+            tree.SetBranchStatus('mjj%s'%corr,1)
+            tree.SetBranchStatus('passHLT_CaloScoutingHT250',1)
+            tree.SetBranchStatus('passHLT_CaloJet40_CaloScouting_PFScouting',1)
+            tree.SetBranchStatus('event',1)
+            tree.SetBranchStatus('lumi',1)
+            tree.SetBranchStatus('run',1)
+            tree.SetBranchStatus('PassJSON',1)
+            tree.SetBranchStatus('deltaETAjj',1)
+            tree.SetBranchStatus('deltaPHIjj',1)
+            tree.SetBranchStatus('phiWJ_j1',1)
+            tree.SetBranchStatus('phiWJ_j2',1)
+            tree.SetBranchStatus('etaWJ_j1',1)
+            tree.SetBranchStatus('etaWJ_j2',1)
+            tree.SetBranchStatus('pTWJ_j1%s'%corr,1)
+            tree.SetBranchStatus('pTWJ_j2%s'%corr,1)
             triggerData = rt.RooDataSet("triggerData","triggerData",rt.RooArgSet(w.var("mjj"),w.cat("cut")))
             # l1 efficiency:
             if options.l1Trigger:
-                cutString = 'abs(deltaETAjj)<1.3&&abs(etaWJ_j1)<2.5&&abs(etaWJ_j2)<2.5&&pTWJ_j1%s>60&&pTWJ_j2%s>30&&PassJSON&&passHLT_CaloJet40_CaloScouting_PFScouting&&mjj>=%i&&mjj<%i'%(corr,corr,w.var("mjj").getMin("Eff"),w.var("mjj").getMax("Eff"))                
+                cutString = 'abs(deltaETAjj)<1.3&&abs(etaWJ_j1)<2.5&&abs(etaWJ_j2)<2.5&&pTWJ_j1%s>60&&pTWJ_j2%s>30&&PassJSON&&passHLT_CaloJet40_CaloScouting_PFScouting&&mjj%s>=%i&&mjj%s<%i&&run>=%i&&run<=%i'%(corr,corr,corr,w.var("mjj").getMin("Eff"),corr,w.var("mjj").getMax("Eff"),options.runMin,options.runMax)                
             # hlt efficiency:
             else:
                 #cutString = 'abs(deltaETAjj)<1.3&&abs(etaWJ_j1)<2.5&&abs(etaWJ_j2)<2.5&&pTWJ_j1%s>60&&pTWJ_j2%s>30&&PassJSON&&passHLT_L1HTT_CaloScouting_PFScouting&&mjj>=%i&&mjj<%i'%(corr,corr,w.var("mjj").getMin("Eff"),w.var("mjj").getMax("Eff"))
-                cutString = 'abs(deltaETAjj)<1.3&&abs(etaWJ_j1)<2.5&&abs(etaWJ_j2)<2.5&&pTWJ_j1%s>60&&pTWJ_j2%s>30&&PassJSON&&passHLT_CaloJet40_CaloScouting_PFScouting&&mjj>=%i&&mjj<%i'%(corr,corr,w.var("mjj").getMin("Eff"),w.var("mjj").getMax("Eff"))
+                cutString = 'abs(deltaETAjj)<1.3&&abs(etaWJ_j1)<2.5&&abs(etaWJ_j2)<2.5&&pTWJ_j1%s>60&&pTWJ_j2%s>30&&PassJSON&&passHLT_CaloJet40_CaloScouting_PFScouting&&mjj%s>=%i&&mjj%s<%i&&run>=%i&&run<=%i'%(corr,corr,corr,w.var("mjj").getMin("Eff"),corr,w.var("mjj").getMax("Eff"),options.runMin,options.runMax)
             #set the RooArgSet and save
             tree.Draw('>>elist',cutString,'entrylist')        
             elist = rt.gDirectory.Get('elist')    
@@ -382,7 +402,7 @@ if __name__ == '__main__':
             eff = effGraph.GetY()[i]
             effUp = effGraph.GetEYhigh()[i]
             effDown = effGraph.GetEYlow()[i]
-            print "eff = %f (%+f/, %+f)" %(eff,effUp,-effDown)
+            print "eff [%i, %i] = %f (%+f/, %+f)" %(x[i],x[i+1],eff,effUp,-effDown)
             if w.var('eff_bin%02d'%(i))!=None:
                 if (eff <= 0 or eff >= 1):
                     w.var('eff_bin%02d'%(i)).setVal(1)
@@ -602,7 +622,8 @@ if __name__ == '__main__':
         binning = rt.RooBinning(w.var('mjj').getMin('Eff'),w.var('mjj').getMax('Eff'))
         xEff = array('d',[w.var('mjj').getMin('Eff')])
         if options.doTriggerFit or options.doSimultaneousFit or options.noFit:
-            plotForLoop = range(int(x[0])+1,int(x[-1]),1)
+            #plotForLoop = range(int(x[0])+1,int(x[-1]),1)
+            plotForLoop = x[1:]
         else:
             plotForLoop = x[1:-1]
         for iBin in plotForLoop:
@@ -631,7 +652,8 @@ if __name__ == '__main__':
         if options.l1Trigger:
             histo.GetXaxis().SetRangeUser(w.var('mjj').getMin('Eff'),x[15])
         else:            
-            histo.GetXaxis().SetRangeUser(w.var('mjj').getMin('Eff'),x[7])
+            #histo.GetXaxis().SetRangeUser(w.var('mjj').getMin('Eff'),x[7])
+            histo.GetXaxis().SetRangeUser(w.var('mjj').getMin('Eff'),x[-1])
         #histo.GetXaxis().SetRangeUser(w.var('mjj').getMin('Eff'),1000)
         histo.SetMinimum(0.)
         histo.SetMaximum(1.1)        
@@ -679,10 +701,14 @@ if __name__ == '__main__':
         #l.DrawLatex(0.3,0.96,"Preliminary")
         #paper
         l.SetTextFont(62)
-        l.SetTextSize(0.055)   
-        l.DrawLatex(0.175,0.85,"CMS")
+        l.SetTextSize(0.065)   
+        l.DrawLatex(0.22,0.89,"CMS")
+        l.SetTextFont(52)
+        l.SetTextSize(0.045)
+        l.DrawLatex(0.32,0.89,"Preliminary")
         
-        leg = rt.TLegend(0.7,0.7,0.89,0.88)
+        #leg = rt.TLegend(0.7,0.7,0.89,0.88)
+        leg = rt.TLegend(0.7,0.1,0.89,0.28)
         leg.SetTextFont(42)
         leg.SetFillColor(rt.kWhite)
         leg.SetFillStyle(0)
@@ -730,7 +756,8 @@ if __name__ == '__main__':
         if options.l1Trigger:
             h_eff_residual_vs_mass.GetXaxis().SetRangeUser(w.var('mjj').getMin('Eff'),x[15])    
         else:
-            h_eff_residual_vs_mass.GetXaxis().SetRangeUser(w.var('mjj').getMin('Eff'),x[7])    
+            #h_eff_residual_vs_mass.GetXaxis().SetRangeUser(w.var('mjj').getMin('Eff'),x[7])
+            h_eff_residual_vs_mass.GetXaxis().SetRangeUser(w.var('mjj').getMin('Eff'),x[-1])    
         h_eff_residual_vs_mass.GetYaxis().SetRangeUser(-6.5,6.5)
         h_eff_residual_vs_mass.GetYaxis().SetNdivisions(210,True)
         h_eff_residual_vs_mass.SetLineWidth(1)
@@ -939,6 +966,9 @@ if __name__ == '__main__':
     l.SetTextFont(62)
     l.SetTextSize(0.065)
     l.DrawLatex(0.22,0.89,"CMS")
+    l.SetTextFont(52)
+    l.SetTextSize(0.045)
+    l.DrawLatex(0.32,0.89,"Preliminary")
         
     if options.signalFileName!=None:
         if 'Calo' in box:
@@ -975,9 +1005,9 @@ if __name__ == '__main__':
     pave_sel.SetTextFont(42)
     pave_sel.SetTextSize(0.045)
     pave_sel.SetTextAlign(11)
-    #pave_sel.AddText("#chi^{{2}} / ndf = {0:.1f} / {1:d} = {2:.1f}".format(
-    #                      list_chi2AndNdf_background[4], list_chi2AndNdf_background[5],
-    #                      list_chi2AndNdf_background[4]/list_chi2AndNdf_background[5]))
+    pave_sel.AddText("#chi^{{2}} / ndf = {0:.1f} / {1:d} = {2:.1f}".format(
+                          list_chi2AndNdf_background[4], list_chi2AndNdf_background[5],
+                          list_chi2AndNdf_background[4]/list_chi2AndNdf_background[5]))
 
     if 'Calo' in box:
         pave_sel.AddText("Wide Calo-jets")
