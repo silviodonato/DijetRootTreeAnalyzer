@@ -412,6 +412,7 @@ if __name__ == '__main__':
         if isinstance(d, rt.TH1):
             #d.SetDirectory(rt.gROOT)
             if name=='h_%s_%i'%(model,massPoint):
+                print "====>>> ", signalXsec,lumi,d.Integral()
                 d.Scale(signalXsec*lumi/d.Integral())
                 if options.trigger:
                     d_turnon = applyTurnonFunc(d,effFrIn,w)
