@@ -7,7 +7,7 @@ from optparse import OptionParser
 
 def getThyXsecDict():    
     thyXsecDict = {}
-    xsecFiles = ['data/all_lowmass_lhc13TeV.txt','data/rsg_gg_lhc13TeV.txt','data/S8_13TeV_narrow.txt','data/string_total_13TeV.txt','data/axi_lhc13TeV_NLO.txt','data/dm_xsec.txt']
+    xsecFiles = ['data/all_lowmass_lhc13TeV.txt','data/rsg_gg_lhc13TeV.txt','data/S8_13TeV_narrow.txt','data/string_total_13TeV.txt','data/axi_lhc13TeV_NLO.txt','data/dm_xsec.txt','data/Zprimebb_xsec.txt','data/dmbb_xsec.txt']
     print xsecFiles
     for xsecFile in xsecFiles:
         moreThyModels = []
@@ -34,6 +34,8 @@ def getThyXsecDict():
         thyXsecDict['AxigluonkNLO'][mass] = 1.08 * thyXsec
     for (mass,thyXsec) in thyXsecDict['DM1GeV'].iteritems():
         thyXsecDict['DM1GeV'][mass] = (5./6.) * thyXsec
+    for (mass,thyXsec) in thyXsecDict['DMbb1GeV'].iteritems():
+        thyXsecDict['DMbb1GeV'][mass] = (5./6.) * thyXsec
     return thyXsecDict
 
 
@@ -293,6 +295,8 @@ if __name__ == '__main__':
     elif options.model=='qq':        
         if 'PF' in options.box:
             thyModelsToDraw = ['AxigluonNLO','E6Diquark',"W'","Z'",'DM1GeV']            
+        if 'PF' in options.box and 'bb' in options.box:
+            thyModelsToDraw = ["Zprimebb",'DMbb1GeV']            
         else:
             thyModelsToDraw = ['AxigluonkNLO','E6Diquark',"W'","Z'",'DM1GeV']            
     elif options.model=='qg':
@@ -317,9 +321,11 @@ if __name__ == '__main__':
                  'S8':1,
                  "W'":5,
                  "Z'":6,       
+                 "Zprimebb":6,       
                  "String":7,     
                  "q*":10,
                  "DM1GeV": 8,
+                 "DMbb1GeV": 8,
                  'None':1               
                  }
         
@@ -332,7 +338,9 @@ if __name__ == '__main__':
                  'S8':rt.kMagenta,
                  "W'":rt.kRed+1,
                  "Z'":rt.kBlue-1,
+                 "Zprimebb":rt.kBlue-1,
                  "DM1GeV":rt.kViolet,
+                 "DMbb1GeV":rt.kViolet,
                  "String":rt.kAzure-3,
                  "q*":rt.kBlack,
                  'None':1,
@@ -361,7 +369,9 @@ if __name__ == '__main__':
                    'None': '',
                    "W'": "W'",
                    "Z'": "Z'",
+                   "Zprimebb": "Z' to bb",
                    "DM1GeV": "DM mediator",
+                   "DMbb1GeV": "DM mediator to bb",
                     "String": "String",
                     "q*": "Excited quark",
                    'gg':'gluon-gluon',
@@ -673,8 +683,9 @@ if __name__ == '__main__':
             yOffset = -0.138
         else:
             #yOffset = 6.5e-5 # for 1e-4 min
-            yOffset = 5.25e-6 # for 1e-5 min
-        for i in range(1,8):
+            #yOffset = 5.25e-6 # for 1e-5 min
+            yOffset = 5.25e-8 # for 1e-5 min
+        for i in range(1,10):
             if i*1000>=options.massMin:
                 xLab.DrawLatex(i*1000, yOffset, "%g"%i)
 

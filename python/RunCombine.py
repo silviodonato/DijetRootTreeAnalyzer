@@ -206,7 +206,7 @@ def main(options,args):
         elif box=='PFDijet2016':
             signalDsName = 'inputs/ResonanceShapes_%s_13TeV_Spring16.root'%model
         elif 'PFDijetbb2016' in box:
-            signalDsName = 'inputs/ResonanceShapes_%s_13TeV_Spring16.root'%model
+            signalDsName = 'inputs/ResonanceShapes_%s_bb_13TeV_Spring16.root'%model
             
         backgroundDsName = {'CaloDijet2015':'inputs/data_CaloScoutingHT_Run2015D_BiasCorrected_CaloDijet2015.root',
                             'CaloDijet2016':'inputs/data_CaloScoutingHT_Run2016BCD_NewBiasCorrectedFlat_Golden12910pb_CaloDijet2016.root',
