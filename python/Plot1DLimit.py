@@ -730,4 +730,16 @@ if __name__ == '__main__':
             else:
                 c.SaveAs(options.outDir+"/limits_freq_"+options.model+"_"+options.box.lower()+".pdf")
                 c.SaveAs(options.outDir+"/limits_freq_"+options.model+"_"+options.box.lower()+".C")
+                outFile = rt.TFile.Open(options.outDir+"/limits_freq_"+options.model+"_"+options.box.lower()+".root","recreate")
+                outFile.cd()
+                c.Write()
+                graphDict = {}
+                graphDict['obs'] = gr_observedLimit
+                graphDict['exp'] = gr_expectedLimit
+                graphDict['exp1sigma'] = gr_expectedLimit1sigma
+                graphDict['exp2sigma'] = gr_expectedLimit2sigma
+                for limitType, graphs in graphDict.iteritems(): 
+                    for (Box,model), graph in graphs.iteritems():
+                        graph.SetName('%s_%s_%s'%(limitType,model,Box.lower()))
+                        graph.Write()
 
