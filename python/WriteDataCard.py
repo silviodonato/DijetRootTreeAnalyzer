@@ -517,6 +517,9 @@ if __name__ == '__main__':
                 if 'p3_%s'%box in paramNames:
                     loc = paramNames.index('p3_%s'%box)
                     paramNames[loc] = 'deco_%s_eig3'%box
+                if 'p4_%s'%box in paramNames:
+                    loc = paramNames.index('p4_%s'%box)
+                    paramNames[loc] = 'deco_%s_eig4'%box
                     
             bkgs = bkgs_deco
             
