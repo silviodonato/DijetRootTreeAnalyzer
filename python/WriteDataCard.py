@@ -412,6 +412,7 @@ if __name__ == '__main__':
         if isinstance(d, rt.TH1):
             #d.SetDirectory(rt.gROOT)
             if name=='h_%s_%i'%(model,massPoint):
+                print "====>>> ", signalXsec,lumi,d.Integral()
                 d.Scale(signalXsec*lumi/d.Integral())
                 if options.trigger:
                     d_turnon = applyTurnonFunc(d,effFrIn,w)
@@ -484,7 +485,21 @@ if __name__ == '__main__':
             w.factory('SUM::extSpBPdf(Ntot_sig_%s*%s_sig,Ntot_bkg_%s*%s_bkg)'%(box,box,box,box))
             w.factory('SUM::extSigPdf(Ntot_sig_%s*%s_sig)'%(box,box))
             frSpB = BinnedFit.binnedFit(w.pdf('extSpBPdf'), w.data('data_obs'))
-            condCovMatrix = frSpB.conditionalCovarianceMatrix(rt.RooArgList(w.var('Ntot_bkg_%s'%box),w.var('p1_%s'%box),w.var('p2_%s'%box),w.var('p3_%s'%box)))
+            paramsToDecoNames = []
+            for p in rootTools.RootIterator.RootIterator(frSpB.floatParsFinal()):
+                paramsToDecoNames.append(p.GetName)                
+            paramsToDeco = rt.RooArgList()
+            if 'Ntot_bkg_%s'%box in paramsToDecoNames:
+                paramsToDeco.add(w.var('Ntot_bkg_%s'%box))
+            if 'p1_%s'%box in paramsToDecoNames:
+                paramsToDeco.add(w.var('p1_%s'%box))
+            if 'p2_%s'%box in paramsToDecoNames:
+                paramsToDeco.add(w.var('p2_%s'%box))
+            if 'p3_%s'%box in paramsToDecoNames:
+                paramsToDeco.add(w.var('p3_%s'%box))
+            if 'p4_%s'%box in paramsToDecoNames:
+                paramsToDeco.add(w.var('p4_%s'%box))                    
+            condCovMatrix = frSpB.conditionalCovarianceMatrix(paramsToDeco)
             w.var('mu').setConstant(True)
             frSpB_muFixed = BinnedFit.binnedFit(w.pdf('extSpBPdf'), w.data('data_obs'))
             covMatrix = frSpB_muFixed.covarianceMatrix()
@@ -516,6 +531,9 @@ if __name__ == '__main__':
                 if 'p3_%s'%box in paramNames:
                     loc = paramNames.index('p3_%s'%box)
                     paramNames[loc] = 'deco_%s_eig3'%box
+                if 'p4_%s'%box in paramNames:
+                    loc = paramNames.index('p4_%s'%box)
+                    paramNames[loc] = 'deco_%s_eig4'%box
                     
             bkgs = bkgs_deco
             
