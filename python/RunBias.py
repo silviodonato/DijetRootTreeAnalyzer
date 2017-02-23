@@ -51,8 +51,9 @@ if __name__ == '__main__':
     (options,args) = parser.parse_args()
 
     pdfIndexMap = {'fourparam': 0,
-                   #'atlas': 1,
-                   'modexp': 1
+                   'modexp': 1,
+                   'fiveparam': 2,
+                   'atlas': 3,
                    }
 
     box = options.box
@@ -60,7 +61,8 @@ if __name__ == '__main__':
     model = options.model
     
     backgroundDsName = {'CaloDijet2015':'inputs/data_CaloScoutingHT_Run2015D_BiasCorrected_CaloDijet2015.root',
-                        'CaloDijet2016':'inputs/data_CaloScoutingHT_Run2016BCD_NewBiasCorrectedFlat_Golden12910pb_CaloDijet2016.root',
+                        #'CaloDijet2016':'inputs/data_CaloScoutingHT_Run2016BCD_NewBiasCorrectedFlat_Golden12910pb_CaloDijet2016.root',
+                        'CaloDijet2016':'inputs/data_CaloScoutingHT_Run2016BCDEFG_BiasCorrected_Mjj300_Golden27637pb_CaloDijet2016.root',
                         'PFDijet2016':'inputs/data_PFRECOHT_Run2016BCD_Golden12910pb_PFDijet2016.root',
                         'CaloDijet20152016':'inputs/data_CaloScoutingHT_Run2015D2016B_CaloDijet20152016.root'
                         }
