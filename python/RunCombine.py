@@ -209,7 +209,8 @@ def main(options,args):
             signalDsName = 'inputs/ResonanceShapes_%s_bb_13TeV_Spring16.root'%model
             
         backgroundDsName = {'CaloDijet2015':'inputs/data_CaloScoutingHT_Run2015D_BiasCorrected_CaloDijet2015.root',
-                            'CaloDijet2016':'inputs/data_CaloScoutingHT_Run2016BCD_NewBiasCorrectedFlat_Golden12910pb_CaloDijet2016.root',
+                            #'CaloDijet2016':'inputs/data_CaloScoutingHT_Run2016BCD_NewBiasCorrectedFlat_Golden12910pb_CaloDijet2016.root',
+                            'CaloDijet2016':'inputs/data_CaloScoutingHT_Run2016BCDEFG_BiasCorrected_Mjj300_Golden27637pb_CaloDijet2016.root',
                             #'PFDijet2016':'inputs/data_PFRECOHT_Run2016BCD_Golden12910pb_PFDijet2016.root',
                             'CaloDijet20152016':'inputs/data_CaloScoutingHT_Run2015D2016B_CaloDijet20152016.root',
                             'PFDijet2016':'inputs/moriond16_v1_36fb_jsonFix.root',
@@ -235,9 +236,13 @@ def main(options,args):
         decoString = ''
         if options.deco:
             decoString  ='--deco'
+            
+        multiString = ''
+        if options.multi:
+            decoString  ='--multi'
 
         for massPoint in massIterable(options.mass):
-            exec_me('python python/WriteDataCard.py -m %s --mass %s -i %s -l %f -c %s -b %s -d %s %s %s %s %s %s %s'%(model, massPoint, options.inputFitFile,1000*lumi,options.config,box,options.outDir,signalDsName,backgroundDsName[box],penaltyString,signalSys,xsecString,decoString),options.dryRun)    
+            exec_me('python python/WriteDataCard.py -m %s --mass %s -i %s -l %f -c %s -b %s -d %s %s %s %s %s %s %s'%(model, massPoint, options.inputFitFile,1000*lumi,options.config,box,options.outDir,signalDsName,backgroundDsName[box],penaltyString,signalSys,xsecString,decoString,multiString),options.dryRun)    
             if options.bayes:
                 rRangeString =  '--setPhysicsModelParameterRanges '
                 if options.deco:
@@ -366,6 +371,8 @@ if __name__ == '__main__':
                   help="queue: 1nh, 8nh, 1nd, etc.")
     parser.add_option('-t','--toys',dest="toys",default=-1,type="int",
                   help="number of toys per job(for bayesian expected limits)")
+    parser.add_option('--multi',dest="multi",default=False,action='store_true',
+                  help="using RooMultiPdf for total background")
 
 
     (options,args) = parser.parse_args()

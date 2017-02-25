@@ -50,10 +50,10 @@ if __name__ == '__main__':
     
     (options,args) = parser.parse_args()
 
-    pdfIndexMap = {'fourparam': 0,
-                   'modexp': 1,
-                   'fiveparam': 2,
-                   'atlas': 3,
+    pdfIndexMap = {#'fourparam': 0,
+                   'modexp': 0,
+                   'fiveparam': 1,
+                   'atlas': 2,
                    }
 
     box = options.box
