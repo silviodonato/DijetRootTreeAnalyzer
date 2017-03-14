@@ -101,9 +101,15 @@ def getHybridCLsArrays(directory, model, Box, bayes):
         expectedLimit_plus1sigma.append(xsecULExpPlus - xsecULExp)#*crossSections[i])
         expectedLimit_minus2sigma.append(xsecULExp - xsecULExpMinus2)#*crossSections[i])
         expectedLimit_plus2sigma.append(xsecULExpPlus2 - xsecULExp)#*crossSections[i])
-    
 
-    return gluinoMassArray, gluinoMassArray_er, observedLimit, observedLimit_er, expectedLimit, expectedLimit_minus1sigma, expectedLimit_plus1sigma, expectedLimit_minus2sigma, expectedLimit_plus2sigma
+    #return gluinoMassArray, gluinoMassArray_er, observedLimit, observedLimit_er, expectedLimit, expectedLimit_minus1sigma, expectedLimit_plus1sigma, expectedLimit_minus2sigma, expectedLimit_plus2sigma
+    
+    # sort arrays first by gluino mass (in case tree entries are out of order)
+    allTuples = zip(*sorted(zip(gluinoMassArray, gluinoMassArray_er, observedLimit, observedLimit_er, expectedLimit, expectedLimit_minus1sigma, expectedLimit_plus1sigma, expectedLimit_minus2sigma, expectedLimit_plus2sigma)))
+    allArrays = []
+    for t in allTuples:
+        allArrays.append(array('d',t))
+    return tuple(allArrays)
 
 
 def getSignificanceArrays(directory, model, Box):
@@ -160,8 +166,14 @@ def getSignificanceArrays(directory, model, Box):
         expectedLimit_minus2sigma.append(xsecULExp - xsecULExpMinus2)#*crossSections[i])
         expectedLimit_plus2sigma.append(xsecULExpPlus2 - xsecULExp)#*crossSections[i])
     
-
-    return gluinoMassArray, gluinoMassArray_er, observedLimit, observedLimit_er, expectedLimit, expectedLimit_minus1sigma, expectedLimit_plus1sigma, expectedLimit_minus2sigma, expectedLimit_plus2sigma
+    
+    #return gluinoMassArray, gluinoMassArray_er, observedLimit, observedLimit_er, expectedLimit, expectedLimit_minus1sigma, expectedLimit_plus1sigma, expectedLimit_minus2sigma, expectedLimit_plus2sigma    
+    # sort arrays first by gluino mass (in case tree entries are out of order)
+    allTuples = zip(*sorted(zip(gluinoMassArray, gluinoMassArray_er, observedLimit, observedLimit_er, expectedLimit, expectedLimit_minus1sigma, expectedLimit_plus1sigma, expectedLimit_minus2sigma, expectedLimit_plus2sigma)))
+    allArrays = []
+    for t in allTuples:
+        allArrays.append(array('d',t))
+    return tuple(allArrays)
     
 def setstyle():
     # For the canvas:
