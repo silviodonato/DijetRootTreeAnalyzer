@@ -421,7 +421,6 @@ if __name__ == '__main__':
     model = options.model
     massPoint = options.mass
     histoName = cfg.getVariables(box, "histoName")
-    mcName = cfg.getVariables(box, "mcName")
 
     myTH1 = None
     for f in args:
@@ -675,7 +674,8 @@ if __name__ == '__main__':
 
     if options.mcFile is not None:
         bkgs = ['bkg']
-        mcFile = rt.TFile.Open(options.mcFile,'read')
+        mcFile = rt.TFile.Open(options.mcFile,'read')        
+        mcName = cfg.getVariables(box, "mcName")
         mcHist = mcFile.Get(mcName)        
         mcHist.Rebin(len(x)-1,'mc_rebin',x)
         mcHist_rebin = rt.gDirectory.Get('mc_rebin')
