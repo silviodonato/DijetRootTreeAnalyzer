@@ -251,6 +251,67 @@ def writeDataCard(box,model,txtfileName,bkgs,paramNames,w,penalty,fixed,shapes=[
         txtfile = open(txtfileName,"w")
         txtfile.write(datacard)
         txtfile.close()
+        
+def writeDataCardMC(box,model,txtfileName,bkgs,paramNames,w):
+        obsRate = w.data("data_obs").sumEntries()
+        nBkgd = len(bkgs)
+        rootFileName = txtfileName.replace('.txt','.root')
+        signals = len(model.split('p'))
+        if signals>1:
+                rates = [w.data("%s_%s"%(box,sig)).sumEntries() for sig in model.split('p')]
+                processes = ["%s_%s"%(box,sig) for sig in model.split('p')]
+                if '2015' in box:
+                        lumiErrs = [1.027 for sig in model.split('p')]
+                elif '2016' in box:
+                        lumiErrs = [1.062 for sig in model.split('p')]                  
+        else:
+                rates = [w.data("%s_%s"%(box,model)).sumEntries()]
+                processes = ["%s_%s"%(box,model)]
+                if '2015' in box:
+                        lumiErrs = [1.027]
+                elif '2016' in box:
+                        lumiErrs = [1.062]            
+        rates.extend([w.var('Ntot_%s_%s'%(bkg,box)).getVal() for bkg in bkgs])
+        processes.extend(["%s_%s"%(box,bkg) for bkg in bkgs])
+        if '2015' in box:
+                lumiErrs.extend([1.027 for bkg in bkgs])
+        elif '2016' in box:
+                lumiErrs.extend([1.062 for bkg in bkgs])
+        divider = "------------------------------------------------------------\n"
+        datacard = "imax 1 number of channels\n" + \
+                   "jmax %i number of processes minus 1\n"%(nBkgd+signals-1) + \
+                   "kmax * number of nuisance parameters\n" + \
+                   divider + \
+                   "observation	%.3f\n"%obsRate + \
+                   divider + \
+                   "shapes * * %s w%s:$PROCESS w%s:$PROCESS_$SYSTEMATIC\n"%(rootFileName,box,box) + \
+                   divider
+        binString = "bin"
+        processString = "process"
+        processNumberString = "process"
+        rateString = "rate"
+        lumiString = "lumi\tlnN"
+        for i in range(0,len(bkgs)+signals):
+            binString +="\t%s"%box
+            processString += "\t%s"%processes[i]
+            processNumberString += "\t%i"%(i-signals+1)
+            rateString += "\t%.3f" %rates[i]
+            lumiString += "\t%.3f"%lumiErrs[i]
+        binString+="\n"; processString+="\n"; processNumberString+="\n"; rateString +="\n"; lumiString+="\n"
+        datacard+=binString+processString+processNumberString+rateString+divider
+        # now nuisances
+        datacard+=lumiString
+        for shape in shapes:
+            shapeString = '%s\tshape\t'%shape
+            for sig in range(0,signals):
+                shapeString += '\t1.0'
+            for i in range(0,len(bkgs)):
+                shapeString += '\t-'
+            shapeString += '\n'
+            datacard+=shapeString
+        txtfile = open(txtfileName,"w")
+        txtfile.write(datacard)
+        txtfile.close()
 
 def convertToTh1xHist(hist):
     
@@ -343,6 +404,9 @@ if __name__ == '__main__':
                   help="refit for S+B")
     parser.add_option('--multi',dest="multi",default=False,action='store_true',
                   help="using RooMultiPdf for total background")
+    parser.add_option('--mc',dest="mcFile", default=None,type="string",
+                  help="file containing MC-based background prediciton inputs")
+
 
     (options,args) = parser.parse_args()
     
@@ -412,6 +476,7 @@ if __name__ == '__main__':
         if isinstance(d, rt.TH1):
             #d.SetDirectory(rt.gROOT)
             if name=='h_%s_%i'%(model,massPoint):
+                print "====>>> ", signalXsec,lumi,d.Integral()
                 d.Scale(signalXsec*lumi/d.Integral())
                 if options.trigger:
                     d_turnon = applyTurnonFunc(d,effFrIn,w)
@@ -484,7 +549,21 @@ if __name__ == '__main__':
             w.factory('SUM::extSpBPdf(Ntot_sig_%s*%s_sig,Ntot_bkg_%s*%s_bkg)'%(box,box,box,box))
             w.factory('SUM::extSigPdf(Ntot_sig_%s*%s_sig)'%(box,box))
             frSpB = BinnedFit.binnedFit(w.pdf('extSpBPdf'), w.data('data_obs'))
-            condCovMatrix = frSpB.conditionalCovarianceMatrix(rt.RooArgList(w.var('Ntot_bkg_%s'%box),w.var('p1_%s'%box),w.var('p2_%s'%box),w.var('p3_%s'%box)))
+            paramsToDecoNames = []
+            for p in rootTools.RootIterator.RootIterator(frSpB.floatParsFinal()):
+                paramsToDecoNames.append(p.GetName)                
+            paramsToDeco = rt.RooArgList()
+            if 'Ntot_bkg_%s'%box in paramsToDecoNames:
+                paramsToDeco.add(w.var('Ntot_bkg_%s'%box))
+            if 'p1_%s'%box in paramsToDecoNames:
+                paramsToDeco.add(w.var('p1_%s'%box))
+            if 'p2_%s'%box in paramsToDecoNames:
+                paramsToDeco.add(w.var('p2_%s'%box))
+            if 'p3_%s'%box in paramsToDecoNames:
+                paramsToDeco.add(w.var('p3_%s'%box))
+            if 'p4_%s'%box in paramsToDecoNames:
+                paramsToDeco.add(w.var('p4_%s'%box))                    
+            condCovMatrix = frSpB.conditionalCovarianceMatrix(paramsToDeco)
             w.var('mu').setConstant(True)
             frSpB_muFixed = BinnedFit.binnedFit(w.pdf('extSpBPdf'), w.data('data_obs'))
             covMatrix = frSpB_muFixed.covarianceMatrix()
@@ -516,6 +595,9 @@ if __name__ == '__main__':
                 if 'p3_%s'%box in paramNames:
                     loc = paramNames.index('p3_%s'%box)
                     paramNames[loc] = 'deco_%s_eig3'%box
+                if 'p4_%s'%box in paramNames:
+                    loc = paramNames.index('p4_%s'%box)
+                    paramNames[loc] = 'deco_%s_eig4'%box
                     
             bkgs = bkgs_deco
             
@@ -590,10 +672,26 @@ if __name__ == '__main__':
         
             rootTools.Utils.importToWS(w,hDown_DataHist)
 
-            
+    if options.mcFile is not None:
+        bkgs = ['bkg']
+        mcFile = rt.TFile.Open(options.mcFile,'read')        
+        mcName = cfg.getVariables(box, "mcName")
+        mcHist = mcFile.Get(mcName)        
+        mcHist.Rebin(len(x)-1,'mc_rebin',x)
+        mcHist_rebin = rt.gDirectory.Get('mc_rebin')
+        mcHist_th1x = convertToTh1xHist(mcHist_rebin)
+        mcDataHist = rt.RooDataHist('%s_%s'%(box,'bkg'),'%s_%s'%(box,'bkg'), rt.RooArgList(th1x), rt.RooFit.Import(mcHist_th1x))
+        mcDataHist_mjj = rt.RooDataHist('%s_%s_mjj'%(box,'bkg'),'%s_%s_mjj'%(box,'bkg'), rt.RooArgList(w.var('mjj')), rt.RooFit.Import(mcHist))
+        rootTools.Utils.importToWS(w,mcDataHist)
+        rootTools.Utils.importToWS(w,mcDataHist_mjj)
+
+ 
     outFile = 'dijet_combine_%s_%i_lumi-%.3f_%s.root'%(model,massPoint,lumi/1000.,box)
     outputFile = rt.TFile.Open(options.outDir+"/"+outFile,"recreate")
-    writeDataCard(box,model,options.outDir+"/"+outFile.replace(".root",".txt"),bkgs,paramNames,w,options.penalty,options.fixed,shapes=shapes,multi=options.multi)
+    if options.mcFile is not None:
+        writeDataCardMC(box,model,options.outDir+"/"+outFile.replace(".root",".txt"),bkgs,paramNames,w)
+    else:
+        writeDataCard(box,model,options.outDir+"/"+outFile.replace(".root",".txt"),bkgs,paramNames,w,options.penalty,options.fixed,shapes=shapes,multi=options.multi)
     w.Write()
     w.Print('v')
     os.system("cat %s"%options.outDir+"/"+outFile.replace(".root",".txt"))

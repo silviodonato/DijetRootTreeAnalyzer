@@ -76,4 +76,28 @@ Instructions to run Calo Scouting Dijet Resonance Search from start to finish.
     $ python python/PlotBias.py -c config/dijet_bias.config --mass 750 -m gg -d signal_bias/ -r 1 -l 12.910 --xsec 10 -t 1000 --gen-pdf modexp  --fit-pdf fourparam
     ```
 
+### Fitting trigger efficiency in different run periods
 
+10. Copying Commisioning dataset (warning: large file)
+    ```sh
+    mkdir trigger
+    cd trigger
+    wget https://www.dropbox.com/s/djdx56s7gy7t4ct/ScoutingCaloCommissioning2016_JEC_CaloL1L2L3_PFL2L3Residual_NewBiasCorrectedFlat_Golden36410pb.root?dl=1
+    cd ..
+    ```
+    
+11. Fitting BCDEFG trigger-turn-on
+
+    ```sh
+    mkdir -p fits_2016_12_14/
+    mkdir -p fits_2016_12_14/CaloDijet2016BCDEFG_Full_hltturnon/
+    python python/BinnedFit.py -b CaloDijet2016 -c config/dijet_turnon.config -t trigger/ScoutingCaloCommissioning2016_JEC_CaloL1L2L3_PFL2L3Residual_NewBiasCorrectedFlat_Golden36410pb.root --fit-trigger -d fits_2016_12_14/CaloDijet2016BCDEFG_Full_hltturnon/ inputs/data_CaloScoutingHT_Run2016BCDEFGH_NoBiasCorr_Mjj300_Golden36410pb_CaloDijet2016.root  -l 27637  --run-min 0 --run-max 280385
+    ```
+    
+Note it takes a long time to convert the tree into a RooDataSet for fitting. Since this only needs to be done once, you can repeat the fit with a file that contains only the RooDataSet (produced the first time you run the command above). This is helpful if you want to change the binning of the plot, etc.
+
+11. Refitting BCDEFG trigger-turn-on with RooDataSet
+
+    ```sh
+    python python/BinnedFit.py -b CaloDijet2016 -c config/dijet_turnon.config -t fits_2016_12_14/CaloDijet2016BCDEFG_Full_hltturnon/triggerData.root --fit-trigger -d fits_2016_12_14/CaloDijet2016BCDEFG_Full_hltturnon/ inputs/data_CaloScoutingHT_Run2016BCDEFGH_NoBiasCorr_Mjj300_Golden36410pb_CaloDijet2016.root  -l 27637  --run-min 0 --run-max 280385
+    ```

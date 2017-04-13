@@ -154,6 +154,12 @@ def main(options,args):
 
     rRangeStringList = []
     sysStringList = []
+    
+    pdfIndexMap = {'modexp': 0,
+                   'fiveparam': 1,
+                   'atlas': 2,
+                   }
+        
     for box,lumi in zip(boxes,lumiFloat):
 
         paramDict = {}
@@ -206,10 +212,11 @@ def main(options,args):
         elif box=='PFDijet2016':
             signalDsName = 'inputs/ResonanceShapes_%s_13TeV_Spring16.root'%model
         elif 'PFDijetbb2016' in box:
-            signalDsName = 'inputs/ResonanceShapes_%s_13TeV_Spring16.root'%model
+            signalDsName = 'inputs/ResonanceShapes_%s_bb_13TeV_Spring16.root'%model
             
         backgroundDsName = {'CaloDijet2015':'inputs/data_CaloScoutingHT_Run2015D_BiasCorrected_CaloDijet2015.root',
-                            'CaloDijet2016':'inputs/data_CaloScoutingHT_Run2016BCD_NewBiasCorrectedFlat_Golden12910pb_CaloDijet2016.root',
+                            #'CaloDijet2016':'inputs/data_CaloScoutingHT_Run2016BCD_NewBiasCorrectedFlat_Golden12910pb_CaloDijet2016.root',
+                            'CaloDijet2016':'inputs/data_CaloScoutingHT_Run2016BCDEFG_BiasCorrected_Mjj300_Golden27637pb_CaloDijet2016.root',
                             #'PFDijet2016':'inputs/data_PFRECOHT_Run2016BCD_Golden12910pb_PFDijet2016.root',
                             'CaloDijet20152016':'inputs/data_CaloScoutingHT_Run2015D2016B_CaloDijet20152016.root',
                             'PFDijet2016':'inputs/moriond16_v1_36fb_jsonFix.root',
@@ -230,14 +237,27 @@ def main(options,args):
             sysString = '-S 0 --freezeNuisances=shapeBkg_%s_bkg_deco_%s__norm,deco_%s_eig1,deco_%s_eig2,deco_%s_eig3,jes,jer,lumi'%(box,box,box,box,box)
         elif options.noSys:
             sysString = '-S 0 --freezeNuisances=shapeBkg_%s_bkg_%s__norm,p1_%s,p2_%s,p3_%s,jes,jer,lumi'%(box,box,box,box,box)
+        elif options.multi and options.fitPdf!='all':
+            sysString = '--setPhysicsModelParameters pdf_index=%i --freezeNuisances pdf_index'%(pdfIndexMap[options.fitPdf])
+            if options.fitPdf != 'fiveparam':
+                sysString += ',p51_CaloDijet2016,p52_CaloDijet2016,p53_CaloDijet2016,p54_CaloDijet2016'
+            if options.fitPdf != 'modexp':
+                sysString += ',pm1_CaloDijet2016,pm2_CaloDijet2016,pm3_CaloDijet2016,pm4_CaloDijet2016'
+            if options.fitPdf != 'atlas':
+                sysString += ',pa1_CaloDijet2016,pa2_CaloDijet2016,pa3_CaloDijet2016,pa4_CaloDijet2016'
+            
         sysStringList.append(sysString)
 
         decoString = ''
         if options.deco:
             decoString  ='--deco'
+            
+        multiString = ''
+        if options.multi:
+            decoString  ='--multi'
 
         for massPoint in massIterable(options.mass):
-            exec_me('python python/WriteDataCard.py -m %s --mass %s -i %s -l %f -c %s -b %s -d %s %s %s %s %s %s %s'%(model, massPoint, options.inputFitFile,1000*lumi,options.config,box,options.outDir,signalDsName,backgroundDsName[box],penaltyString,signalSys,xsecString,decoString),options.dryRun)    
+            exec_me('python python/WriteDataCard.py -m %s --mass %s -i %s -l %f -c %s -b %s -d %s %s %s %s %s %s %s %s'%(model, massPoint, options.inputFitFile,1000*lumi,options.config,box,options.outDir,signalDsName,backgroundDsName[box],penaltyString,signalSys,xsecString,decoString,multiString),options.dryRun)    
             if options.bayes:
                 rRangeString =  '--setPhysicsModelParameterRanges '
                 if options.deco:
@@ -271,7 +291,7 @@ def main(options,args):
                 else:
                     rRangeString = ''
                     if options.rMax>-1:                
-                        rRangeString =  '--setPhysicsModelParameterRanges r=0,%f'%(options.rMax)                        
+                        rRangeString =  '--setPhysicsModelParameterRanges r=0,%f'%(options.rMax)                
                         rRangeStringList.append(rRangeString)
                     if len(boxes)==1:
                         exec_me('combine -M Asymptotic -H ProfileLikelihood %s/dijet_combine_%s_%s_lumi-%.3f_%s.txt -n %s_%s_lumi-%.3f_%s --minimizerTolerance %f --minimizerStrategy %i %s --saveWorkspace %s %s'%(options.outDir,model,massPoint,lumi,box,model,massPoint,lumi,box,options.min_tol,options.min_strat,rRangeString,blindString,sysString),options.dryRun)
@@ -366,6 +386,10 @@ if __name__ == '__main__':
                   help="queue: 1nh, 8nh, 1nd, etc.")
     parser.add_option('-t','--toys',dest="toys",default=-1,type="int",
                   help="number of toys per job(for bayesian expected limits)")
+    parser.add_option('--multi',dest="multi",default=False,action='store_true',
+                  help="using RooMultiPdf for total background")
+    parser.add_option('--fit-pdf',dest="fitPdf", default="all", choices=['all','modexp','fiveparam','atlas'],
+                  help="pdf for fitting")
 
 
     (options,args) = parser.parse_args()
