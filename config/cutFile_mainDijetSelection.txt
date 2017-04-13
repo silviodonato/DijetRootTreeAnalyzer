@@ -84,7 +84,8 @@ nBjets_t       	     -inf           +inf                -               -       
 evtBweight_m	     -inf           +inf                -               -               1       1000 0 1          SAVE
 evtBweight_t	     -inf           +inf                -               -               1       1000 0 1          SAVE
 evtBweight_mt	     -inf           +inf                -               -               1       1000 0 1          SAVE
-
+jetHflavour_j1	     -inf           +inf                -               -               1       100  0 100        SAVE
+jetHflavour_j2	     -inf           +inf                -               -               1       100  0 100        SAVE
 
 mjj_shiftJEC         -inf           +inf                -               -               1       10000 0 10000      SAVE
 # no cut on these variables, just want to save histograms
