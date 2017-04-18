@@ -219,13 +219,13 @@ def main(options,args):
                             'CaloDijet2016':'inputs/data_CaloScoutingHT_Run2016BCDEFG_BiasCorrected_Mjj300_Golden27637pb_CaloDijet2016.root',
                             #'PFDijet2016':'inputs/data_PFRECOHT_Run2016BCD_Golden12910pb_PFDijet2016.root',
                             'CaloDijet20152016':'inputs/data_CaloScoutingHT_Run2015D2016B_CaloDijet20152016.root',
-                            'PFDijet2016':'inputs/moriond16_v1_36fb_jsonFix.root',
-                            'PFDijetbb20160mt':'inputs/moriond16_v1_36fb_jsonFix.root',
-                            'PFDijetbb20161mt':'inputs/moriond16_v1_36fb_jsonFix.root',
-                            'PFDijetbb20162mt':'inputs/moriond16_v1_36fb_jsonFix.root',
-                            'PFDijetbb20160mm':'inputs/moriond16_v1_36fb_jsonFix.root',
-                            'PFDijetbb20161mm':'inputs/moriond16_v1_36fb_jsonFix.root',
-                            'PFDijetbb20162mm':'inputs/moriond16_v1_36fb_jsonFix.root'
+                            'PFDijet2016':'inputs/JetHT_run2016_moriond17_red_cert_v2.root',
+                            'PFDijetbb20160mt':'inputs/JetHT_run2016_moriond17_red_cert_v2.root',
+                            'PFDijetbb20161mt':'inputs/JetHT_run2016_moriond17_red_cert_v2.root',
+                            'PFDijetbb20162mt':'inputs/JetHT_run2016_moriond17_red_cert_v2.root',
+                            'PFDijetbb20160mm':'inputs/JetHT_run2016_moriond17_red_cert_v2.root',
+                            'PFDijetbb20161mm':'inputs/JetHT_run2016_moriond17_red_cert_v2.root',
+                            'PFDijetbb20162mm':'inputs/JetHT_run2016_moriond17_red_cert_v2.root'
                             }
 
         blindString = ''

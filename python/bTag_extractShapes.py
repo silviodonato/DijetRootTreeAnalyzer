@@ -7,7 +7,7 @@ from rootTools import tdrstyle as setTDRStyle
 #to import samples names
 from bTag_signalStudies import *
 
-usage = """usage: python python/bTag_extractShapes.py -f none -m qq"""
+usage = """usage: python python/bTag_extractShapes.py -e none -m qq"""
 
 
 
@@ -27,7 +27,9 @@ def makeShape(mass, sample, model):
 
 
         #select bb events at gen level
-        if (tchain.jetHflavour_j1 != 5 or tchain.jetHflavour_j2 != 5):
+        if (model == 'qq' and (tchain.jetHflavour_j1 != 5 or tchain.jetHflavour_j2 != 5)):
+            continue
+        if (model == 'qg' and (tchain.jetHflavour_j1 != 5 and tchain.jetHflavour_j2 != 5)):
             continue
 
         myHisto.Fill(tchain.mjj)
@@ -58,7 +60,6 @@ if __name__ == '__main__':
     model   = options.model
 
     effFile = rt.TFile(options.eff)
-    g_eff = effFile.Get("g_2btag_rate")
 
     print "signal model    :",model
     ###################################################################                                                                                                                                        
@@ -69,8 +70,12 @@ if __name__ == '__main__':
     # loop over the MC samples
     if (model == "qq"):
         sampleNames = sampleNames_qq
+        g_eff = effFile.Get("g_2btag_rate")
+
     elif (model == "qg"):
         sampleNames = sampleNames_qg
+        g_eff = effFile.Get("g_1btag_rate")
+
     elif (model == "gg"):
         sampleNames = sampleNames_gg
     else:
@@ -80,7 +85,7 @@ if __name__ == '__main__':
     for mass, sample in sorted(sampleNames.iteritems()):
         histo = makeShape(mass,sample,model)
         #scale the shape to take into account the bTag eff
-        scaleShape(mass, histo,g_eff)
+        scaleShape(mass, histo, g_eff)
         histo.Write()
 
 

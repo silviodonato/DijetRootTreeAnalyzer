@@ -30,17 +30,17 @@ sampleNames_qq = {#500: eosPrefix+eosPath+"rootfile_RSGravitonToQuarkQuark_kMpl0
                   }
 
 #CHANGE FILE NAME AS SOON AS THE NTUPLES ARE READY
-sampleNames_qg = {#500: eosPrefix+eosPath+"rootfile_RSGravitonToQuarkQuark_kMpl01_M_500_TuneCUETP8M1_13TeV_pythia8_RSGravitonToQuarkQuark_kMpl01_Spring16_20161214_115751_0_reduced_skim.root",
-                  #750:  eosPrefix+eosPath+"rootfile_RSGravitonToQuarkQuark_kMpl01_M_750_TuneCUETP8M1_13TeV_pythia8_RSGravitonToQuarkQuark_kMpl01_Spring16_20161214_115751_0_reduced_skim.root",
-                  1000:  eosPrefix+eosPath+"rootfile_RSGravitonToQuarkQuark_kMpl01_M_1000_TuneCUETP8M1_13TeV_pythia8_RSGravitonToQuarkQuark_kMpl01_Spring16_20161214_115751_0_reduced_skim.root",
-                  #2000:  eosPrefix+eosPath+"rootfile_RSGravitonToQuarkQuark_kMpl01_M_2000_TuneCUETP8M1_13TeV_pythia8_RSGravitonToQuarkQuark_kMpl01_Spring16_20161214_115751_0_reduced_skim.root",
-                  3000:  eosPrefix+eosPath+"rootfile_RSGravitonToQuarkQuark_kMpl01_M_3000_TuneCUETP8M1_13TeV_pythia8_RSGravitonToQuarkQuark_kMpl01_Spring16_20161214_115751_0_reduced_skim.root",
-                  4000:  eosPrefix+eosPath+"rootfile_RSGravitonToQuarkQuark_kMpl01_M_4000_TuneCUETP8M1_13TeV_pythia8_RSGravitonToQuarkQuark_kMpl01_Spring16_20161214_115751_0_reduced_skim.root",
-                  5000:  eosPrefix+eosPath+"rootfile_RSGravitonToQuarkQuark_kMpl01_M_5000_TuneCUETP8M1_13TeV_pythia8_RSGravitonToQuarkQuark_kMpl01_Spring16_20161214_115751_0_reduced_skim.root",
-                  6000:  eosPrefix+eosPath+"rootfile_RSGravitonToQuarkQuark_kMpl01_M_6000_TuneCUETP8M1_13TeV_pythia8_RSGravitonToQuarkQuark_kMpl01_Spring16_20161214_115751_0_reduced_skim.root",
-                  7000:  eosPrefix+eosPath+"rootfile_RSGravitonToQuarkQuark_kMpl01_M_7000_TuneCUETP8M1_13TeV_pythia8_RSGravitonToQuarkQuark_kMpl01_Spring16_20161214_115751_0_reduced_skim.root",
-                  8000:  eosPrefix+eosPath+"rootfile_RSGravitonToQuarkQuark_kMpl01_M_8000_TuneCUETP8M1_13TeV_pythia8_RSGravitonToQuarkQuark_kMpl01_Spring16_20161214_115751_0_reduced_skim.root",
-                  9000:  eosPrefix+eosPath+"rootfile_RSGravitonToQuarkQuark_kMpl01_M_9000_TuneCUETP8M1_13TeV_pythia8_RSGravitonToQuarkQuark_kMpl01_Spring16_20161214_115751_0_reduced_skim.root"
+sampleNames_qg = {500:  eosPrefix+eosPath+"rootfile_QstarToJJ_M_500_TuneCUETP8M1_13TeV_pythia8_QstarToJJ_TuneCUETP8M1_13TeV_pythia8_20170115_213938_0_reduced_skim.root",
+                  750:  eosPrefix+eosPath+"rootfile_QstarToJJ_M_750_TuneCUETP8M1_13TeV_pythia8_QstarToJJ_TuneCUETP8M1_13TeV_pythia8_20170115_213938_0_reduced_skim.root",
+                  1000:  eosPrefix+eosPath+"rootfile_QstarToJJ_M_1000_TuneCUETP8M1_13TeV_pythia8_QstarToJJ_TuneCUETP8M1_13TeV_pythia8_20170115_213938_0_reduced_skim.root",
+                  2000:  eosPrefix+eosPath+"rootfile_QstarToJJ_M_2000_TuneCUETP8M1_13TeV_pythia8_QstarToJJ_TuneCUETP8M1_13TeV_pythia8_20170115_213938_0_reduced_skim.root",
+                  3000:  eosPrefix+eosPath+"rootfile_QstarToJJ_M_3000_TuneCUETP8M1_13TeV_pythia8_QstarToJJ_TuneCUETP8M1_13TeV_pythia8_20170115_213938_0_reduced_skim.root",
+                  4000:  eosPrefix+eosPath+"rootfile_QstarToJJ_M_4000_TuneCUETP8M1_13TeV_pythia8_QstarToJJ_TuneCUETP8M1_13TeV_pythia8_20170115_213938_0_reduced_skim.root",
+                  5000:  eosPrefix+eosPath+"rootfile_QstarToJJ_M_5000_TuneCUETP8M1_13TeV_pythia8_QstarToJJ_TuneCUETP8M1_13TeV_pythia8_20170115_213938_0_reduced_skim.root",
+                  6000:  eosPrefix+eosPath+"rootfile_QstarToJJ_M_6000_TuneCUETP8M1_13TeV_pythia8_QstarToJJ_TuneCUETP8M1_13TeV_pythia8_20170115_213938_0_reduced_skim.root",
+                  7000:  eosPrefix+eosPath+"rootfile_QstarToJJ_M_7000_TuneCUETP8M1_13TeV_pythia8_QstarToJJ_TuneCUETP8M1_13TeV_pythia8_20170115_213938_0_reduced_skim.root",
+                  8000:  eosPrefix+eosPath+"rootfile_QstarToJJ_M_8000_TuneCUETP8M1_13TeV_pythia8_QstarToJJ_TuneCUETP8M1_13TeV_pythia8_20170115_213938_0_reduced_skim.root",
+                  9000:  eosPrefix+eosPath+"rootfile_QstarToJJ_M_9000_TuneCUETP8M1_13TeV_pythia8_QstarToJJ_TuneCUETP8M1_13TeV_pythia8_20170115_213938_0_reduced_skim.root"
                   }
 
 #CHANGE FILE NAME AS SOON AS THE NTUPLES ARE READY
@@ -137,6 +137,8 @@ def bookAndFill(mass,sample,flavour):
         elif (flavour == "cc" and (tchain.jetHflavour_j1 != 4 or tchain.jetHflavour_j2 != 4)):
             continue
         elif (flavour == "qq" and (tchain.jetHflavour_j1 == 4 or tchain.jetHflavour_j1 == 5 or tchain.jetHflavour_j2 == 4 or tchain.jetHflavour_j2 == 5  )):
+            continue
+        elif (flavour == "bg" and (tchain.jetHflavour_j1 != 5 and tchain.jetHflavour_j2 != 5  )):
             continue
 
         hDict["h_mass_all"].Fill(tchain.mjj)
