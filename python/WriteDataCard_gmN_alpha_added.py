@@ -253,7 +253,7 @@ def writeDataCard(box,model,txtfileName,bkgs,paramNames,w,penalty,fixed,shapes=[
         txtfile.write(datacard)
         txtfile.close()
         
-def writeDataCardMC(box,model,txtfileName,bkgs,paramNames,w):  #this function creates the datacard.txt file when mcFile argument is given
+def writeDataCardMC(box,model,txtfileName,bkgs,paramNames,w,x):  #this function creates the datacard.txt file when mcFile argument is given
         obsRate = w.data("data_obs").sumEntries() #gets the Total entries of the data histo stored in w
         nBkgd = len(bkgs)
         rootFileName = txtfileName.replace('.txt','.root')
@@ -306,6 +306,8 @@ def writeDataCardMC(box,model,txtfileName,bkgs,paramNames,w):  #this function cr
         #datacard += "PFDijet2016MC_bkg_stat\tgmN\t44509\t-\t8.7545440\n"    #30 times less CR statistics
         #datacard += "PFDijet2016MC_bkg_stat\tgmN\t6676\t-\t58.36374\n"       #200 times less CR statistics
         datacard += "alpha\tshape\t-\t1\n"
+        for i in range(1,len(x)):
+            datacard += "mcstat%i\tshape\t-\t1\n"%i
         for shape in shapes:
             shapeString = '%s\tshape\t'%shape
             for sig in range(0,signals):
@@ -692,7 +694,7 @@ if __name__ == '__main__':    #THIS IS THE MAIN FUNCTION WHICH  CALLS THE REST
         mcDataHist_mjj = rt.RooDataHist('%s_%s_mjj'%(box,'bkg'),'%s_%s_mjj'%(box,'bkg'), rt.RooArgList(w.var('mjj')), rt.RooFit.Import(mcHist))
         rootTools.Utils.importToWS(w,mcDataHist)
         rootTools.Utils.importToWS(w,mcDataHist_mjj)
-
+        
         myTH1predUp = mcFile.Get('h_mjj_prediction_1GeVbin_plus_sigma')
         myTH1predUp.Print('v')
         myTH1predDown = mcFile.Get('h_mjj_prediction_1GeVbin_minus_sigma')
@@ -710,11 +712,26 @@ if __name__ == '__main__':    #THIS IS THE MAIN FUNCTION WHICH  CALLS THE REST
         myRealTH1predDown = convertToTh1xHist(myRebinnedTH1predDown)
         predHistDown = rt.RooDataHist("PFDijet2016MC_bkg_alphaDown", "PFDijet2016MC_bkg_alphaDown", rt.RooArgList(th1x), rt.RooFit.Import(myRealTH1predDown))
         rootTools.Utils.importToWS(w,predHistDown) 
+
+
+        # make one shape Up/Down for each bin (uncorrelated mcstat uncertainty)
+        for iBinX in range(1,mcHist_th1x.GetNbinsX()+1):
+            
+            print 'mcstat bin %i percent uncertainty: %f%%'%(iBinX,mcHist_th1x.GetBinError(iBinX)*100./mcHist_th1x.GetBinContent(iBinX))
+            myRealTH1mcstatUp = mcHist_th1x.Clone('hist_mcstat%iUp'%iBinX) # clone the original histogram
+            myRealTH1mcstatUp.SetBinContent(iBinX, mcHist_th1x.GetBinContent(iBinX)+mcHist_th1x.GetBinError(iBinX)) # set only bin iBinX to (Nominal+Error) to get "Up" prediction
+            predHistUp = rt.RooDataHist("PFDijet2016MC_bkg_mcstat%iUp"%iBinX, "PFDijet2016MC_bkg_mcstat%iUp"%iBinX, rt.RooArgList(th1x), rt.RooFit.Import(myRealTH1mcstatUp))
+            rootTools.Utils.importToWS(w,predHistUp)
+            
+            myRealTH1mcstatDown = mcHist_th1x.Clone('hist_mcstat%iDown'%iBinX) # clone the original histogram
+            myRealTH1mcstatDown.SetBinContent(iBinX, mcHist_th1x.GetBinContent(iBinX)-mcHist_th1x.GetBinError(iBinX)) # set only bin iBinX to (Nominal-Error) to get "Down" prediction
+            predHistDown = rt.RooDataHist("PFDijet2016MC_bkg_mcstat%iDown"%iBinX, "PFDijet2016MC_bkg_mcstat%iDown"%iBinX, rt.RooArgList(th1x), rt.RooFit.Import(myRealTH1mcstatDown))
+            rootTools.Utils.importToWS(w,predHistDown) 
  
     outFile = 'dijet_combine_%s_%i_lumi-%.3f_%s.root'%(model,massPoint,lumi/1000.,box) #creates the name of the output .root file
     outputFile = rt.TFile.Open(options.outDir+"/"+outFile,"recreate")                  #creates the output file
     if options.mcFile is not None:
-        writeDataCardMC(box,model,options.outDir+"/"+outFile.replace(".root",".txt"),bkgs,paramNames,w)
+        writeDataCardMC(box,model,options.outDir+"/"+outFile.replace(".root",".txt"),bkgs,paramNames,w,x)
     else:
         writeDataCard(box,model,options.outDir+"/"+outFile.replace(".root",".txt"),bkgs,paramNames,w,options.penalty,options.fixed,shapes=shapes,multi=options.multi)
     w.Write() #writes the workspace in the output file
