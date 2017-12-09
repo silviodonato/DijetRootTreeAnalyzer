@@ -111,6 +111,117 @@ def getHybridCLsArrays(directory, model, Box, bayes):
         allArrays.append(array('d',t))
     return tuple(allArrays)
 
+def getHybridCLsArraysRSG(directory, Box):
+    
+    tfileqq = rt.TFile.Open("%s/qq/xsecUL_Asymptotic_qq_%s.root"%(directory,Box))
+    tfilegg = rt.TFile.Open("%s/gg/xsecUL_Asymptotic_gg_%s.root"%(directory,Box))
+    xsecTreeqq = tfileqq.Get("xsecTree")
+    xsecTreegg = tfilegg.Get("xsecTree")
+    
+    dict_RSG_BR_qq = {}
+    dict_RSG_BR_gg = {}
+    rsg_br_file = open("data/rsg_lhc13TeV.out")
+    for line in rsg_br_file:
+      if not line.startswith("#"):
+        massRSG = float(line.split()[0])
+        RSG_BR_qqbar = float(line.split()[2]) + float(line.split()[4])
+        RSG_BR_gg = float(line.split()[3]) + float(line.split()[5])
+        dict_RSG_BR_qq[massRSG] = RSG_BR_qqbar
+        dict_RSG_BR_gg[massRSG] = RSG_BR_gg
+    
+    gluinoMassArray = array('d')
+    gluinoMassArray_er = array('d')
+    observedLimit_qq = array('d')
+    observedLimit_er_qq = array('d')
+    expectedLimit_qq = array('d')
+    expectedLimit_minus1sigma_qq = array('d')
+    expectedLimit_plus1sigma_qq = array('d')
+    expectedLimit_minus2sigma_qq = array('d')
+    expectedLimit_plus2sigma_qq = array('d')
+    observedLimit_gg = array('d')
+    observedLimit_er_gg = array('d')
+    expectedLimit_gg = array('d')
+    expectedLimit_minus1sigma_gg = array('d')
+    expectedLimit_plus1sigma_gg = array('d')
+    expectedLimit_minus2sigma_gg = array('d')
+    expectedLimit_plus2sigma_gg = array('d')
+    observedLimit = array('d')
+    observedLimit_er = array('d')
+    expectedLimit = array('d')
+    expectedLimit_minus1sigma = array('d')
+    expectedLimit_plus1sigma = array('d')
+    expectedLimit_minus2sigma = array('d')
+    expectedLimit_plus2sigma = array('d')
+
+    
+    xsecTreeqq.Draw('>>elist','','entrylist')
+    elist = rt.gDirectory.Get('elist')
+    entry = -1
+    while True:
+        entry = elist.Next()
+        if entry == -1: break
+        xsecTreeqq.GetEntry(entry)
+        
+	mass = xsecTreeqq.mass
+        gluinoMassArray.append(xsecTreeqq.mass)
+        gluinoMassArray_er.append(0.0)
+        
+        exec 'xsecULObs_qq = xsecTreeqq.xsecULObs_%s'%Box
+        exec 'xsecULExp_qq = xsecTreeqq.xsecULExp_%s'%Box
+        exec 'xsecULExpPlus_qq = xsecTreeqq.xsecULExpPlus_%s'%Box
+        exec 'xsecULExpMinus_qq = xsecTreeqq.xsecULExpMinus_%s'%Box
+        exec 'xsecULExpPlus2_qq = xsecTreeqq.xsecULExpPlus2_%s'%Box
+        exec 'xsecULExpMinus2_qq = xsecTreeqq.xsecULExpMinus2_%s'%Box
+        
+	xsecTreegg.GetEntry(entry)
+        exec 'xsecULObs_gg = xsecTreegg.xsecULObs_%s'%Box
+        exec 'xsecULExp_gg = xsecTreegg.xsecULExp_%s'%Box
+        exec 'xsecULExpPlus_gg = xsecTreegg.xsecULExpPlus_%s'%Box
+        exec 'xsecULExpMinus_gg = xsecTreegg.xsecULExpMinus_%s'%Box
+        exec 'xsecULExpPlus2_gg = xsecTreegg.xsecULExpPlus2_%s'%Box
+        exec 'xsecULExpMinus2_gg = xsecTreegg.xsecULExpMinus2_%s'%Box
+
+            
+            
+        xsecULObs_qq = xsecULObs_qq
+        xsecULExp_qq = xsecULExp_qq
+        observedLimit_qq.append(xsecULObs_qq)#*crossSections[i])
+        observedLimit_er_qq.append(0.0)#*crossSections[i])
+        expectedLimit_qq.append(xsecULExp_qq)#*crossSections[i])
+        
+        xsecULObs_gg = xsecULObs_gg
+        xsecULExp_gg = xsecULExp_gg
+        observedLimit_gg.append(xsecULObs_gg)#*crossSections[i])
+        observedLimit_er_gg.append(0.0)#*crossSections[i])
+        expectedLimit_gg.append(xsecULExp_gg)#*crossSections[i])
+            
+        xsecULObs = xsecULObs_qq*dict_RSG_BR_qq[mass] + xsecULObs_gg*dict_RSG_BR_gg[mass]
+        xsecULExp = xsecULExp_qq*dict_RSG_BR_qq[mass] + xsecULExp_gg*dict_RSG_BR_gg[mass]
+        observedLimit.append(xsecULObs)#*crossSections[i])
+        observedLimit_er.append(0.0)#*crossSections[i])
+        expectedLimit.append(xsecULExp)#*crossSections[i])
+
+        xsecULExpPlus_qq = max(xsecULExpPlus_qq,xsecULExp_qq)
+        xsecULExpMinus_qq = min(xsecULExpMinus_qq,xsecULExp_qq)
+        xsecULExpPlus2_qq = max(xsecULExpPlus2_qq,xsecULExpPlus_qq)
+        xsecULExpMinus2_qq = min(xsecULExpMinus2_qq,xsecULExpMinus_qq)
+        xsecULExpPlus_gg = max(xsecULExpPlus_gg,xsecULExp_gg)
+        xsecULExpMinus_gg = min(xsecULExpMinus_gg,xsecULExp_gg)
+        xsecULExpPlus2_gg = max(xsecULExpPlus2_gg,xsecULExpPlus_gg)
+        xsecULExpMinus2_gg = min(xsecULExpMinus2_gg,xsecULExpMinus_gg)
+        xsecULExpPlus = xsecULExpPlus_qq*dict_RSG_BR_qq[mass] + xsecULExpPlus_gg*dict_RSG_BR_gg[mass]
+        xsecULExpMinus = xsecULExpMinus_qq*dict_RSG_BR_qq[mass] + xsecULExpMinus_gg*dict_RSG_BR_gg[mass]
+        xsecULExpPlus2 = xsecULExpPlus2_qq*dict_RSG_BR_qq[mass] + xsecULExpPlus2_gg*dict_RSG_BR_gg[mass]
+        xsecULExpMinus2 = xsecULExpMinus2_qq*dict_RSG_BR_qq[mass] +xsecULExpMinus2_gg*dict_RSG_BR_gg[mass]
+
+        expectedLimit_minus1sigma.append(xsecULExp - xsecULExpMinus)#*crossSections[i])
+        expectedLimit_plus1sigma.append(xsecULExpPlus - xsecULExp)#*crossSections[i])
+        expectedLimit_minus2sigma.append(xsecULExp - xsecULExpMinus2)#*crossSections[i])
+        expectedLimit_plus2sigma.append(xsecULExpPlus2 - xsecULExp)#*crossSections[i])
+    
+
+    return gluinoMassArray, gluinoMassArray_er, observedLimit, observedLimit_er, expectedLimit, expectedLimit_minus1sigma, expectedLimit_plus1sigma, expectedLimit_minus2sigma, expectedLimit_plus2sigma
+
 
 def getSignificanceArrays(directory, model, Box):
     tfile = rt.TFile.Open("%s/xsecUL_ProfileLikelihood_%s_%s.root"%(directory,model,Box))
@@ -322,11 +433,13 @@ if __name__ == '__main__':
         thyModelsToDraw = ['String','q*','AxigluonNLO','E6Diquark','S8',"W'","Z'",'DM1GeV','RSGraviton']
     elif options.model=='gg_qg_qq_gaus' or options.model=='gg_qg_qq_gaus10':
         thyModelsToDraw = ['q*','AxigluonkNLO','E6Diquark','RSGraviton',"W'","Z'","DM1GeV"]
+    elif options.model=='rsg':        
+        thyModelsToDraw = ['RSGraviton']            
 
 
     lineStyle = {'RSGravitonGG':4,
                  'RSGraviton':4,
-                 'Axigluon':3,
+                 'Axigluon':2,
                  'AxigluonkNLO':3,
                  'AxigluonNLO':3,
                  'E6Diquark':9,
@@ -342,7 +455,7 @@ if __name__ == '__main__':
                  }
         
     lineColor = {'RSGravitonGG':rt.kGray+1,
-                 'RSGraviton':rt.kGray+2,
+                 'RSGraviton':rt.kAzure+3,
                  'Axigluon':rt.kBlue+1,
                  'AxigluonkNLO':rt.kBlue+1,
                  'AxigluonNLO':rt.kBlue+1,
@@ -441,13 +554,16 @@ if __name__ == '__main__':
 
     for Box in Boxes:
         for model in models:
-            if len(models)>1:
-                #directory =  options.outDir+'/%s_IntermediateRange'%model
-                directory =  options.outDir+'/%s'%model
-            if options.doSignificance:
-                gluinoMassArray[(Box,model)], gluinoMassArray_er[(Box,model)], observedLimit[(Box,model)], observedLimit_er[(Box,model)], expectedLimit[(Box,model)], expectedLimit_minus1sigma[(Box,model)], expectedLimit_plus1sigma[(Box,model)], expectedLimit_minus2sigma[(Box,model)], expectedLimit_plus2sigma[(Box,model)] = getSignificanceArrays(directory, model, Box)
-            else:        
-                gluinoMassArray[(Box,model)], gluinoMassArray_er[(Box,model)], observedLimit[(Box,model)], observedLimit_er[(Box,model)], expectedLimit[(Box,model)], expectedLimit_minus1sigma[(Box,model)], expectedLimit_plus1sigma[(Box,model)], expectedLimit_minus2sigma[(Box,model)], expectedLimit_plus2sigma[(Box,model)] = getHybridCLsArrays(directory, model, Box, options.bayes)
+	    if not model=='rsg':
+                if len(models)>1:
+                    #directory =  options.outDir+'/%s_IntermediateRange'%model
+                    directory =  options.outDir+'/%s'%model
+                if options.doSignificance:
+                    gluinoMassArray[(Box,model)], gluinoMassArray_er[(Box,model)], observedLimit[(Box,model)], observedLimit_er[(Box,model)], expectedLimit[(Box,model)], expectedLimit_minus1sigma[(Box,model)], expectedLimit_plus1sigma[(Box,model)], expectedLimit_minus2sigma[(Box,model)], expectedLimit_plus2sigma[(Box,model)] = getSignificanceArrays(directory, model, Box)
+                else:        
+                    gluinoMassArray[(Box,model)], gluinoMassArray_er[(Box,model)], observedLimit[(Box,model)], observedLimit_er[(Box,model)], expectedLimit[(Box,model)], expectedLimit_minus1sigma[(Box,model)], expectedLimit_plus1sigma[(Box,model)], expectedLimit_minus2sigma[(Box,model)], expectedLimit_plus2sigma[(Box,model)] = getHybridCLsArrays(directory, model, Box, options.bayes)
+	    else:
+                    gluinoMassArray[(Box,model)], gluinoMassArray_er[(Box,model)], observedLimit[(Box,model)], observedLimit_er[(Box,model)], expectedLimit[(Box,model)], expectedLimit_minus1sigma[(Box,model)], expectedLimit_plus1sigma[(Box,model)], expectedLimit_minus2sigma[(Box,model)], expectedLimit_plus2sigma[(Box,model)] = getHybridCLsArraysRSG(directory,  Box)
 
 
             nPoints = len(observedLimit[(Box,model)])
@@ -682,8 +798,11 @@ if __name__ == '__main__':
 
 
     if 'PF' in Box or options.massMax>1600:
-        h_limit.GetXaxis().SetTitle('Resonance mass [TeV]')
-        h_limit.GetXaxis().SetLabelOffset(1000)
+        if model=='rsg':
+            h_limit.GetXaxis().SetTitle('RS Graviton mass [TeV]')
+        else:
+	    h_limit.GetXaxis().SetTitle('Resonance mass [TeV]')
+	h_limit.GetXaxis().SetLabelOffset(1000)
         #h_fit_residual_vs_mass.GetXaxis().SetNoExponent()
         #h_fit_residual_vs_mass.GetXaxis().SetMoreLogLabels()    
         xLab = rt.TLatex()
@@ -702,6 +821,10 @@ if __name__ == '__main__':
                 xLab.DrawLatex(i*1000, yOffset, "%g"%i)
 
     else:
+        if model=='rsg':
+            h_limit.GetXaxis().SetTitle('RS Graviton mass [TeV]')
+        else:
+            h_limit.GetXaxis().SetTitle('Resonance mass [GeV]')
         h_limit.GetXaxis().SetNdivisions(408,True)
 
     if options.box=="CaloDijet2016_PFDijet2016":
