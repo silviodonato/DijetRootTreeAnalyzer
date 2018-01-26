@@ -703,6 +703,9 @@ if __name__ == '__main__':    #THIS IS THE MAIN FUNCTION WHICH  CALLS THE REST
             rootTools.Utils.importToWS(w,mcDataHist)
             rootTools.Utils.importToWS(w,mcDataHist_mjj)
         
+    if options.mcFile is not None and box=='PFDijet2016MC': #THIS IS USED FOR THE RATIO-PREDICTION
+        
+        
         myTH1predUp = mcFile.Get('h_mjj_prediction_1GeVbin_plus_sigma')
         myTH1predUp.Print('v')
         myTH1predDown = mcFile.Get('h_mjj_prediction_1GeVbin_minus_sigma')
@@ -759,12 +762,24 @@ if __name__ == '__main__':    #THIS IS THE MAIN FUNCTION WHICH  CALLS THE REST
             for iBinX in range(1,mcHist_th1x.GetNbinsX()+1):
                 w.factory('mjjBin%i[%f]'%(iBinX,myRebinnedTH1.GetXaxis().GetBinCenter(iBinX)))
                 w.factory('mcRatioBin%i[%f]'%(iBinX,myRealMCRatio.GetBinContent(iBinX)))
-                w.factory('crBin%i[%f]'%(iBinX,myRealCR.GetBinContent(iBinX)))
+                w.factory('crBin%i[%f,%f,%f]'%(iBinX,myRealCR.GetBinContent(iBinX),0,myRealCR.GetBinContent(iBinX)+myRealCR.GetBinError(iBinX)*50))
                 w.factory("expr::bin%iFunc('(@0+@1*@2)*@3*@4',beta,slope,mjjBin%i,mcRatioBin%i,crBin%i)"%(iBinX,iBinX,iBinX,iBinX))
                 binFunctions.add(w.function('bin%iFunc'%iBinX))
                 print iBinX, w.var('beta').getVal(), w.var('slope').getVal(), w.var('mjjBin%i'%iBinX).getVal(), myRealMCRatio.GetBinContent(iBinX), myRealCR.GetBinContent(iBinX), w.function('bin%iFunc'%iBinX).getVal(), myRealTH1.GetBinContent(iBinX)
             rph = rt.RooParametricHist('PFDijet2016MC_bkg','PFDijet2016MC_bkg',th1x,binFunctions,myRealTH1)
             rph_norm = rt.RooAddition('PFDijet2016MC_bkg_norm','PFDijet2016MC_bkg_norm',binFunctions)
+            rootTools.Utils.importToWS(w,rph)
+            rootTools.Utils.importToWS(w,rph_norm,rt.RooFit.RecycleConflictNodes())
+            
+    elif options.mcFile is not None and box=='PFDijet2016MCCR': #THIS IS USED FOR THE RATIO-PREDICTION
+        # Use RooParametricHist                                               
+        if options.useRooParametricHist:
+            binVariablesCR = rt.RooArgList()
+            for iBinX in range(1,myRealTH1.GetNbinsX()+1):
+                w.factory('crBin%i[%f,%f,%f]'%(iBinX,myRealTH1.GetBinContent(iBinX),0,myRealTH1.GetBinContent(iBinX)+myRealTH1.GetBinError(iBinX)*50))
+                binVariablesCR.add(w.var('crBin%i'%iBinX))
+            rph = rt.RooParametricHist('PFDijet2016MCCR_bkg','PFDijet2016MCCR_bkg',th1x,binVariablesCR,myRealTH1)
+            rph_norm = rt.RooAddition('PFDijet2016MCCR_bkg_norm','PFDijet2016MCCR_bkg_norm',binVariablesCR)
             rootTools.Utils.importToWS(w,rph)
             rootTools.Utils.importToWS(w,rph_norm,rt.RooFit.RecycleConflictNodes())
 
