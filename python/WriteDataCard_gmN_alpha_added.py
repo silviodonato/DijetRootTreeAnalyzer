@@ -264,6 +264,8 @@ def writeDataCardMC(box,model,txtfileName,bkgs,paramNames,w,x,useRooParametricHi
                 if '2015' in box:
                         lumiErrs = [1.027 for sig in model.split('p')]
                 elif '2016' in box:
+                        lumiErrs = [1.062 for sig in model.split('p')]        #number of lumi's error 
+		elif '2017' in box:
                         lumiErrs = [1.062 for sig in model.split('p')]        #number of lumi's error          
         else:                                  #does all the above only once since there is only 1 signal 
                 rates = [w.data("%s_%s"%(box,model)).sumEntries()]#rates=prediction's total entries (rates is an array)
@@ -271,6 +273,8 @@ def writeDataCardMC(box,model,txtfileName,bkgs,paramNames,w,x,useRooParametricHi
                 if '2015' in box:
                         lumiErrs = [1.027]
                 elif '2016' in box:
+                        lumiErrs = [1.062]   
+		elif '2017' in box:
                         lumiErrs = [1.062]            
         if not useRooParametricHist:
             rates.extend([w.var('Ntot_%s_%s'%(bkg,box)).getVal() for bkg in bkgs])#extends array 'rates' and stores the value of parameters with "Ntot_" name
@@ -280,6 +284,8 @@ def writeDataCardMC(box,model,txtfileName,bkgs,paramNames,w,x,useRooParametricHi
         if '2015' in box:
                 lumiErrs.extend([1.027 for bkg in bkgs])
         elif '2016' in box:
+                lumiErrs.extend([1.000 for bkg in bkgs])
+	elif '2017' in box:
                 lumiErrs.extend([1.000 for bkg in bkgs])
         divider = "------------------------------------------------------------\n"
         datacard = "imax 1 number of channels\n" + \
@@ -703,8 +709,7 @@ if __name__ == '__main__':    #THIS IS THE MAIN FUNCTION WHICH  CALLS THE REST
             rootTools.Utils.importToWS(w,mcDataHist)
             rootTools.Utils.importToWS(w,mcDataHist_mjj)
         
-    if options.mcFile is not None and box=='PFDijet2016MC': #THIS IS USED FOR THE RATIO-PREDICTION
-        
+    if options.mcFile is not None and 'MC' in box and 'MCCR' not in box: #THIS IS USED FOR THE RATIO-PREDICTION
         
         myTH1predUp = mcFile.Get('h_mjj_prediction_1GeVbin_plus_sigma')
         myTH1predUp.Print('v')
@@ -726,13 +731,14 @@ if __name__ == '__main__':    #THIS IS THE MAIN FUNCTION WHICH  CALLS THE REST
         myRebinnedTH1predUp = rt.gDirectory.Get('pred_Up_rebin')
         myRebinnedTH1predUp.SetDirectory(0)
         myRealTH1predUp = convertToTh1xHist(myRebinnedTH1predUp)
-        predHistUp = rt.RooDataHist("PFDijet2016MC_bkg_alphaUp", "PFDijet2016MC_bkg_alphaUp", rt.RooArgList(th1x), rt.RooFit.Import(myRealTH1predUp))
-                                             
+        predHistUp = rt.RooDataHist("%s_bkg_alphaUp"%box, "%s_bkg_alphaUp"%box, rt.RooArgList(th1x), rt.RooFit.Import(myRealTH1predUp))
+        rootTools.Utils.importToWS(w,predHistUp) 
         myTH1predDown.Rebin(len(x)-1,'pred_Down_rebin',x)
         myRebinnedTH1predDown = rt.gDirectory.Get('pred_Down_rebin')
         myRebinnedTH1predDown.SetDirectory(0)
         myRealTH1predDown = convertToTh1xHist(myRebinnedTH1predDown)
-        predHistDown = rt.RooDataHist("PFDijet2016MC_bkg_alphaDown", "PFDijet2016MC_bkg_alphaDown", rt.RooArgList(th1x), rt.RooFit.Import(myRealTH1predDown))
+        predHistDown = rt.RooDataHist("%s_bkg_alphaDown"%box, "%s_bkg_alphaDown"%box, rt.RooArgList(th1x), rt.RooFit.Import(myRealTH1predDown))
+        rootTools.Utils.importToWS(w,predHistDown) 
                                                                                         
         if not options.useRooParametricHist:
             rootTools.Utils.importToWS(w,predHistUp) 
@@ -742,14 +748,18 @@ if __name__ == '__main__':    #THIS IS THE MAIN FUNCTION WHICH  CALLS THE REST
         # make one shape Up/Down for each bin (uncorrelated mcstat uncertainty)
         for iBinX in range(1,mcHist_th1x.GetNbinsX()+1):
             
-            print 'mcstat bin %i percent uncertainty: %f%%'%(iBinX,mcHist_th1x.GetBinError(iBinX)*100./mcHist_th1x.GetBinContent(iBinX))
+            if mcHist_th1x.GetBinContent(iBinX) > 0: 
+                print 'mcstat bin %i percent uncertainty: %f%%'%(iBinX,mcHist_th1x.GetBinError(iBinX)*100./mcHist_th1x.GetBinContent(iBinX))
             myRealTH1mcstatUp = mcHist_th1x.Clone('hist_mcstat%iUp'%iBinX) # clone the original histogram
             myRealTH1mcstatUp.SetBinContent(iBinX, mcHist_th1x.GetBinContent(iBinX)+mcHist_th1x.GetBinError(iBinX)) # set only bin iBinX to (Nominal+Error) to get "Up" prediction
-            predHistUp = rt.RooDataHist("PFDijet2016MC_bkg_mcstat%iUp"%iBinX, "PFDijet2016MC_bkg_mcstat%iUp"%iBinX, rt.RooArgList(th1x), rt.RooFit.Import(myRealTH1mcstatUp))
+            predHistUp = rt.RooDataHist("%s_bkg_mcstat%iUp"%(box,iBinX), "%s_bkg_mcstat%iUp"%(box,iBinX), rt.RooArgList(th1x), rt.RooFit.Import(myRealTH1mcstatUp))
+            rootTools.Utils.importToWS(w,predHistUp)
             
             myRealTH1mcstatDown = mcHist_th1x.Clone('hist_mcstat%iDown'%iBinX) # clone the original histogram
             myRealTH1mcstatDown.SetBinContent(iBinX, mcHist_th1x.GetBinContent(iBinX)-mcHist_th1x.GetBinError(iBinX)) # set only bin iBinX to (Nominal-Error) to get "Down" prediction
-            predHistDown = rt.RooDataHist("PFDijet2016MC_bkg_mcstat%iDown"%iBinX, "PFDijet2016MC_bkg_mcstat%iDown"%iBinX, rt.RooArgList(th1x), rt.RooFit.Import(myRealTH1mcstatDown))
+            predHistDown = rt.RooDataHist("%s_bkg_mcstat%iDown"%(box,iBinX), "%s_bkg_mcstat%iDown"%(box,iBinX), rt.RooArgList(th1x), rt.RooFit.Import(myRealTH1mcstatDown))
+            rootTools.Utils.importToWS(w,predHistDown) 
+
             if not options.useRooParametricHist:
                 rootTools.Utils.importToWS(w,predHistUp)
                 rootTools.Utils.importToWS(w,predHistDown) 
@@ -766,20 +776,20 @@ if __name__ == '__main__':    #THIS IS THE MAIN FUNCTION WHICH  CALLS THE REST
                 w.factory("expr::bin%iFunc('(@0+@1*@2)*@3*@4',beta,slope,mjjBin%i,mcRatioBin%i,crBin%i)"%(iBinX,iBinX,iBinX,iBinX))
                 binFunctions.add(w.function('bin%iFunc'%iBinX))
                 print iBinX, w.var('beta').getVal(), w.var('slope').getVal(), w.var('mjjBin%i'%iBinX).getVal(), myRealMCRatio.GetBinContent(iBinX), myRealCR.GetBinContent(iBinX), w.function('bin%iFunc'%iBinX).getVal(), myRealTH1.GetBinContent(iBinX)
-            rph = rt.RooParametricHist('PFDijet2016MC_bkg','PFDijet2016MC_bkg',th1x,binFunctions,myRealTH1)
-            rph_norm = rt.RooAddition('PFDijet2016MC_bkg_norm','PFDijet2016MC_bkg_norm',binFunctions)
+            rph = rt.RooParametricHist('%s_bkg'%box,'%s_bkg'%box,th1x,binFunctions,myRealTH1)
+            rph_norm = rt.RooAddition('%s_bkg_norm'%box,'%s_bkg_norm'%box,binFunctions)
             rootTools.Utils.importToWS(w,rph)
             rootTools.Utils.importToWS(w,rph_norm,rt.RooFit.RecycleConflictNodes())
             
-    elif options.mcFile is not None and box=='PFDijet2016MCCR': #THIS IS USED FOR THE RATIO-PREDICTION
+    elif options.mcFile is not None and 'MCCR' in box: #THIS IS USED FOR THE RATIO-PREDICTION
         # Use RooParametricHist                                               
         if options.useRooParametricHist:
             binVariablesCR = rt.RooArgList()
             for iBinX in range(1,myRealTH1.GetNbinsX()+1):
                 w.factory('crBin%i[%f,%f,%f]'%(iBinX,myRealTH1.GetBinContent(iBinX),0,myRealTH1.GetBinContent(iBinX)+myRealTH1.GetBinError(iBinX)*50))
                 binVariablesCR.add(w.var('crBin%i'%iBinX))
-            rph = rt.RooParametricHist('PFDijet2016MCCR_bkg','PFDijet2016MCCR_bkg',th1x,binVariablesCR,myRealTH1)
-            rph_norm = rt.RooAddition('PFDijet2016MCCR_bkg_norm','PFDijet2016MCCR_bkg_norm',binVariablesCR)
+            rph = rt.RooParametricHist('%s_bkg'%box,'%s_bkg'%box,th1x,binVariablesCR,myRealTH1)
+            rph_norm = rt.RooAddition('%s_bkg_norm'%box,'%s_bkg_norm'%box,binVariablesCR)
             rootTools.Utils.importToWS(w,rph)
             rootTools.Utils.importToWS(w,rph_norm,rt.RooFit.RecycleConflictNodes())
 
