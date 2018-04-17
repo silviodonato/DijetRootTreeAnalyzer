@@ -264,6 +264,8 @@ def writeDataCardMC(box,model,txtfileName,bkgs,paramNames,w,x):  #this function 
                 if '2015' in box:
                         lumiErrs = [1.027 for sig in model.split('p')]
                 elif '2016' in box:
+                        lumiErrs = [1.062 for sig in model.split('p')]        #number of lumi's error 
+		elif '2017' in box:
                         lumiErrs = [1.062 for sig in model.split('p')]        #number of lumi's error          
         else:                                  #does all the above only once since there is only 1 signal 
                 rates = [w.data("%s_%s"%(box,model)).sumEntries()]#rates=prediction's total entries (rates is an array)
@@ -271,12 +273,16 @@ def writeDataCardMC(box,model,txtfileName,bkgs,paramNames,w,x):  #this function 
                 if '2015' in box:
                         lumiErrs = [1.027]
                 elif '2016' in box:
+                        lumiErrs = [1.062]   
+		elif '2017' in box:
                         lumiErrs = [1.062]            
         rates.extend([w.var('Ntot_%s_%s'%(bkg,box)).getVal() for bkg in bkgs])#extends array 'rates' and stores the value of parameters with "Ntot_" name
         processes.extend(["%s_%s"%(box,bkg) for bkg in bkgs])
         if '2015' in box:
                 lumiErrs.extend([1.027 for bkg in bkgs])
         elif '2016' in box:
+                lumiErrs.extend([1.000 for bkg in bkgs])
+	elif '2017' in box:
                 lumiErrs.extend([1.000 for bkg in bkgs])
         divider = "------------------------------------------------------------\n"
         datacard = "imax 1 number of channels\n" + \
@@ -703,29 +709,42 @@ if __name__ == '__main__':    #THIS IS THE MAIN FUNCTION WHICH  CALLS THE REST
         myRebinnedTH1predUp = rt.gDirectory.Get('pred_Up_rebin')
         myRebinnedTH1predUp.SetDirectory(0)
         myRealTH1predUp = convertToTh1xHist(myRebinnedTH1predUp)
-        predHistUp = rt.RooDataHist("PFDijet2016MC_bkg_alphaUp", "PFDijet2016MC_bkg_alphaUp", rt.RooArgList(th1x), rt.RooFit.Import(myRealTH1predUp))
+	if '2016' in box:
+                predHistUp = rt.RooDataHist("PFDijet2016MC_bkg_alphaUp", "PFDijet2016MC_bkg_alphaUp", rt.RooArgList(th1x), rt.RooFit.Import(myRealTH1predUp))
+        elif '2017' in box:
+                predHistUp = rt.RooDataHist("PFDijet2017MC_bkg_alphaUp", "PFDijet2017MC_bkg_alphaUp", rt.RooArgList(th1x), rt.RooFit.Import(myRealTH1predUp))
         rootTools.Utils.importToWS(w,predHistUp) 
 
         myTH1predDown.Rebin(len(x)-1,'pred_Down_rebin',x)
         myRebinnedTH1predDown = rt.gDirectory.Get('pred_Down_rebin')
         myRebinnedTH1predDown.SetDirectory(0)
         myRealTH1predDown = convertToTh1xHist(myRebinnedTH1predDown)
-        predHistDown = rt.RooDataHist("PFDijet2016MC_bkg_alphaDown", "PFDijet2016MC_bkg_alphaDown", rt.RooArgList(th1x), rt.RooFit.Import(myRealTH1predDown))
+	if '2016' in box:
+        	predHistDown = rt.RooDataHist("PFDijet2016MC_bkg_alphaDown", "PFDijet2016MC_bkg_alphaDown", rt.RooArgList(th1x), rt.RooFit.Import(myRealTH1predDown))
+	elif '2017' in box:
+		predHistDown = rt.RooDataHist("PFDijet2017MC_bkg_alphaDown", "PFDijet2017MC_bkg_alphaDown", rt.RooArgList(th1x), rt.RooFit.Import(myRealTH1predDown))
         rootTools.Utils.importToWS(w,predHistDown) 
 
 
         # make one shape Up/Down for each bin (uncorrelated mcstat uncertainty)
         for iBinX in range(1,mcHist_th1x.GetNbinsX()+1):
             
-            print 'mcstat bin %i percent uncertainty: %f%%'%(iBinX,mcHist_th1x.GetBinError(iBinX)*100./mcHist_th1x.GetBinContent(iBinX))
+            if mcHist_th1x.GetBinContent(iBinX) != 0. : 
+	      print 'mcstat bin %i percent uncertainty: %f%%'%(iBinX,mcHist_th1x.GetBinError(iBinX)*100./mcHist_th1x.GetBinContent(iBinX))
             myRealTH1mcstatUp = mcHist_th1x.Clone('hist_mcstat%iUp'%iBinX) # clone the original histogram
             myRealTH1mcstatUp.SetBinContent(iBinX, mcHist_th1x.GetBinContent(iBinX)+mcHist_th1x.GetBinError(iBinX)) # set only bin iBinX to (Nominal+Error) to get "Up" prediction
-            predHistUp = rt.RooDataHist("PFDijet2016MC_bkg_mcstat%iUp"%iBinX, "PFDijet2016MC_bkg_mcstat%iUp"%iBinX, rt.RooArgList(th1x), rt.RooFit.Import(myRealTH1mcstatUp))
+	    if '2016' in box:
+            	predHistUp = rt.RooDataHist("PFDijet2016MC_bkg_mcstat%iUp"%iBinX, "PFDijet2016MC_bkg_mcstat%iUp"%iBinX, rt.RooArgList(th1x), rt.RooFit.Import(myRealTH1mcstatUp))
+	    elif '2017' in box:
+	    	predHistUp = rt.RooDataHist("PFDijet2017MC_bkg_mcstat%iUp"%iBinX, "PFDijet2017MC_bkg_mcstat%iUp"%iBinX, rt.RooArgList(th1x), rt.RooFit.Import(myRealTH1mcstatUp))
             rootTools.Utils.importToWS(w,predHistUp)
             
             myRealTH1mcstatDown = mcHist_th1x.Clone('hist_mcstat%iDown'%iBinX) # clone the original histogram
             myRealTH1mcstatDown.SetBinContent(iBinX, mcHist_th1x.GetBinContent(iBinX)-mcHist_th1x.GetBinError(iBinX)) # set only bin iBinX to (Nominal-Error) to get "Down" prediction
-            predHistDown = rt.RooDataHist("PFDijet2016MC_bkg_mcstat%iDown"%iBinX, "PFDijet2016MC_bkg_mcstat%iDown"%iBinX, rt.RooArgList(th1x), rt.RooFit.Import(myRealTH1mcstatDown))
+	    if '2016' in box:
+            	predHistDown = rt.RooDataHist("PFDijet2016MC_bkg_mcstat%iDown"%iBinX, "PFDijet2016MC_bkg_mcstat%iDown"%iBinX, rt.RooArgList(th1x), rt.RooFit.Import(myRealTH1mcstatDown))
+	    elif '2017' in box:
+		predHistDown = rt.RooDataHist("PFDijet2017MC_bkg_mcstat%iDown"%iBinX, "PFDijet2017MC_bkg_mcstat%iDown"%iBinX, rt.RooArgList(th1x), rt.RooFit.Import(myRealTH1mcstatDown))
             rootTools.Utils.importToWS(w,predHistDown) 
  
     outFile = 'dijet_combine_%s_%i_lumi-%.3f_%s.root'%(model,massPoint,lumi/1000.,box) #creates the name of the output .root file
