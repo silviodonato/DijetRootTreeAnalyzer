@@ -699,83 +699,76 @@ if __name__ == '__main__':    #THIS IS THE MAIN FUNCTION WHICH  CALLS THE REST
         bkgs = ['bkg']
         mcFile = rt.TFile.Open(options.mcFile,'read')   #reads the .root file with the prediction
         mcName = cfg.getVariables(box, "mcName")        #gets the name 'h_mjj_prediction_1GeVbin' as string
-        mcHist = mcFile.Get(mcName)                     #gets the prediction histo
-        mcHist.Rebin(len(x)-1,'mc_rebin',x)             #Rebins the prediction according to th1x
-        mcHist_rebin = rt.gDirectory.Get('mc_rebin')    #gets the rebinned histo
-        mcHist_th1x = convertToTh1xHist(mcHist_rebin)   #calls a function to get the rebinned histo with '_th1x' added in name (search convertToTh1xHist)
-        mcDataHist = rt.RooDataHist('%s_%s'%(box,'bkg'),'%s_%s'%(box,'bkg'), rt.RooArgList(th1x), rt.RooFit.Import(mcHist_th1x)) #recreates the prediction as rooFit histo
-        mcDataHist_mjj = rt.RooDataHist('%s_%s_mjj'%(box,'bkg'),'%s_%s_mjj'%(box,'bkg'), rt.RooArgList(w.var('mjj')), rt.RooFit.Import(mcHist))
+        mcRatioName = cfg.getVariables(box, "mcRatioName")   #gets the name mc ratio hist name
         if not options.useRooParametricHist:
+            mcHist = mcFile.Get(mcName)                     #gets the prediction histo
+            mcHist.Rebin(len(x)-1,'mc_rebin',x)             #Rebins the prediction according to th1x
+            mcHist_rebin = rt.gDirectory.Get('mc_rebin')    #gets the rebinned histo
+            mcHist_th1x = convertToTh1xHist(mcHist_rebin)   #calls a function to get the rebinned histo with '_th1x' added in name (search convertToTh1xHist)
+            mcDataHist = rt.RooDataHist('%s_%s'%(box,'bkg'),'%s_%s'%(box,'bkg'), rt.RooArgList(th1x), rt.RooFit.Import(mcHist_th1x)) #recreates the prediction as rooFit histo
+            mcDataHist_mjj = rt.RooDataHist('%s_%s_mjj'%(box,'bkg'),'%s_%s_mjj'%(box,'bkg'), rt.RooArgList(w.var('mjj')), rt.RooFit.Import(mcHist))
             rootTools.Utils.importToWS(w,mcDataHist)
             rootTools.Utils.importToWS(w,mcDataHist_mjj)
         
     if options.mcFile is not None and 'MC' in box and 'MCCR' not in box: #THIS IS USED FOR THE RATIO-PREDICTION
-        
-        myTH1predUp = mcFile.Get('h_mjj_prediction_1GeVbin_plus_sigma')
-        myTH1predUp.Print('v')
-        myTH1predDown = mcFile.Get('h_mjj_prediction_1GeVbin_minus_sigma')
+        if not options.useRooParametricHist:
+            myTH1predUp = mcFile.Get('h_mjj_prediction_1GeVbin_plus_sigma')
+            myTH1predUp.Rebin(len(x)-1,'pred_Up_rebin',x)
+            myRebinnedTH1predUp = rt.gDirectory.Get('pred_Up_rebin')
+            myRebinnedTH1predUp.SetDirectory(0)
+            myRealTH1predUp = convertToTh1xHist(myRebinnedTH1predUp)
+            predHistUp = rt.RooDataHist("%s_bkg_alphaUp"%box, "%s_bkg_alphaUp"%box, rt.RooArgList(th1x), rt.RooFit.Import(myRealTH1predUp))
+            rootTools.Utils.importToWS(w,predHistUp) 
 
-        myMCRatio = mcFile.Get('h_ratio_MC')
-        myMCRatio.Rebin(len(x)-1,'mcRatio_rebin',x)        
-        myRebinnedMCRatio = rt.gDirectory.Get('mcRatio_rebin')
-        myRebinnedMCRatio.SetDirectory(0)
-        myRealMCRatio = convertToTh1xHist(myRebinnedMCRatio)
+            myTH1predDown = mcFile.Get('h_mjj_prediction_1GeVbin_minus_sigma')
+            myTH1predDown.Rebin(len(x)-1,'pred_Down_rebin',x)
+            myRebinnedTH1predDown = rt.gDirectory.Get('pred_Down_rebin')
+            myRebinnedTH1predDown.SetDirectory(0)
+            myRealTH1predDown = convertToTh1xHist(myRebinnedTH1predDown)
+            predHistDown = rt.RooDataHist("%s_bkg_alphaDown"%box, "%s_bkg_alphaDown"%box, rt.RooArgList(th1x), rt.RooFit.Import(myRealTH1predDown))
+            
+        myMCRatio = mcFile.Get(mcRatioName)
+        #myMCRatio.Rebin(len(x)-1,'mcRatio_rebin',x)        
+        #myRebinnedMCRatio = rt.gDirectory.Get('mcRatio_rebin')
+        #myRebinnedMCRatio.SetDirectory(0)
+        #myRealMCRatio = convertToTh1xHist(myRebinnedMCRatio)
         
-        myCR = mcFile.Get('h_mjj_high_1GeVbin')
+        myCR = mcFile.Get(cfg.getVariables(box+'CR', "histoName"))
         myCR.Rebin(len(x)-1,'cr_rebin',x)        
         myRebinnedCR = rt.gDirectory.Get('cr_rebin')
         myRebinnedCR.SetDirectory(0)
         myRealCR = convertToTh1xHist(myRebinnedCR)
         
-        myTH1predUp.Rebin(len(x)-1,'pred_Up_rebin',x)
-        myRebinnedTH1predUp = rt.gDirectory.Get('pred_Up_rebin')
-        myRebinnedTH1predUp.SetDirectory(0)
-        myRealTH1predUp = convertToTh1xHist(myRebinnedTH1predUp)
-        predHistUp = rt.RooDataHist("%s_bkg_alphaUp"%box, "%s_bkg_alphaUp"%box, rt.RooArgList(th1x), rt.RooFit.Import(myRealTH1predUp))
-        rootTools.Utils.importToWS(w,predHistUp) 
-        myTH1predDown.Rebin(len(x)-1,'pred_Down_rebin',x)
-        myRebinnedTH1predDown = rt.gDirectory.Get('pred_Down_rebin')
-        myRebinnedTH1predDown.SetDirectory(0)
-        myRealTH1predDown = convertToTh1xHist(myRebinnedTH1predDown)
-        predHistDown = rt.RooDataHist("%s_bkg_alphaDown"%box, "%s_bkg_alphaDown"%box, rt.RooArgList(th1x), rt.RooFit.Import(myRealTH1predDown))
-        rootTools.Utils.importToWS(w,predHistDown) 
-                                                                                        
-        if not options.useRooParametricHist:
-            rootTools.Utils.importToWS(w,predHistUp) 
-            rootTools.Utils.importToWS(w,predHistDown) 
-
-
         # make one shape Up/Down for each bin (uncorrelated mcstat uncertainty)
-        for iBinX in range(1,mcHist_th1x.GetNbinsX()+1):
+        if not options.useRooParametricHist:
+            for iBinX in range(1,myRealTH1.GetNbinsX()+1):
             
-            if mcHist_th1x.GetBinContent(iBinX) > 0: 
-                print 'mcstat bin %i percent uncertainty: %f%%'%(iBinX,mcHist_th1x.GetBinError(iBinX)*100./mcHist_th1x.GetBinContent(iBinX))
-            myRealTH1mcstatUp = mcHist_th1x.Clone('hist_mcstat%iUp'%iBinX) # clone the original histogram
-            myRealTH1mcstatUp.SetBinContent(iBinX, mcHist_th1x.GetBinContent(iBinX)+mcHist_th1x.GetBinError(iBinX)) # set only bin iBinX to (Nominal+Error) to get "Up" prediction
-            predHistUp = rt.RooDataHist("%s_bkg_mcstat%iUp"%(box,iBinX), "%s_bkg_mcstat%iUp"%(box,iBinX), rt.RooArgList(th1x), rt.RooFit.Import(myRealTH1mcstatUp))
-            rootTools.Utils.importToWS(w,predHistUp)
-            
-            myRealTH1mcstatDown = mcHist_th1x.Clone('hist_mcstat%iDown'%iBinX) # clone the original histogram
-            myRealTH1mcstatDown.SetBinContent(iBinX, mcHist_th1x.GetBinContent(iBinX)-mcHist_th1x.GetBinError(iBinX)) # set only bin iBinX to (Nominal-Error) to get "Down" prediction
-            predHistDown = rt.RooDataHist("%s_bkg_mcstat%iDown"%(box,iBinX), "%s_bkg_mcstat%iDown"%(box,iBinX), rt.RooArgList(th1x), rt.RooFit.Import(myRealTH1mcstatDown))
-            rootTools.Utils.importToWS(w,predHistDown) 
-
-            if not options.useRooParametricHist:
+                if mcHist_th1x.GetBinContent(iBinX) > 0: 
+                    print 'mcstat bin %i percent uncertainty: %f%%'%(iBinX,mcHist_th1x.GetBinError(iBinX)*100./mcHist_th1x.GetBinContent(iBinX))
+                myRealTH1mcstatUp = mcHist_th1x.Clone('hist_mcstat%iUp'%iBinX) # clone the original histogram
+                myRealTH1mcstatUp.SetBinContent(iBinX, mcHist_th1x.GetBinContent(iBinX)+mcHist_th1x.GetBinError(iBinX)) # set only bin iBinX to (Nominal+Error) to get "Up" prediction
+                predHistUp = rt.RooDataHist("%s_bkg_mcstat%iUp"%(box,iBinX), "%s_bkg_mcstat%iUp"%(box,iBinX), rt.RooArgList(th1x), rt.RooFit.Import(myRealTH1mcstatUp))
                 rootTools.Utils.importToWS(w,predHistUp)
+                            
+                myRealTH1mcstatDown = mcHist_th1x.Clone('hist_mcstat%iDown'%iBinX) # clone the original histogram
+                myRealTH1mcstatDown.SetBinContent(iBinX, mcHist_th1x.GetBinContent(iBinX)-mcHist_th1x.GetBinError(iBinX)) # set only bin iBinX to (Nominal-Error) to get "Down" prediction
+                predHistDown = rt.RooDataHist("%s_bkg_mcstat%iDown"%(box,iBinX), "%s_bkg_mcstat%iDown"%(box,iBinX), rt.RooArgList(th1x), rt.RooFit.Import(myRealTH1mcstatDown))
                 rootTools.Utils.importToWS(w,predHistDown) 
  
         # Use RooParametricHist                                               
         if options.useRooParametricHist:
             binFunctions = rt.RooArgList()
-            w.factory('slope[2.25746e-05,-1e-3,1e-3]')
-            w.factory('beta[1.02779e+00,0.5,2]')
-            for iBinX in range(1,mcHist_th1x.GetNbinsX()+1):
-                w.factory('mjjBin%i[%f]'%(iBinX,myRebinnedTH1.GetXaxis().GetBinCenter(iBinX)))
-                w.factory('mcRatioBin%i[%f]'%(iBinX,myRealMCRatio.GetBinContent(iBinX)))
-                w.factory('crBin%i[%f,%f,%f]'%(iBinX,myRealCR.GetBinContent(iBinX),0,myRealCR.GetBinContent(iBinX)+myRealCR.GetBinError(iBinX)*50))
-                w.factory("expr::bin%iFunc('(@0+@1*@2)*@3*@4',beta,slope,mjjBin%i,mcRatioBin%i,crBin%i)"%(iBinX,iBinX,iBinX,iBinX))
+            w.factory('slope[5.14,0.5,50.]')
+            w.factory('beta[0.977,0.1,10.]')
+            for iBinX in range(1,myRealTH1.GetNbinsX()+1):
+                mjjBin = myRebinnedTH1.GetXaxis().GetBinCenter(iBinX)
+                w.factory('mjjBin%i[%f]'%(iBinX,mjjBin))
+                #w.factory('mcRatioBin%i[%f]'%(iBinX,myRealMCRatio.GetBinContent(iBinX)))
+                w.factory('mcRatioBin%i[%f]'%(iBinX,myMCRatio.GetBinContent(myMCRatio.FindBin(mjjBin))))
+                w.factory('crBin%i[%f,%f,%f]'%(iBinX,myRealCR.GetBinContent(iBinX),0,myRealCR.GetBinContent(iBinX)+myRealCR.GetBinError(iBinX)*50.))
+                w.factory("expr::bin%iFunc('(@0+@1*(@2/@3)**4)*@4*@5',beta,slope,mjjBin%i,sqrts,mcRatioBin%i,crBin%i)"%(iBinX,iBinX,iBinX,iBinX))
                 binFunctions.add(w.function('bin%iFunc'%iBinX))
-                print iBinX, w.var('beta').getVal(), w.var('slope').getVal(), w.var('mjjBin%i'%iBinX).getVal(), myRealMCRatio.GetBinContent(iBinX), myRealCR.GetBinContent(iBinX), w.function('bin%iFunc'%iBinX).getVal(), myRealTH1.GetBinContent(iBinX)
+                print iBinX, w.var('beta').getVal(), w.var('slope').getVal(), w.var('mjjBin%i'%iBinX).getVal(), myMCRatio.GetBinContent(myMCRatio.FindBin(mjjBin)), myRealCR.GetBinContent(iBinX), w.function('bin%iFunc'%iBinX).getVal(), myRealTH1.GetBinContent(iBinX)
             rph = rt.RooParametricHist('%s_bkg'%box,'%s_bkg'%box,th1x,binFunctions,myRealTH1)
             rph_norm = rt.RooAddition('%s_bkg_norm'%box,'%s_bkg_norm'%box,binFunctions)
             rootTools.Utils.importToWS(w,rph)
