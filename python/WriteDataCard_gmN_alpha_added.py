@@ -253,7 +253,7 @@ def writeDataCard(box,model,txtfileName,bkgs,paramNames,w,penalty,fixed,shapes=[
         txtfile.write(datacard)
         txtfile.close()
         
-def writeDataCardMC(box,model,txtfileName,bkgs,paramNames,w,x,useRooParametricHist):  #this function creates the datacard.txt file when mcFile argument is given
+def writeDataCardMC(box,model,txtfileName,bkgs,paramNames,w,x,useRooParametricHist,penalty):  #this function creates the datacard.txt file when mcFile argument is given
         obsRate = w.data("data_obs").sumEntries() #gets the Total entries of the data histo stored in w
         nBkgd = len(bkgs)
         rootFileName = txtfileName.replace('.txt','.root')
@@ -326,6 +326,16 @@ def writeDataCardMC(box,model,txtfileName,bkgs,paramNames,w,x,useRooParametricHi
                 shapeString += '\t-'
             shapeString += '\n'
             datacard+=shapeString
+        if penalty:
+            slopeString = 'slope\tparam\t5.2\t0.8\n'
+            betaString = 'beta\tparam\t0.976\t0.001\n'
+            epsilonString = 'epsilon\tflatParam\n'
+        else:
+            slopeString = 'slope\tflatParam\n'
+            betaString = 'beta\tflatParam\n'
+            epsilonString = 'epsilon\tflatParam\n'            
+        datacard+=slopeString+betaString+epsilonString
+        
         txtfile = open(txtfileName,"w")
         txtfile.write(datacard)
         txtfile.close()
@@ -758,28 +768,40 @@ if __name__ == '__main__':    #THIS IS THE MAIN FUNCTION WHICH  CALLS THE REST
         # Use RooParametricHist                                               
         if options.useRooParametricHist:
             binFunctions = rt.RooArgList()
-            w.factory('slope[5.14,0.5,50.]')
-            w.factory('beta[0.977,0.1,10.]')
+            w.factory('slope[5.2,0,10]') # here is where I change slope # 5.14 for data # 1.0 for corrected ratio
+            w.factory('beta[0.976,0.9,1.1]') # here is where I change beta # 0.976 for data # 1.018 for corrected ratio
+            w.factory('epsilon[1.,0.,2.]') # overall normalization term
+        
             for iBinX in range(1,myRealTH1.GetNbinsX()+1):
-                mjjBin = myRebinnedTH1.GetXaxis().GetBinCenter(iBinX)
+                # Bin center calculation
+                #mjjBin = myRebinnedTH1.GetXaxis().GetBinCenter(iBinX) 
+                # L-W method assuming exponential fit exp(-b*mjj) to CR 
+                # with Eqn. 8 of http://www.sciencedirect.com/science/article/pii/0168900294011125a
+                mjjCen = myRebinnedTH1.GetXaxis().GetBinCenter(iBinX) 
+                mjjLow = myRebinnedTH1.GetXaxis().GetBinLowEdge(iBinX) 
+                mjjUp = myRebinnedTH1.GetXaxis().GetBinUpEdge(iBinX) 
+                mjjBinWidth = mjjUp-mjjLow
+                expB = 2.5E-03 # from fit of CR
+                mjjBin = mjjLow + (1./expB) *(rt.TMath.Log(expB * mjjBinWidth) - rt.TMath.Log(1. - rt.TMath.Exp(-1. * expB * mjjBinWidth)))
                 w.factory('mjjBin%i[%f]'%(iBinX,mjjBin))
+                #print mjjCen, mjjBin
                 #w.factory('mcRatioBin%i[%f]'%(iBinX,myRealMCRatio.GetBinContent(iBinX)))
                 w.factory('mcRatioBin%i[%f]'%(iBinX,myMCRatio.GetBinContent(myMCRatio.FindBin(mjjBin))))
                 w.factory('crBin%i[%f,%f,%f]'%(iBinX,myRealCR.GetBinContent(iBinX),0,myRealCR.GetBinContent(iBinX)+myRealCR.GetBinError(iBinX)*50.))
-                w.factory("expr::bin%iFunc('(@0+@1*(@2/@3)**4)*@4*@5',beta,slope,mjjBin%i,sqrts,mcRatioBin%i,crBin%i)"%(iBinX,iBinX,iBinX,iBinX))
+                w.factory("expr::bin%iFunc('(@0+@1*(@2/@3)**4)*@4*@5*@6',beta,slope,mjjBin%i,sqrts,mcRatioBin%i,crBin%i,epsilon)"%(iBinX,iBinX,iBinX,iBinX))
+
                 binFunctions.add(w.function('bin%iFunc'%iBinX))
-                print iBinX, w.var('beta').getVal(), w.var('slope').getVal(), w.var('mjjBin%i'%iBinX).getVal(), myMCRatio.GetBinContent(myMCRatio.FindBin(mjjBin)), myRealCR.GetBinContent(iBinX), w.function('bin%iFunc'%iBinX).getVal(), myRealTH1.GetBinContent(iBinX)
+                print iBinX, w.var('beta').getVal(), w.var('beta').getError(), w.var('slope').getVal(), w.var('mjjBin%i'%iBinX).getVal(), myMCRatio.GetBinContent(myMCRatio.FindBin(mjjBin)), myRealCR.GetBinContent(iBinX), w.function('bin%iFunc'%iBinX).getVal(), myRealTH1.GetBinContent(iBinX)
             rph = rt.RooParametricHist('%s_bkg'%box,'%s_bkg'%box,th1x,binFunctions,myRealTH1)
             rph_norm = rt.RooAddition('%s_bkg_norm'%box,'%s_bkg_norm'%box,binFunctions)
             rootTools.Utils.importToWS(w,rph)
             rootTools.Utils.importToWS(w,rph_norm,rt.RooFit.RecycleConflictNodes())
-            
     elif options.mcFile is not None and 'MCCR' in box: #THIS IS USED FOR THE RATIO-PREDICTION
         # Use RooParametricHist                                               
         if options.useRooParametricHist:
             binVariablesCR = rt.RooArgList()
             for iBinX in range(1,myRealTH1.GetNbinsX()+1):
-                w.factory('crBin%i[%f,%f,%f]'%(iBinX,myRealTH1.GetBinContent(iBinX),0,myRealTH1.GetBinContent(iBinX)+myRealTH1.GetBinError(iBinX)*50))
+                w.factory('crBin%i[%f,%f,%f]'%(iBinX,myRealTH1.GetBinContent(iBinX),0,myRealTH1.GetBinContent(iBinX)+myRealTH1.GetBinError(iBinX)*50.))
                 binVariablesCR.add(w.var('crBin%i'%iBinX))
             rph = rt.RooParametricHist('%s_bkg'%box,'%s_bkg'%box,th1x,binVariablesCR,myRealTH1)
             rph_norm = rt.RooAddition('%s_bkg_norm'%box,'%s_bkg_norm'%box,binVariablesCR)
@@ -789,9 +811,10 @@ if __name__ == '__main__':    #THIS IS THE MAIN FUNCTION WHICH  CALLS THE REST
     outFile = 'dijet_combine_%s_%i_lumi-%.3f_%s.root'%(model,massPoint,lumi/1000.,box) #creates the name of the output .root file
     outputFile = rt.TFile.Open(options.outDir+"/"+outFile,"recreate")                  #creates the output file
     if options.mcFile is not None:
-        writeDataCardMC(box,model,options.outDir+"/"+outFile.replace(".root",".txt"),bkgs,paramNames,w,x,options.useRooParametricHist)
+        writeDataCardMC(box,model,options.outDir+"/"+outFile.replace(".root",".txt"),bkgs,paramNames,w,x,options.useRooParametricHist,options.penalty)
     else:
         writeDataCard(box,model,options.outDir+"/"+outFile.replace(".root",".txt"),bkgs,paramNames,w,options.penalty,options.fixed,shapes=shapes,multi=options.multi)
     w.Write() #writes the workspace in the output file
     w.Print('v')
     os.system("cat %s"%options.outDir+"/"+outFile.replace(".root",".txt"))
+
