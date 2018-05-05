@@ -104,12 +104,12 @@ analysisClass::analysisClass(string * inputList, string * cutFile, string * tree
     
     //uncertainty
    // unc = new JetCorrectionUncertainty("data/Spring16_V8_DATA/Spring16_25nsV8p2_DATA_Uncertainty_AK4PFchs.txt");
-unc = new JetCorrectionUncertainty("data/Fall17_17Nov2017_V6_MC/Fall17_17Nov2017_V6_MC_Uncertainty_AK4PFchs.txt");
+//unc = new JetCorrectionUncertainty("data/Fall17_17Nov2017_V6_MC/Fall17_17Nov2017_V6_MC_Uncertainty_AK4PFchs.txt");
 
     
     
     //uncertainty
-   // unc = new JetCorrectionUncertainty("data/Fall17_17Nov2017_V6_DATA/Fall17_17Nov2017B_V6_DATA_Uncertainty_AK4PFchs.txt");
+    unc = new JetCorrectionUncertainty("data/Fall17_17Nov2017_V6_DATA/Fall17_17Nov2017B_V6_DATA_Uncertainty_AK4PFchs.txt");
     
   
 
