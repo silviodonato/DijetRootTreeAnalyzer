@@ -253,6 +253,8 @@ if __name__ == '__main__':
                   help="do simultaneous trigger fit")
     parser.add_option('--multi',dest="multi", default=True,action='store_true',
                   help="multiple background pdfs")
+    parser.add_option('--linearX',dest="linearX", default=False,action='store_true',
+                  help="linear X axis")
 
     rt.RooMsgService.instance().setGlobalKillBelow(rt.RooFit.FATAL)
     rt.gStyle.SetPaintTextFormat('+.2f')
@@ -643,6 +645,7 @@ if __name__ == '__main__':
         w.data('triggerData').fillHistogram(h_denominator_coarse,rt.RooArgList(w.var('mjj')))
         effGraph_coarse = rt.TGraphAsymmErrors(h_numerator_coarse,h_denominator_coarse)
         
+        histo.GetXaxis().SetNdivisions(509)
         histo = h_numerator.Clone('empty')
         for i in range(1,histo.GetNbinsX()+1):
             histo.SetBinContent(i,0)             
@@ -687,13 +690,12 @@ if __name__ == '__main__':
     
         l = rt.TLatex()
         l.SetTextAlign(11)
-        l.SetTextSize(0.045)
+        l.SetTextSize(0.065)
         l.SetTextFont(42)
         l.SetNDC()
         #l.DrawLatex(0.7,0.96,"%i pb^{-1} (%i TeV)"%(lumi,w.var('sqrts').getVal()/1000.))
-        l.DrawLatex(0.73,0.96,"%.1f fb^{-1} (%i TeV)"%(lumi/1000.,w.var('sqrts').getVal()/1000.))     
+        l.DrawLatex(0.73,0.96,"%d fb^{-1} (%i TeV)"%(lumi/1000.,w.var('sqrts').getVal()/1000.))     
         # PAS        
-        #l.SetTextFont(62)
         #l.SetTextSize(0.055)   
         #l.DrawLatex(0.175,0.96,"CMS")
         #l.SetTextFont(52)
@@ -702,10 +704,9 @@ if __name__ == '__main__':
         #paper
         l.SetTextFont(62)
         l.SetTextSize(0.065)   
-        l.DrawLatex(0.22,0.89,"CMS")
+        l.DrawLatex(0.22,0.85,"CMS")
         l.SetTextFont(52)
         l.SetTextSize(0.045)
-        l.DrawLatex(0.32,0.89,"Preliminary")
         
         #leg = rt.TLegend(0.7,0.7,0.89,0.88)
         leg = rt.TLegend(0.7,0.1,0.89,0.28)
@@ -776,7 +777,7 @@ if __name__ == '__main__':
     
     
         h_eff_residual_vs_mass.Draw("histsame")
-    
+
         d.Print(options.outDir+"/eff_mjj_%s_%s.pdf"%(fitRegion.replace(',','_'),box))
         d.Print(options.outDir+"/eff_mjj_%s_%s.C"%(fitRegion.replace(',','_'),box))
         tdirectory.cd()
@@ -839,15 +840,18 @@ if __name__ == '__main__':
     c.Divide(1,2,0,0,0)
     
     pad_1 = c.GetPad(1)
+    pad_1.SetTickx()
+    pad_1.SetTicky()
     #PAS
     #pad_1.SetPad(0.01,0.36,0.99,0.98)
     #paper 
     pad_1.SetPad(0.01,0.37,0.99,0.98)
     pad_1.SetLogy()
     if 'PF' in box or w.var('mjj').getMax() > 2037:
-        pad_1.SetLogx()
+        if not options.linearX: 
+            pad_1.SetLogx()
     pad_1.SetRightMargin(0.05)
-    pad_1.SetTopMargin(0.05)
+    pad_1.SetTopMargin(0.07)
     pad_1.SetLeftMargin(0.175)
     pad_1.SetFillColor(0)
     pad_1.SetBorderMode(0)
@@ -855,14 +859,17 @@ if __name__ == '__main__':
     pad_1.SetFrameBorderMode(0)
     
     pad_2 = c.GetPad(2)
+    pad_2.SetTickx()
+    pad_2.SetTicky()
     pad_2.SetLeftMargin(0.175)
-    pad_2.SetPad(0.01,0.02,0.99,0.37)
+    pad_2.SetPad(0.01,0.02,0.99,0.36)
     pad_2.SetBottomMargin(0.35)
     pad_2.SetRightMargin(0.05)
-    pad_2.SetGridx()
-    pad_2.SetGridy()
+    #pad_2.SetGridx()
+    #pad_2.SetGridy()
     if 'PF' in box or w.var('mjj').getMax() > 2037:
-        pad_2.SetLogx()
+        if not options.linearX: 
+          pad_2.SetLogx()
 
     pad_1.cd()
     
@@ -950,11 +957,11 @@ if __name__ == '__main__':
     
     l = rt.TLatex()
     l.SetTextAlign(11)
-    l.SetTextSize(0.045)
+    l.SetTextSize(0.055)
     l.SetTextFont(42)
     l.SetNDC()
     #l.DrawLatex(0.7,0.96,"%i pb^{-1} (%i TeV)"%(lumi,w.var('sqrts').getVal()/1000.))
-    l.DrawLatex(0.72,0.96,"%.1f fb^{-1} (%i TeV)"%(lumi/1000.,w.var('sqrts').getVal()/1000.))
+    l.DrawLatex(0.7,0.94,"%d fb^{-1} (%i TeV)"%(lumi/1000.,w.var('sqrts').getVal()/1000.))
     # PAS
     #l.SetTextFont(62)
     #l.SetTextSize(0.055)   
@@ -965,18 +972,17 @@ if __name__ == '__main__':
     # paper
     l.SetTextFont(62)
     l.SetTextSize(0.065)
-    l.DrawLatex(0.22,0.89,"CMS")
+    l.DrawLatex(0.22,0.85,"CMS")
     l.SetTextFont(52)
     l.SetTextSize(0.045)
-    l.DrawLatex(0.32,0.89,"Preliminary")
         
     if options.signalFileName!=None:
         if 'Calo' in box:
-            leg = rt.TLegend(0.58,0.58,0.89,0.94)
+            leg = rt.TLegend(0.58,0.55,0.85,0.87)
         else:
-            leg = rt.TLegend(0.6,0.58,0.89,0.94)
+            leg = rt.TLegend(0.6,0.55,0.85,0.87)
     else:        
-        leg = rt.TLegend(0.7,0.7,0.89,0.88)
+        leg = rt.TLegend(0.7,0.7,0.89,0.89)
     leg.SetTextFont(42)
     leg.SetFillColor(rt.kWhite)
     leg.SetFillStyle(0)
@@ -998,7 +1004,7 @@ if __name__ == '__main__':
     #g_data.Draw("pezsame")
 
     #pave_sel = rt.TPaveText(0.2,0.03,0.5,0.25,"NDC")
-    pave_sel = rt.TPaveText(0.2,0.03,0.5,0.23,"NDC")
+    pave_sel = rt.TPaveText(0.2,0.03,0.5,0.22,"NDC")
     pave_sel.SetFillColor(0)
     pave_sel.SetBorderSize(0)
     pave_sel.SetFillStyle(0)
@@ -1085,7 +1091,7 @@ if __name__ == '__main__':
         yLab.SetTextAlign(32)
         yLab.SetTextSize(0.05)
         yLab.SetTextFont(42)
-        xM = 0.
+        xM = 1200
         yLab.DrawLatex(xM, 10, "10^{4}")
         yLab.DrawLatex(xM, 1, "10^{3}")
         yLab.DrawLatex(xM, 0.1, "10^{2}")
@@ -1098,12 +1104,17 @@ if __name__ == '__main__':
 
         
         f_h2_log10_x_axis = rt.TF1("f_h2_log10_x_axis", "log10(x)", myRebinnedDensityTH1.GetXaxis().GetXmin(), myRebinnedDensityTH1.GetXaxis().GetXmax())
-        b = rt.TGaxis(myRebinnedDensityTH1.GetXaxis().GetXmin(), 2e-8,
-                      myRebinnedDensityTH1.GetXaxis().GetXmax(), 2e-8, "f_h2_log10_x_axis", 509, "BS", 0.0)
-        b.SetTickSize(myRebinnedDensityTH1.GetTickLength("X"))
-        b.SetMoreLogLabels()
-        b.SetLabelOffset(1000)
-        b.Draw()
+        #b = rt.TGaxis(myRebinnedDensityTH1.GetXaxis().GetXmin(), 2e-8,
+        #              myRebinnedDensityTH1.GetXaxis().GetXmax(), 2e-8, "f_h2_log10_x_axis", 509, "BS", 0.0)
+        #b.SetTickSize(myRebinnedDensityTH1.GetTickLength("X"))
+        #b.SetMoreLogLabels()
+        bbot = rt.TGaxis(myRebinnedDensityTH1.GetXaxis().GetXmin(),2e-8,myRebinnedDensityTH1.GetXaxis().GetXmax(), 2e-8,0.001,10000,510,"UG");
+        btop = rt.TGaxis(myRebinnedDensityTH1.GetXaxis().GetXmin(),20,myRebinnedDensityTH1.GetXaxis().GetXmax(), 20,0.001,10000,510,"-UG");
+        bbot.SetTickSize(myRebinnedDensityTH1.GetTickLength("X"))
+        btop.SetTickSize(myRebinnedDensityTH1.GetTickLength("X"))
+	bbot.Draw()
+	btop.Draw()
+
         
         rt.gPad.Modified()
         rt.gPad.Update()
@@ -1118,7 +1129,7 @@ if __name__ == '__main__':
         yLab.SetTextAlign(32)
         yLab.SetTextSize(0.05)
         yLab.SetTextFont(42)
-        xM = 434
+        xM = 470
         yLab.DrawLatex(xM, 1000, "10^{6}")
         yLab.DrawLatex(xM, 100, "10^{5}")
         yLab.DrawLatex(xM, 10, "10^{4}")
@@ -1129,8 +1140,7 @@ if __name__ == '__main__':
         yLab.DrawLatex(xM, 0.0001, "10^{#minus1}")
 
 
-        
-    pad_1.Update()
+    #pad_1.Update()
 
     pad_2.cd()
     
@@ -1159,6 +1169,8 @@ if __name__ == '__main__':
     h_fit_residual_vs_mass.GetXaxis().SetTitle('Dijet mass [GeV]')
 
     h_fit_residual_vs_mass.Draw("histsame")
+    line = rt.TLine(h_fit_residual_vs_mass.GetXaxis().GetXmin(),0,h_fit_residual_vs_mass.GetXaxis().GetXmax(),0) 
+    line.Draw("same")
     
     if 'PF' in box or w.var('mjj').getMax() > 2037:        
         # PAS
@@ -1167,8 +1179,9 @@ if __name__ == '__main__':
         h_fit_residual_vs_mass.GetXaxis().SetTitle('Dijet mass [TeV]')
         h_fit_residual_vs_mass.GetXaxis().SetLabelOffset(1000)
         h_fit_residual_vs_mass.GetXaxis().SetNoExponent()
-        h_fit_residual_vs_mass.GetXaxis().SetMoreLogLabels()    
-        h_fit_residual_vs_mass.GetXaxis().SetNdivisions(999)
+        h_fit_residual_vs_mass.GetXaxis().SetMoreLogLabels()
+        if not options.linearX:
+	    h_fit_residual_vs_mass.GetXaxis().SetNdivisions(512,rt.kFALSE)
         xLab = rt.TLatex()
         xLab.SetTextAlign(22)
         xLab.SetTextFont(42)
@@ -1185,13 +1198,18 @@ if __name__ == '__main__':
         xLab.DrawLatex(8000, -4, "8")
         
         f_h2_log10_x_axis = rt.TF1("f_h2_log10_x_axis", "log10(x)", h_fit_residual_vs_mass.GetXaxis().GetXmin(), h_fit_residual_vs_mass.GetXaxis().GetXmax())
-        a = rt.TGaxis(h_fit_residual_vs_mass.GetXaxis().GetXmin(), -3.5,
-                      h_fit_residual_vs_mass.GetXaxis().GetXmax(), -3.5, "f_h2_log10_x_axis", 509, "BS", 0.0)
-        a.SetTickSize(h_fit_residual_vs_mass.GetTickLength("X"))
-        a.SetMoreLogLabels()
-        a.SetLabelOffset(1000)
-        a.Draw()
+        #a = rt.TGaxis(h_fit_residual_vs_mass.GetXaxis().GetXmin(), -3.5,
+        #              h_fit_residual_vs_mass.GetXaxis().GetXmax(), -3.5, "f_h2_log10_x_axis", 509, "BS", 0.0)
+        #a.SetTickSize(h_fit_residual_vs_mass.GetTickLength("X"))
+        #a.SetMoreLogLabels()
+        #a.SetLabelOffset(1000)
+        #a.Draw()
+        abot = rt.TGaxis(h_fit_residual_vs_mass.GetXaxis().GetXmin(),-3.5,h_fit_residual_vs_mass.GetXaxis().GetXmax(), -3.5,0.001,10000,510,"UG");
+        atop = rt.TGaxis(h_fit_residual_vs_mass.GetXaxis().GetXmin(),3.5,h_fit_residual_vs_mass.GetXaxis().GetXmax(), 3.5,0.001,10000,510,"-UG");
+	abot.Draw()
+	atop.Draw()
         
+        rt.gPad.RedrawAxis()
         rt.gPad.Modified()
         rt.gPad.Update()
     
@@ -1215,6 +1233,8 @@ if __name__ == '__main__':
         xLab.DrawLatex(1600, -4, "1.6")
         xLab.DrawLatex(1800, -4, "1.8")
         xLab.DrawLatex(2000, -4, "2")
+        #rt.gPad.RedrawAxis()
+        #rt.gPad.Update()
 
     sigHistResiduals = []
     g_signal_residuals = []
@@ -1276,9 +1296,14 @@ if __name__ == '__main__':
 
         
     #c.RedrawAxis() # request from David
-    
-    c.Print(options.outDir+"/fit_mjj_%s_%s.pdf"%(fitRegion.replace(',','_'),box))
-    c.Print(options.outDir+"/fit_mjj_%s_%s.C"%(fitRegion.replace(',','_'),box))
+   
+    if not options.linearX:
+        c.Print(options.outDir+"/fit_mjj_%s_%s.pdf"%(fitRegion.replace(',','_'),box))
+        c.Print(options.outDir+"/fit_mjj_%s_%s.C"%(fitRegion.replace(',','_'),box))
+    else:
+        c.Print(options.outDir+"/fit_mjj_%s_%s_linearX.pdf"%(fitRegion.replace(',','_'),box))
+        c.Print(options.outDir+"/fit_mjj_%s_%s_linearX.C"%(fitRegion.replace(',','_'),box))
+        
     tdirectory.cd()
     c.Write()
     
