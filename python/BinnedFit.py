@@ -978,9 +978,9 @@ if __name__ == '__main__':
         
     if options.signalFileName!=None:
         if 'Calo' in box:
-            leg = rt.TLegend(0.58,0.55,0.85,0.87)
+            leg = rt.TLegend(0.58,0.55,0.87,0.87)
         else:
-            leg = rt.TLegend(0.6,0.55,0.85,0.87)
+            leg = rt.TLegend(0.58,0.55,0.85,0.87)
     else:        
         leg = rt.TLegend(0.7,0.7,0.89,0.89)
     leg.SetTextFont(42)
@@ -1011,7 +1011,7 @@ if __name__ == '__main__':
     pave_sel.SetTextFont(42)
     pave_sel.SetTextSize(0.045)
     pave_sel.SetTextAlign(11)
-    pave_sel.AddText("#chi^{{2}} / ndf = {0:.1f} / {1:d} = {2:.1f}".format(
+    pave_sel.AddText("#chi^{{2}} / NDF = {0:.1f} / {1:d} = {2:.1f}".format(
                           list_chi2AndNdf_background[4], list_chi2AndNdf_background[5],
                           list_chi2AndNdf_background[4]/list_chi2AndNdf_background[5]))
 
@@ -1108,8 +1108,10 @@ if __name__ == '__main__':
         #              myRebinnedDensityTH1.GetXaxis().GetXmax(), 2e-8, "f_h2_log10_x_axis", 509, "BS", 0.0)
         #b.SetTickSize(myRebinnedDensityTH1.GetTickLength("X"))
         #b.SetMoreLogLabels()
-        bbot = rt.TGaxis(myRebinnedDensityTH1.GetXaxis().GetXmin(),2e-8,myRebinnedDensityTH1.GetXaxis().GetXmax(), 2e-8,0.001,10000,510,"UG");
-        btop = rt.TGaxis(myRebinnedDensityTH1.GetXaxis().GetXmin(),20,myRebinnedDensityTH1.GetXaxis().GetXmax(), 20,0.001,10000,510,"-UG");
+        bbot = rt.TGaxis(myRebinnedDensityTH1.GetXaxis().GetXmin(), 2e-8,
+	                 myRebinnedDensityTH1.GetXaxis().GetXmax(), 2e-8, "f_h2_log10_x_axis", 509,"UBS", 0.0);
+        btop = rt.TGaxis(myRebinnedDensityTH1.GetXaxis().GetXmin(),20,
+	                 myRebinnedDensityTH1.GetXaxis().GetXmax(), 20,  "f_h2_log10_x_axis", 509,"-UBS", 0.0);
         bbot.SetTickSize(myRebinnedDensityTH1.GetTickLength("X"))
         btop.SetTickSize(myRebinnedDensityTH1.GetTickLength("X"))
 	bbot.Draw()
@@ -1204,8 +1206,12 @@ if __name__ == '__main__':
         #a.SetMoreLogLabels()
         #a.SetLabelOffset(1000)
         #a.Draw()
-        abot = rt.TGaxis(h_fit_residual_vs_mass.GetXaxis().GetXmin(),-3.5,h_fit_residual_vs_mass.GetXaxis().GetXmax(), -3.5,0.001,10000,510,"UG");
-        atop = rt.TGaxis(h_fit_residual_vs_mass.GetXaxis().GetXmin(),3.5,h_fit_residual_vs_mass.GetXaxis().GetXmax(), 3.5,0.001,10000,510,"-UG");
+        #abot = rt.TGaxis(h_fit_residual_vs_mass.GetXaxis().GetXmin(),-3.5,h_fit_residual_vs_mass.GetXaxis().GetXmax(), -3.5,0.001,10000,509,"UG");
+        #atop = rt.TGaxis(h_fit_residual_vs_mass.GetXaxis().GetXmin(),3.5,h_fit_residual_vs_mass.GetXaxis().GetXmax(), 3.5,0.001,10000,509,"-UG");
+        abot = rt.TGaxis(myRebinnedDensityTH1.GetXaxis().GetXmin(), -3.5,
+	                 myRebinnedDensityTH1.GetXaxis().GetXmax(), -3.5, "f_h2_log10_x_axis", 509,"UBS", 0.0);
+        atop = rt.TGaxis(myRebinnedDensityTH1.GetXaxis().GetXmin(), 3.5,
+	                 myRebinnedDensityTH1.GetXaxis().GetXmax(), 3.5,  "f_h2_log10_x_axis", 509,"-UBS", 0.0);
 	abot.Draw()
 	atop.Draw()
         
