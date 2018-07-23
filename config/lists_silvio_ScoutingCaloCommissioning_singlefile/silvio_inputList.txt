@@ -1,0 +1,1 @@
+root://cms-xrd-global.cern.ch///eos/cms/store/group/phys_exotica/dijet/Dijet13TeVScouting/rootTrees_big/2016/ScoutingCaloHT_Run2016H-v1_Nov-17-2016_20161117_175444/ScoutingCaloHT/crab_ScoutingCaloHT__Run2016H-v1__RAW/161117_165651/0001/failed/ScoutingCaloHT__Run2016H-v1__RAW_1937.root

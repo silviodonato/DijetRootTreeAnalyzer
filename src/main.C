@@ -3,7 +3,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include <stdio.h> 
+#include <stdio.h>
 #include <iomanip>
 
 #include <TTree.h>
@@ -40,9 +40,10 @@ int main(int argc, char* argv[])
   string * treeName       = new  string(argv[3]);
   string * outputFileName = new  string(argv[4]);
   string * cutEfficFile   = new  string(argv[5]);
+  //string * store_ntuple_string   = new  string(argv[6]);
+  bool store_ntuple = false;
 
-  analysisClass analysisClass_(inputList, cutFile, treeName, outputFileName, cutEfficFile);
+  analysisClass analysisClass_(inputList, cutFile, treeName, outputFileName, cutEfficFile, store_ntuple);
   analysisClass_.Loop();
 
 }
-

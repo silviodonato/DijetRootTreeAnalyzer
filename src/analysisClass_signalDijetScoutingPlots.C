@@ -12,8 +12,8 @@
 
 analysisClass::analysisClass(string *inputList, string *cutFile,
                              string *treeName, string *outputFileName,
-                             string *cutEfficFile)
-    : baseClass(inputList, cutFile, treeName, outputFileName, cutEfficFile)
+                             string *cutEfficFile, bool store_ntuple)
+    : baseClass(inputList, cutFile, treeName, outputFileName, cutEfficFile, store_ntuple)
 {
     std::cout << "analysisClass::analysisClass(): begins " << std::endl;
 
@@ -88,16 +88,16 @@ void analysisClass::Loop()
     TH1F* h_mjj_ratio_jerUp = new TH1F("h_mjj_ratio_jerUp", "", getHistoNBins("mjj_ratio"),
                                  getHistoMin("mjj_ratio"), getHistoMax("mjj_ratio"));
     TH1F* h_mjj_ratio_jerDown = new TH1F("h_mjj_ratio_jerDown", "", getHistoNBins("mjj_ratio"),
-                                 getHistoMin("mjj_ratio"), getHistoMax("mjj_ratio"));    
+                                 getHistoMin("mjj_ratio"), getHistoMax("mjj_ratio"));
     TH1F* h_mjj_ratio_jesUp = new TH1F("h_mjj_ratio_jesUp", "", getHistoNBins("mjj_ratio"),
                                  getHistoMin("mjj_ratio"), getHistoMax("mjj_ratio"));
     TH1F* h_mjj_ratio_jesDown = new TH1F("h_mjj_ratio_jesDown", "", getHistoNBins("mjj_ratio"),
-                                 getHistoMin("mjj_ratio"), getHistoMax("mjj_ratio"));    
+                                 getHistoMin("mjj_ratio"), getHistoMax("mjj_ratio"));
 
 
     /////////initialize variables
     TRandom3 r(1988);
-    
+
     TF1* hltFunc = new TF1("hltFunc","sqrt([0]*[0]/x+[1]*[1])",0,14000);
     hltFunc->SetParameter(0,getPreCutValue1("hltP0"));
     hltFunc->SetParameter(1,getPreCutValue1("hltP1"));
@@ -109,7 +109,7 @@ void analysisClass::Loop()
     smearJerUpFunc->SetParameter(0,getPreCutValue1("jerUp"));
     TF1* smearJerDownFunc  = new TF1("smearJerDownFunc","(recoFunc)*sqrt(pow(hltFunc + [0]*recoFunc,2.0)/recoFunc/recoFunc-1.0)",0,14000);
     smearJerDownFunc->SetParameter(0,getPreCutValue1("jerDown"));
-    
+
     Long64_t nentries = fChain->GetEntriesFast();
     std::cout << "analysisClass::Loop(): nentries = " << nentries << std::endl;
 
@@ -131,31 +131,31 @@ void analysisClass::Loop()
 
         resetCuts();
 
-	double x1 = r.Gaus();
-	double x2 = r.Gaus();
-	double x3 = r.Gaus();
-	
-	double mjj_nom = mjj*(1.+getPreCutValue1("jes"))*(1.+smearFunc->Eval(mjj)*x1);
-	
-	double mjj_jerUp = mjj*(1.+getPreCutValue1("jes"))*(1.+smearJerUpFunc->Eval(mjj)*x2);
-	double mjj_jerDown = mjj*(1.+getPreCutValue1("jes"))*(1.+smearJerDownFunc->Eval(mjj)*x3);
+      	double x1 = r.Gaus();
+      	double x2 = r.Gaus();
+      	double x3 = r.Gaus();
 
-	double mjj_jesUp = mjj*(1.+getPreCutValue1("jesUp"))*(1.+smearFunc->Eval(mjj)*x1);
-	double mjj_jesDown = mjj*(1.+getPreCutValue1("jesDown"))*(1.+smearFunc->Eval(mjj)*x1);
-	
-        double mjj_ratio = mjj/getPreCutValue1("resonanceMass");
-	
-	double mjj_ratio_nom = mjj_nom/getPreCutValue1("resonanceMass");
-	
-	double mjj_ratio_jerUp = mjj_jerUp/getPreCutValue1("resonanceMass");	
-	double mjj_ratio_jerDown = mjj_jerDown/getPreCutValue1("resonanceMass");
-	
-	double mjj_ratio_jesUp = mjj_jesUp/getPreCutValue1("resonanceMass");
-	double mjj_ratio_jesDown = mjj_jesDown/getPreCutValue1("resonanceMass");
+      	double mjj_nom = dijet_mass*(1.+getPreCutValue1("jes"))*(1.+smearFunc->Eval(dijet_mass)*x1);
+
+      	double mjj_jerUp = dijet_mass*(1.+getPreCutValue1("jes"))*(1.+smearJerUpFunc->Eval(dijet_mass)*x2);
+      	double mjj_jerDown = dijet_mass*(1.+getPreCutValue1("jes"))*(1.+smearJerDownFunc->Eval(dijet_mass)*x3);
+
+      	double mjj_jesUp = dijet_mass*(1.+getPreCutValue1("jesUp"))*(1.+smearFunc->Eval(dijet_mass)*x1);
+      	double mjj_jesDown = dijet_mass*(1.+getPreCutValue1("jesDown"))*(1.+smearFunc->Eval(dijet_mass)*x1);
+
+        double mjj_ratio = dijet_mass/getPreCutValue1("resonanceMass");
+
+      	double mjj_ratio_nom = mjj_nom/getPreCutValue1("resonanceMass");
+
+      	double mjj_ratio_jerUp = mjj_jerUp/getPreCutValue1("resonanceMass");
+      	double mjj_ratio_jerDown = mjj_jerDown/getPreCutValue1("resonanceMass");
+
+      	double mjj_ratio_jesUp = mjj_jesUp/getPreCutValue1("resonanceMass");
+      	double mjj_ratio_jesDown = mjj_jesDown/getPreCutValue1("resonanceMass");
 
         //== Fill Variables ==
-        fillVariableWithValue("deltaETAjj", deltaETAjj);
-        fillVariableWithValue("mjj", mjj);
+        fillVariableWithValue("deltaETAjj", dijet_deta);
+        fillVariableWithValue("mjj", dijet_mass);
         fillVariableWithValue("mjj_nom", mjj_nom);
         fillVariableWithValue("mjj_jesUp", mjj_jesUp);
         fillVariableWithValue("mjj_jesDown", mjj_jesDown);
@@ -172,6 +172,7 @@ void analysisClass::Loop()
         evaluateCuts();
 
         if (passedCut("all")) {
+          if(isr_pt > 50  && jet2_pt>45  && abs(dijet_deta)<1.2 && jet1_pt>90){
             h_mjj_fullSel_varBin->Fill(getVariableValue("mjj"));
             h_mjj_nom_fullSel_varBin->Fill(getVariableValue("mjj_nom"));
             h_mjj_jerUp_fullSel_varBin->Fill(getVariableValue("mjj_jerUp"));
@@ -184,13 +185,14 @@ void analysisClass::Loop()
             h_mjj_jerDown_fullSel_fixBin->Fill(getVariableValue("mjj_jerDown"));
             h_mjj_jesUp_fullSel_fixBin->Fill(getVariableValue("mjj_jesUp"));
             h_mjj_jesDown_fullSel_fixBin->Fill(getVariableValue("mjj_jesDown"));
-	    
+
             h_mjj_ratio->Fill(getVariableValue("mjj_ratio"));
             h_mjj_ratio_nom->Fill(getVariableValue("mjj_ratio_nom"));
             h_mjj_ratio_jerUp->Fill(getVariableValue("mjj_ratio_jerUp"));
             h_mjj_ratio_jerDown->Fill(getVariableValue("mjj_ratio_jerDown"));
             h_mjj_ratio_jesUp->Fill(getVariableValue("mjj_ratio_jesUp"));
             h_mjj_ratio_jesDown->Fill(getVariableValue("mjj_ratio_jesDown"));
+          }
         }
 
         ////////////////////// User's code ends here ///////////////////////
@@ -198,7 +200,7 @@ void analysisClass::Loop()
     } // End loop over events
 
     //////////write histos
-
+    TFile f("histos.root", "RECREATE");
     h_mjj_fullSel_varBin->Write();
     h_mjj_nom_fullSel_varBin->Write();
     h_mjj_jerUp_fullSel_varBin->Write();
@@ -217,6 +219,6 @@ void analysisClass::Loop()
     h_mjj_ratio_jerDown->Write();
     h_mjj_ratio_jesUp->Write();
     h_mjj_ratio_jesDown->Write();
-
+    f.Close();
     std::cout << "analysisClass::Loop() ends" << std::endl;
 }

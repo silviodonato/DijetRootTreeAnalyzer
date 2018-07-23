@@ -8,19 +8,19 @@ import sys
 
 def getDownFromUpNom(hUp,hNom):
 
-    hDown = hUp.Clone(hUp.GetName().replace('Up','Down'))    
+    hDown = hUp.Clone(hUp.GetName().replace('Up','Down'))
     for i in range(1,hDown.GetNbinsX()+1):
         nom = hNom.GetBinContent(i)
         up = hUp.GetBinContent(i)
         if up > 0:
-            down = nom*nom / up 
+            down = nom*nom / up
             hDown.SetBinContent(i, down)
         else:
             hDown.SetBinContent(i, 0)
 
     return hDown
 
-    
+
 
 def fixPars(w, label, doFix=True, setVal=None):
     parSet = w.allVars()
@@ -30,12 +30,12 @@ def fixPars(w, label, doFix=True, setVal=None):
             if setVal is not None: par.setVal(setVal)
 
 def initializeWorkspace(w,cfg,box,scaleFactor=1.,penalty=False,multi=False,x=None,emptyHist1D=None):
-    
+
     if x is None:
         x = array('d', cfg.getBinning(box)[0]) # mjj binning
     nBins = len(x)-1
     maxBins = nBins
-    
+
     variables = cfg.getVariablesRange(box, "variables",w)
     w.var('th1x').setBins(maxBins)
     parameters = cfg.getVariables(box, "combine_parameters")
@@ -44,7 +44,7 @@ def initializeWorkspace(w,cfg,box,scaleFactor=1.,penalty=False,multi=False,x=Non
         if penalty and '_norm' in parameter:
             continue
         w.factory(parameter)
-        
+
     constPars = ['sqrts','p0_%s'%box, 'sqrts5', 'p50_%s'%box, 'sqrtsm', 'pm0_%s'%box, 'sqrtsa', 'pa0_%s'%box]
     if w.var('meff_%s'%box).getVal()<0 and w.var('seff_%s'%box).getVal()<0:
         constPars.extend(['meff_%s'%box,'seff_%s'%box])
@@ -54,29 +54,29 @@ def initializeWorkspace(w,cfg,box,scaleFactor=1.,penalty=False,multi=False,x=Non
         constPars.extend(['pm3_%s'%box])
     if  w.var('pm4_%s'%box)!=None and w.var('pm4_%s'%box).getVal()==0:
         constPars.extend(['pm4_%s'%box])
-        
-        
+
+
     for parameter in parameters:
         paramName = parameter.split('[')[0]
         if paramName not in constPars:
             paramNames.append(paramName)
             w.var(paramName).setConstant(False)
-            
-        
+
+
         # float normalization parameters
         fixPars(w,"Ntot",False)
-        
+
         # fix Gaussian constraint parameters
         fixPars(w,"In")
         fixPars(w,"Mean")
         fixPars(w,"Sigma")
 
-        # fix center of mass energy, trigger turn-on, and p0                                                                                   
+        # fix center of mass energy, trigger turn-on, and p0
         for myvar in constPars:
             fixPars(w,myvar)
 
-        
-        
+
+
     if emptyHist1D==None:
         emptyHist1D = rt.TH1D("emptyHist1D","emptyHist1D",len(x)-1,x)
         iBinX = -1
@@ -84,8 +84,8 @@ def initializeWorkspace(w,cfg,box,scaleFactor=1.,penalty=False,multi=False,x=Non
             iBinX+=1
             emptyHist1D.SetBinContent(ix,1)
             emptyHist1D.SetBinError(ix,0)
-        
-    
+
+
     commands = cfg.getVariables(box, "combine_pdfs")
     bkgs = []
     for command in commands:
@@ -104,7 +104,7 @@ def initializeWorkspace(w,cfg,box,scaleFactor=1.,penalty=False,multi=False,x=Non
                 if w.var(myvar)!=None:
                     arglist.append(w.var(myvar))
                 elif w.function(myvar)!=None:
-                    arglist.append(w.function(myvar))  
+                    arglist.append(w.function(myvar))
                 elif 'eff_' in myvar:
                         parlist = rt.RooArgList(myvar)
                         listdef = ''
@@ -132,16 +132,16 @@ def initializeWorkspace(w,cfg,box,scaleFactor=1.,penalty=False,multi=False,x=Non
                         rootTools.Utils.importToWS(w,parlist)
                         rootTools.Utils.importToWS(w,prodlist)
                         prod = rt.RooProdPdf('g_eff','g_eff',prodlist)
-                        rootTools.Utils.importToWS(w,prod)                        
-                        arglist.append(parlist)                        
+                        rootTools.Utils.importToWS(w,prod)
+                        arglist.append(parlist)
             if myclass == 'RooMultiPdf':
                 arglist = arglist[0:2]
                 arglist.append(w.cat(mylist[0]))
                 mypdfs = rt.RooArgList('pdf_list')
                 [mypdfs.add(w.pdf(myvar)) for myvar in mylist[1:]]
                 rootTools.Utils.importToWS(w,mypdfs)
-                arglist.append(mypdfs)                
-                        
+                arglist.append(mypdfs)
+
             args = tuple(arglist)
             pdf = getattr(rt,myclass)(*args)
             if hasattr(pdf,'setTH1Binning'):
@@ -151,7 +151,7 @@ def initializeWorkspace(w,cfg,box,scaleFactor=1.,penalty=False,multi=False,x=Non
             if box in bkg: bkg.remove(box)
             bkgs.append("_".join(bkg))
 
-    
+
     w.Print('v')
     if multi:
         paramNames.append('pdf_index')
@@ -170,14 +170,14 @@ def writeDataCard(box,model,txtfileName,bkgs,paramNames,w,penalty,fixed,shapes=[
                 if '2015' in box:
                         lumiErrs = [1.027 for sig in model.split('p')]
                 elif '2016' in box:
-                        lumiErrs = [1.062 for sig in model.split('p')]                  
+                        lumiErrs = [1.062 for sig in model.split('p')]
         else:
                 rates = [w.data("%s_%s"%(box,model)).sumEntries()]
                 processes = ["%s_%s"%(box,model)]
                 if '2015' in box:
                         lumiErrs = [1.027]
                 elif '2016' in box:
-                        lumiErrs = [1.062]            
+                        lumiErrs = [1.062]
         rates.extend([w.var('Ntot_%s_%s'%(bkg,box)).getVal() for bkg in bkgs])
         processes.extend(["%s_%s"%(box,bkg) for bkg in bkgs])
         lumiErrs.extend([1.00 for bkg in bkgs])
@@ -215,30 +215,30 @@ def writeDataCard(box,model,txtfileName,bkgs,paramNames,w,penalty,fixed,shapes=[
             datacard+=shapeString
         for paramName in paramNames:
             if fixed:
-                fixPars(w,paramName)    
+                fixPars(w,paramName)
             elif 'Mean' in paramName or 'Sigma' in paramName:
-                fixPars(w,paramName)           
-            elif penalty:                    
+                fixPars(w,paramName)
+            elif penalty:
                 mean = w.var(paramName).getVal()
-                sigma = w.var(paramName).getError()                
-                if "Ntot" in paramName:                    
+                sigma = w.var(paramName).getError()
+                if "Ntot" in paramName:
                     effectString = ''
                     for sig in range(0,signals):
-                        effectString += "\t1.0"           
+                        effectString += "\t1.0"
                     for bkg in bkgs:
                         if bkg in paramName:
-                            effectString += "\t%.3f"%(1.0+sigma/mean)                            
+                            effectString += "\t%.3f"%(1.0+sigma/mean)
                         else:
-                            effectString += "\t1.0"                    
+                            effectString += "\t1.0"
                     datacard += "%s\tlnN%s\n"%(paramName.replace("Ntot","Norm"),effectString)
                 else:
                     datacard += "%s\tparam\t%e\t%e\n"%(paramName,mean,sigma)
-                         
+
             else:
                 if "Ntot" in paramName:
                     continue
-                
-                elif paramName=='pdf_index':                            
+
+                elif paramName=='pdf_index':
                     datacard += "%s\tdiscrete\n"%(paramName)
                 elif paramName in ["meff","seff"]:
                     datacard += "%s\tparam\t%e\t%e\n"%(paramName,w.var(paramName+"_Mean").getVal(),w.var(paramName+"_Sigma").getVal())
@@ -247,11 +247,11 @@ def writeDataCard(box,model,txtfileName,bkgs,paramNames,w,penalty,fixed,shapes=[
                         if ('_norm' in paramName and 'multi' not in paramName):
                             continue
                     datacard += "%s\tflatParam\n"%(paramName)
-            
+
         txtfile = open(txtfileName,"w")
         txtfile.write(datacard)
         txtfile.close()
-        
+
 def writeDataCardMC(box,model,txtfileName,bkgs,paramNames,w):
         obsRate = w.data("data_obs").sumEntries()
         nBkgd = len(bkgs)
@@ -263,14 +263,14 @@ def writeDataCardMC(box,model,txtfileName,bkgs,paramNames,w):
                 if '2015' in box:
                         lumiErrs = [1.027 for sig in model.split('p')]
                 elif '2016' in box:
-                        lumiErrs = [1.062 for sig in model.split('p')]                  
+                        lumiErrs = [1.062 for sig in model.split('p')]
         else:
                 rates = [w.data("%s_%s"%(box,model)).sumEntries()]
                 processes = ["%s_%s"%(box,model)]
                 if '2015' in box:
                         lumiErrs = [1.027]
                 elif '2016' in box:
-                        lumiErrs = [1.062]            
+                        lumiErrs = [1.062]
         rates.extend([w.var('Ntot_%s_%s'%(bkg,box)).getVal() for bkg in bkgs])
         processes.extend(["%s_%s"%(box,bkg) for bkg in bkgs])
         if '2015' in box:
@@ -314,7 +314,7 @@ def writeDataCardMC(box,model,txtfileName,bkgs,paramNames,w):
         txtfile.close()
 
 def convertToTh1xHist(hist):
-    
+
     hist_th1x = rt.TH1D(hist.GetName()+'_th1x',hist.GetName()+'_th1x',hist.GetNbinsX(),0,hist.GetNbinsX())
     for i in range(1,hist.GetNbinsX()+1):
         hist_th1x.SetBinContent(i,hist.GetBinContent(i))
@@ -323,7 +323,7 @@ def convertToTh1xHist(hist):
     return hist_th1x
 
 def convertToMjjHist(hist_th1x,x):
-    
+
     hist = rt.TH1D(hist_th1x.GetName()+'_mjj',hist_th1x.GetName()+'_mjj',len(x)-1,x)
     for i in range(1,hist_th1x.GetNbinsX()+1):
         hist.SetBinContent(i,hist_th1x.GetBinContent(i)/(x[i]-x[i-1]))
@@ -342,7 +342,7 @@ def applyTurnonFunc(hist,effFr,w):
         w.var('mjj').setVal(hist.GetXaxis().GetBinCenter(i))
         #print 'mjj = %f, eff = %f'%(hist.GetXaxis().GetBinCenter(i), w.function('effFunc').getVal(rt.RooArgSet(w.var('mjj'))))
         hist_turnon.SetBinContent(i,hist.GetBinContent(i)*w.function('effFunc').getVal(rt.RooArgSet(w.var('mjj'))))
-        
+
     return hist_turnon
 
 def applyTurnonGraph(hist,effGraph):
@@ -354,11 +354,11 @@ def applyTurnonGraph(hist,effGraph):
         effUp = effGraph.GetEYhigh()[i-1]
         effDown = effGraph.GetEYlow()[i-1]
         hist_turnon.SetBinContent(i,hist.GetBinContent(i)*eff)
-        
+
     return hist_turnon
-        
-    
-    
+
+
+
 
 
 if __name__ == '__main__':
@@ -409,12 +409,12 @@ if __name__ == '__main__':
 
 
     (options,args) = parser.parse_args()
-    
+
     cfg = Config.Config(options.config)
 
     box = options.box
     lumi = options.lumi
-    
+
     signalXsec = options.xsec
 
     signalFileName = ''
@@ -428,30 +428,30 @@ if __name__ == '__main__':
             if f.lower().find('resonanceshapes')!=-1:
                 signalFileName = f
             else:
-                rootFile = rt.TFile(f)                
+                rootFile = rt.TFile(f)
                 names = [k.GetName() for k in rootFile.GetListOfKeys()]
                 if histoName in names:
                     myTH1 = rootFile.Get(histoName)
                     myTH1.Print('v')
 
     w = rt.RooWorkspace("w"+box)
-    
+
     paramNames, bkgs = initializeWorkspace(w,cfg,box,scaleFactor=1,penalty=options.penalty,multi=options.multi)
-    
-    
+
+
     th1x = w.var('th1x')
-    
+
     if myTH1 is None:
-        print "give a background root file as input"        
-    
+        print "give a background root file as input"
+
     x = array('d', cfg.getBinning(box)[0]) # mjj binning
-        
+
     myTH1.Rebin(len(x)-1,'data_obs_rebin',x)
     myRebinnedTH1 = rt.gDirectory.Get('data_obs_rebin')
     myRebinnedTH1.SetDirectory(0)
 
     myRealTH1 = convertToTh1xHist(myRebinnedTH1)
-    
+
     dataHist = None
     if options.asimov:
         asimov = w.pdf('extDijetPdf').generateBinned(rt.RooArgSet(th1x),rt.RooFit.Asimov())
@@ -462,7 +462,7 @@ if __name__ == '__main__':
         dataHist = rt.RooDataHist("data_obs", "data_obs", rt.RooArgList(th1x), rt.RooFit.Import(myRealTH1))
         #triggerData = wIn.data("triggerData")
         #rootTools.Utils.importToWS(w,triggerData)
-        
+
     rootTools.Utils.importToWS(w,dataHist)
 
     # import signal pdfs
@@ -492,7 +492,7 @@ if __name__ == '__main__':
 
                 d_th1x = convertToTh1xHist(d_rebin)
                 signalHistos.append(d_th1x)
-                
+
                 sigDataHist = rt.RooDataHist('%s_%s'%(box,model),'%s_%s'%(box,model), rt.RooArgList(th1x), rt.RooFit.Import(d_th1x))
                 sigDataHist_mjj = rt.RooDataHist('%s_%s_mjj'%(box,model),'%s_%s_mjj'%(box,model), rt.RooArgList(w.var('mjj')), rt.RooFit.Import(d))
                 sigPdf_mjj = rt.RooHistPdf('pdf_%s_%s_mjj'%(box,model),'pdf_%s_%s_mjj'%(box,model), rt.RooArgSet(w.var('mjj')), sigDataHist_mjj)
@@ -502,7 +502,7 @@ if __name__ == '__main__':
     # initialize fit parameters (b-only fit)
     if options.inputFitFile is not None:
         inputRootFile = rt.TFile.Open(options.inputFitFile,"r")
-        wIn = inputRootFile.Get("w"+box).Clone("wIn"+box)            
+        wIn = inputRootFile.Get("w"+box).Clone("wIn"+box)
         if wIn.obj("fitresult_extDijetPdf_data_obs") != None:
             frIn = wIn.obj("fitresult_extDijetPdf_data_obs")
         elif wIn.obj("nll_extDijetPdf_data_obs") != None:
@@ -516,9 +516,9 @@ if __name__ == '__main__':
         print "restoring parameters from fit"
         if options.trigger:
             effFrIn = wIn.obj("nll_effPdf_triggerData")
-            
+
         frIn.Print("V")
-        
+
         for p in rootTools.RootIterator.RootIterator(frIn.floatParsFinal()):
             if w.var(p.GetName()) != None:
                 w.var(p.GetName()).setVal(p.getVal())
@@ -530,13 +530,13 @@ if __name__ == '__main__':
                 if options.multi:
                     w.var('Ntot_multi_%s'%(box)).setVal(p.getVal())
                     w.var('Ntot_multi_%s'%(box)).setError(p.getError())
-                    
-                    
+
+
         for p in rootTools.RootIterator.RootIterator(frIn.constPars()):
             if w.var(p.GetName()) != None:
                 w.var(p.GetName()).setVal(p.getVal())
                 w.var(p.GetName()).setError(p.getError())
-        
+
         if options.deco or options.refit:
             sigDataHist = w.data('%s_%s'%(box,model))
             sigPdf = rt.RooHistPdf('%s_sig'%box,'%s_sig'%box,rt.RooArgSet(th1x), sigDataHist)
@@ -552,7 +552,7 @@ if __name__ == '__main__':
             frSpB = BinnedFit.binnedFit(w.pdf('extSpBPdf'), w.data('data_obs'))
             paramsToDecoNames = []
             for p in rootTools.RootIterator.RootIterator(frSpB.floatParsFinal()):
-                paramsToDecoNames.append(p.GetName)                
+                paramsToDecoNames.append(p.GetName)
             paramsToDeco = rt.RooArgList()
             if 'Ntot_bkg_%s'%box in paramsToDecoNames:
                 paramsToDeco.add(w.var('Ntot_bkg_%s'%box))
@@ -563,7 +563,7 @@ if __name__ == '__main__':
             if 'p3_%s'%box in paramsToDecoNames:
                 paramsToDeco.add(w.var('p3_%s'%box))
             if 'p4_%s'%box in paramsToDecoNames:
-                paramsToDeco.add(w.var('p4_%s'%box))                    
+                paramsToDeco.add(w.var('p4_%s'%box))
             condCovMatrix = frSpB.conditionalCovarianceMatrix(paramsToDeco)
             w.var('mu').setConstant(True)
             frSpB_muFixed = BinnedFit.binnedFit(w.pdf('extSpBPdf'), w.data('data_obs'))
@@ -599,16 +599,16 @@ if __name__ == '__main__':
                 if 'p4_%s'%box in paramNames:
                     loc = paramNames.index('p4_%s'%box)
                     paramNames[loc] = 'deco_%s_eig4'%box
-                    
+
             bkgs = bkgs_deco
-            
+
         for p in rootTools.RootIterator.RootIterator(frIn.floatParsFinal()):
             if "Ntot" in p.GetName():
                 if options.deco:
                     w.factory('Ntot_bkg_deco_%s[%f]'%(box,p.getVal()))
                     w.var('Ntot_bkg_deco_%s'%(box)).setError(p.getError())
-                
-                
+
+
     if options.noSignalSys:
         shapes = []
         shapeFiles = {}
@@ -639,15 +639,15 @@ if __name__ == '__main__':
             hUp.SetDirectory(0)
             hUp.Rebin(len(x)-1,hUp.GetName()+'_rebin',x)
             hUpRebin = rt.gDirectory.Get(hUp.GetName()+'_rebin')
-            hUpRebin.SetDirectory(0)        
-            hUpTh1x = convertToTh1xHist(hUpRebin)            
+            hUpRebin.SetDirectory(0)
+            hUpTh1x = convertToTh1xHist(hUpRebin)
             hUpTh1x.Scale(hSigTh1x.Integral()/hUpTh1x.Integral())
-            
+
             hUp_DataHist = rt.RooDataHist('%s_%s_%sUp'%(box,model,shape),'%s_%s_%sUp'%(box,model,shape),rt.RooArgList(th1x),hUpTh1x)
-        
+
             rootTools.Utils.importToWS(w,hUp_DataHist)
-            
-        if shapeFiles[shape+'Down'] is not None: 
+
+        if shapeFiles[shape+'Down'] is not None:
             fDown = rt.TFile.Open(shapeFiles[shape+'Down'])
             if options.trigger:
                 hDown = applyTurnonFunc(fDown.Get('h_%s_%i'%(model,massPoint)),effFrIn,w)
@@ -655,29 +655,29 @@ if __name__ == '__main__':
                 hDown = fDown.Get('h_%s_%i'%(model,massPoint))
             hDown.SetName('h_%s_%i_%sDown'%(model,massPoint,shape))
             hDown.SetDirectory(0)
-        
+
             hDown.Rebin(len(x)-1,hDown.GetName()+'_rebin',x)
             hDownRebin = rt.gDirectory.Get(hDown.GetName()+'_rebin')
-            hDownRebin.SetDirectory(0)        
+            hDownRebin.SetDirectory(0)
             hDownTh1x = convertToTh1xHist(hDownRebin)
             hDownTh1x.Scale(hSigTh1x.Integral()/hDownTh1x.Integral())
-        
+
             hDown_DataHist = rt.RooDataHist('%s_%s_%sDown'%(box,model,shape),'%s_%s_%sDown'%(box,model,shape),rt.RooArgList(th1x),hDownTh1x)
-        
+
             rootTools.Utils.importToWS(w,hDown_DataHist)
         else:
             hDownTh1x = getDownFromUpNom(hUpTh1x,hSigTh1x)
             hDownTh1x.Scale(hSigTh1x.Integral()/hDownTh1x.Integral())
-        
+
             hDown_DataHist = rt.RooDataHist('%s_%s_%sDown'%(box,model,shape),'%s_%s_%sDown'%(box,model,shape),rt.RooArgList(th1x),hDownTh1x)
-        
+
             rootTools.Utils.importToWS(w,hDown_DataHist)
 
     if options.mcFile is not None:
         bkgs = ['bkg']
-        mcFile = rt.TFile.Open(options.mcFile,'read')        
+        mcFile = rt.TFile.Open(options.mcFile,'read')
         mcName = cfg.getVariables(box, "mcName")
-        mcHist = mcFile.Get(mcName)        
+        mcHist = mcFile.Get(mcName)
         mcHist.Rebin(len(x)-1,'mc_rebin',x)
         mcHist_rebin = rt.gDirectory.Get('mc_rebin')
         mcHist_th1x = convertToTh1xHist(mcHist_rebin)
@@ -686,7 +686,7 @@ if __name__ == '__main__':
         rootTools.Utils.importToWS(w,mcDataHist)
         rootTools.Utils.importToWS(w,mcDataHist_mjj)
 
- 
+
     outFile = 'dijet_combine_%s_%i_lumi-%.3f_%s.root'%(model,massPoint,lumi/1000.,box)
     outputFile = rt.TFile.Open(options.outDir+"/"+outFile,"recreate")
     if options.mcFile is not None:
