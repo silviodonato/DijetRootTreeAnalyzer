@@ -3,24 +3,24 @@
 //#include <boost/lexical_cast.hpp>
 
 //=========================
-//(optional) 
+//(optional)
 // The first bin of this histogram contains the number of events originally processed (may be different from the number of events in the tree)
 // This can be typically used for rescaling the MC samples
 // If histogram does not exist, the code assumes that the original number of events is what is available in the tree
 // The code searches if one of the following histograms exists
-string histoCountNstart1 = "dijets/TriggerPass"; 
+string histoCountNstart1 = "dijets/TriggerPass";
 string histoCountNstart2 = "dijetscouting/TriggerPass";
 string histoCountNstart3 = "DijetFilter/EventCount/EventCounter"; //when running on a reduced skim
 //=========================
 
-baseClass::baseClass(string * inputList, string * cutFile, string * treeName, string * outputFileName, string * cutEfficFile):
+baseClass::baseClass(string * inputList, string * cutFile, string * treeName, string * outputFileName, string * cutEfficFile, bool store_ntuple):
   PileupWeight_ ( 1.0 ),
   fillSkim_                         ( true ) ,
   fillAllPreviousCuts_              ( true ) ,
   fillAllOtherCuts_                 ( true ) ,
   fillAllSameLevelAndLowerLevelCuts_( true ) ,
   fillAllCuts_                      ( true ) ,
-  oldKey_                           ( "" ) 
+  oldKey_                           ( "" )
 {
   //STDOUT("begins");
   // nOptimizerCuts_ = 26;
@@ -30,6 +30,7 @@ baseClass::baseClass(string * inputList, string * cutFile, string * treeName, st
   treeName_= treeName;
   outputFileName_ = outputFileName;
   cutEfficFile_ = cutEfficFile;
+  store_ntuple_ = store_ntuple;
   init();
   //STDOUT("ends");
 }
@@ -84,9 +85,9 @@ void baseClass::init()
   produceSkim_ = false;
   NAfterSkim_ = 0;
   if(int(getSkimPreCutValue("produceSkim"))==1) produceSkim_ = true;
-  
+
   if(produceSkim_) {
-    
+
     skim_file_ = new TFile((*outputFileName_ + "_skim.root").c_str(),"RECREATE");
     skim_tree_ = fChain->CloneTree(0);
     hCount_ = new TH1I("EventCounter","Event Counter",3,-0.5,2.5);
@@ -151,7 +152,7 @@ int baseClass::readInputList()
           if (pName[0] == '#') continue;
 	  //if (pName[0] == ' ') continue; // do we want to skip lines that start with a space?
 	  if (pName[0] == '\n') continue;// simple protection against blank lines
-	  count_line += 1; 
+	  count_line += 1;
           STDOUT("Adding file: " << pName);
           chain->Add(pName);
 	  NBeforeSkim = getGlobalInfoNstart(pName);
@@ -167,7 +168,7 @@ int baseClass::readInputList()
       int entries = chain->GetEntries();
       STDOUT("chain entries = " << entries);
       STDOUT("baseClass::readInputList: Finished reading list: " << *inputList_ );
-  
+
       return 1;
     }
   else
@@ -175,7 +176,7 @@ int baseClass::readInputList()
       STDOUT("baseClass::readInputList: ERROR opening inputList:" << *inputList_ );
       return 0;
       exit (1);
-      
+
     }
   is.close();
 
@@ -193,7 +194,7 @@ bool is_number(const std::string& s) {
    return false;
   }
 
-//  try { 
+//  try {
     //double number = boost::lexical_cast<double>(s);
 //  } catch(boost::bad_lexical_cast& e) {
 //    return false;
@@ -220,14 +221,14 @@ void baseClass::readCutFile()
 	  if ( v.size() == 0 ) continue;
 
 	  STDOUT("starting JSON code");
-	  
-	  if ( v[0] == "JSON" ){ 
+
+	  if ( v[0] == "JSON" ){
 
 	    if ( jsonFileWasUsed_ ){
 	      STDOUT("ERROR: Please specify only one JSON file in your cut file!");
 	      return;
 	    }
-	    
+
 	    if ( v.size() != 2 ){
 	      STDOUT("ERROR: In your cutfile, JSON file line must have the syntax: \"JSON <full json file path>\"");
 	    }
@@ -240,9 +241,9 @@ void baseClass::readCutFile()
 	  }
 
 	  STDOUT ("starting pileup reweighting code 1");
-	  
-	  if ( v[0] == "PILEUP_DATA_ROOT_FILE" ){ 
-	    if ( pileupDataFileWasUsed_ ) { 
+
+	  if ( v[0] == "PILEUP_DATA_ROOT_FILE" ){
+	    if ( pileupDataFileWasUsed_ ) {
 	      STDOUT("ERROR: Please specify only one PILEUP_DATA_ROOT_FILE in your cut file!");
 	      return;
 	    }
@@ -250,7 +251,7 @@ void baseClass::readCutFile()
 	    if ( v.size() != 2 ){
 	      STDOUT("ERROR: In your cutfile, PILEUP_DATA_ROOT_FILE line must have the syntax: \"PILEUP_DATA_ROOT_FILE <full pileup data file path>\"");
 	    }
-	    
+
 	    pileupDataFileName_ = v[1];
 	    STDOUT("Getting PILEUP_DATA_ROOT_FILE:" << v[1]);
 	    pileupReweighter_.readPileupDataFile ( & v[1] ) ;
@@ -260,8 +261,8 @@ void baseClass::readCutFile()
 
 	  STDOUT ("starting pileup reweighting code 2");
 
-	  if ( v[0] == "PILEUP_MC_TXT_FILE" ){ 
-	    if ( pileupMCFileWasUsed_ ) { 
+	  if ( v[0] == "PILEUP_MC_TXT_FILE" ){
+	    if ( pileupMCFileWasUsed_ ) {
 	      STDOUT("ERROR: Please specify only one PILEUP_MC_TXT_FILE in your cut file!");
 	      return;
 	    }
@@ -269,7 +270,7 @@ void baseClass::readCutFile()
 	    if ( v.size() != 2 ){
 	      STDOUT("ERROR: In your cutfile, PILEUP_MC_TXT_FILE line must have the syntax: \"PILEUP_MC_TXT_FILE <full pileup MC file path>\"");
 	    }
-	    
+
 	    pileupMCFileName_ = v[1];
 	    STDOUT("Getting PILEUP_MC_TXT_FILE:" << v[1]);
 	    pileupReweighter_.readPileupMCFile ( & v[1] ) ;
@@ -346,7 +347,7 @@ void baseClass::readCutFile()
 	  string M2=v[4];
 	  if( m1=="-" || M1=="-" )
 	    {
-	      STDOUT("ERROR: minValue1 and maxValue2 have to be provided. Returning.");
+	      STDOUT("ERROR: minValue1 and maxValue2 have to be provided. Returning. variableName = "<< v[0]);
 	      return; // FIXME implement exception
 	    }
 	  if( (m2=="-" && M2!="-") || (m2!="-" && M2=="-") )
@@ -411,7 +412,7 @@ void baseClass::readCutFile()
 	pileupReweighter_.printPileupWeights();
       }
       else if ( (!pileupMCFileWasUsed_) && pileupDataFileWasUsed_  ||
-		pileupMCFileWasUsed_  && (!pileupDataFileWasUsed_) ) { 
+		pileupMCFileWasUsed_  && (!pileupDataFileWasUsed_) ) {
 	STDOUT("ERROR: You must specify TWO pileup files in your cutfile:");
 	if ( pileupMCFileWasUsed_   ) STDOUT("   You have only specified PILEUP_MC_TXT_FILE " ) ;
 	if ( pileupDataFileWasUsed_ ) STDOUT("   You have only specified PILEUP_DATA_ROOT_FILE " ) ;
@@ -479,8 +480,8 @@ void baseClass::fillVariableWithValue(const string& s, const double& d, const do
       c->filled = true;
       c->value = d;
       c->weight = w;
-      
-// if ( pileupReweighter_.pileupWeightsCalculated() ) 
+
+// if ( pileupReweighter_.pileupWeightsCalculated() )
 // 	c ->weight *= PileupWeight_;
     }
   fillOptimizerWithValue(s, d);
@@ -982,15 +983,15 @@ bool baseClass::fillCutHistos()
       cut * c = & (cutName_cut_.find(*it)->second);
       if( c->filled )
 	{
-	  if ( fillSkim_ ) 
+	  if ( fillSkim_ )
 	    c->histo1.Fill( c->value, c->weight );
-	  if ( fillAllPreviousCuts_ ) 
+	  if ( fillAllPreviousCuts_ )
 	    if( passedAllPreviousCuts(c->variableName) )                c->histo2.Fill( c->value, c->weight );
-	  if( fillAllSameLevelAndLowerLevelCuts_) 
+	  if( fillAllSameLevelAndLowerLevelCuts_)
 	    if( passedAllOtherSameAndLowerLevelCuts(c->variableName) )  c->histo3.Fill( c->value, c->weight );
-	  if( fillAllOtherCuts_ ) 
+	  if( fillAllOtherCuts_ )
 	    if( passedAllOtherCuts(c->variableName) )                   c->histo4.Fill( c->value, c->weight );
-	  if( fillAllCuts_ ) 
+	  if( fillAllCuts_ )
 	    if( passedCut("all") )                                      c->histo5.Fill( c->value, c->weight );
 	}
     }
@@ -1008,7 +1009,7 @@ bool baseClass::writeCutHistos()
       if ( fillSkim_                          ) c->histo1.Write();
       if ( fillAllPreviousCuts_               ) c->histo2.Write();
       if ( fillAllOtherCuts_                  ) c->histo4.Write();
-#ifdef SAVE_ALL_HISTOGRAMS 
+#ifdef SAVE_ALL_HISTOGRAMS
       if ( fillAllSameLevelAndLowerLevelCuts_ ) c->histo3.Write();
       if ( fillAllCuts_                       ) c->histo5.Write();
 #endif // SAVE_ALL_HISTOGRAMS
@@ -1074,15 +1075,15 @@ bool baseClass::writeCutEfficFile()
   if ( jsonFileWasUsed_ ) {
     os << "################################## JSON file used at runtime    ###################################################################\n"
        << "### " << jsonFileName_ << "\n";
-  } else { 
+  } else {
     os << "################################## NO JSON file used at runtime ###################################################################\n";
   }
 
   if ( pileupMCFileWasUsed_ && pileupDataFileWasUsed_ ){
     os << "################################## PILEUP files used at runtime    ###################################################################\n"
-       << "### " << pileupMCFileName_ << "\n" 
+       << "### " << pileupMCFileName_ << "\n"
        << "### " << pileupDataFileName_ << "\n";
-  } else { 
+  } else {
     os << "################################## NO PILEUP files used at runtime ###################################################################\n";
   }
 
@@ -1469,24 +1470,24 @@ void baseClass::FillUserTH2DLower(const char* nameAndTitle, Double_t value_x,  D
       TAxis * y_axis   = hist -> GetYaxis();
       int     n_bins_x = hist -> GetNbinsX();
       int     n_bins_y = hist -> GetNbinsY();
-      
+
       for ( int i_bin_x = 1; i_bin_x <= n_bins_x; ++i_bin_x ){
-	
+
 	double x_min  = x_axis -> GetBinLowEdge( i_bin_x );
 	double x_max  = x_axis -> GetBinUpEdge ( i_bin_x );
 	double x_mean = x_axis -> GetBinCenter ( i_bin_x );
 
 	if ( value_x <= x_min ) continue;
-	
+
 	for ( int i_bin_y = 1; i_bin_y <= n_bins_y; ++i_bin_y ){
-	  
+
 	  double y_min  = y_axis -> GetBinLowEdge( i_bin_y );
 	  double y_mean = y_axis -> GetBinCenter ( i_bin_y );
-	  
+
 	  if ( value_y <= y_min ) continue;
-	  
+
 	  hist -> Fill (x_mean,y_mean, weight);
-	  
+
 	}
       }
     }
@@ -1551,7 +1552,7 @@ bool baseClass::writeSkimTree()
   bool ret = true;
 
   if(!produceSkim_) return ret;
-  
+
   skim_file_->cd();
   TDirectory *dir1 = skim_file_->mkdir("DijetFilter");
   TDirectory *dir2 = dir1->mkdir("EventCount");
@@ -1570,8 +1571,8 @@ bool baseClass::writeSkimTree()
     skim_file_->cd("rootTupleTree");
     fChain -> CloneTree(0) -> Write("tree");
   }
-  
-  else { 
+
+  else {
     skim_file_->cd();
     skim_file_->mkdir("rootTupleTree");
     skim_file_->cd("rootTupleTree");
@@ -1588,11 +1589,12 @@ bool baseClass::writeReducedSkimTree()
 
   if(!produceReducedSkim_) return ret;
 
-  reduced_skim_file_->cd();
-  reduced_skim_file_->mkdir("rootTupleTree");
-  reduced_skim_file_->cd("rootTupleTree");
-  reduced_skim_tree_->Write();
-
+  if (store_ntuple_) {
+    reduced_skim_file_->cd();
+    reduced_skim_file_->mkdir("rootTupleTree");
+    reduced_skim_file_->cd("rootTupleTree");
+    reduced_skim_tree_->Write();
+  }
   reduced_skim_file_->cd();
   TDirectory *dir1 = reduced_skim_file_->mkdir("DijetFilter");
   TDirectory *dir2 = dir1->mkdir("EventCount");
@@ -1604,25 +1606,41 @@ bool baseClass::writeReducedSkimTree()
   hReducedCount_->SetBinContent(2,nEntRoottuple);
   hReducedCount_->SetBinContent(3,NAfterReducedSkim_);
   hReducedCount_->Write();
-
+  reduced_skim_file_->cd();
+  TDirectory *dir4 = dir1->mkdir("dijetMassHisto");
+  reduced_skim_file_->cd("DijetFilter/dijetMassHisto");
+  // dijetMassHisto->Write();
+  dijetMassHisto_40_50->Write();
+  dijetMassHisto_50_60->Write();
+  dijetMassHisto_60_70->Write();
+  dijetMassHisto_70_80->Write();
+  dijetMassHisto_80_90->Write();
+  dijetMassHisto_90_100->Write();
+  dijetMassHisto_100_150->Write();
+  dijetMassHisto_150_200->Write();
+  dijetMassHisto_200_300->Write();
+  dijetMassHisto_300->Write();
+  dijetMassHisto_50->Write();
+  dijetMassHisto_50_HT_270->Write();
+  dijetMassHisto_50_L1_HTT240_L1_HTT270->Write();
   // Any failure mode to implement?
   return ret;
 }
 
 int baseClass::passJSON (int this_run, int this_lumi, bool this_is_data ) {
-  
+
   if ( !this_is_data     ) return 1;
   if ( !jsonFileWasUsed_ ) {
     STDOUT( "ERROR: baseClass::passJSON invoked when running on data, but no JSON file was specified!" );
     return 0;
   }
-  
+
   return jsonParser_.isAGoodLumi ( this_run, this_lumi );
-  
+
 }
 
-double baseClass::getPileupWeight ( int npileup, bool this_is_data ) { 
-  
+double baseClass::getPileupWeight ( int npileup, bool this_is_data ) {
+
   PileupWeight_ = 1.0;
 
   if ( this_is_data )                                     return PileupWeight_;
@@ -1630,19 +1648,19 @@ double baseClass::getPileupWeight ( int npileup, bool this_is_data ) {
   if ( npileup == -1 )                                    return PileupWeight_;
 
   PileupWeight_ = pileupReweighter_.getPileupWeight ( npileup ) ;
-  
+
   return PileupWeight_;
 }
 
-void baseClass::getTriggers(std::string * HLTKey ,  
-			    std::vector<std::string> * names, 
+void baseClass::getTriggers(std::string * HLTKey ,
+			    std::vector<std::string> * names,
 			    std::vector<bool>        * decisions,
 			    std::vector<int>         * prescales ){
   triggerDecisionMap_.clear();
   triggerPrescaleMap_.clear();
-    
+
   int ntriggers = names -> size();
-  
+
   for (int i = 0; i < ntriggers; ++i){
     triggerDecisionMap_[ (*names)[i].c_str() ] = (*decisions)[i];
     triggerPrescaleMap_[ (*names)[i].c_str() ] = (*prescales)[i];
@@ -1662,15 +1680,15 @@ bool baseClass::triggerFired ( const char* name ) {
   else return i -> second;
 }
 
-int baseClass::triggerPrescale ( const char* name ) { 
+int baseClass::triggerPrescale ( const char* name ) {
   std::map<std::string, int>::iterator i = triggerPrescaleMap_.find ( name ) ;
   if ( i == triggerPrescaleMap_.end()) return -999;
   else return i -> second;
 }
 
-void baseClass::fillTriggerVariable ( const char * hlt_path, const char* variable_name ) { 
+void baseClass::fillTriggerVariable ( const char * hlt_path, const char* variable_name ) {
   int prescale = triggerPrescale(hlt_path);
-  if ( triggerFired (hlt_path) ) fillVariableWithValue(variable_name, prescale      ) ; 
+  if ( triggerFired (hlt_path) ) fillVariableWithValue(variable_name, prescale      ) ;
   else                           fillVariableWithValue(variable_name, prescale * -1 ) ;
 }
 

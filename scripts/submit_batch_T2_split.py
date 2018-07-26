@@ -1,4 +1,5 @@
 #! /usr/bin/env python
+imc = 0
 
 import os
 import sys
@@ -9,8 +10,8 @@ usage = "usage: To be run from DijetRootTreeAnalyzer/ :  python scripts/submit_b
 nfig/cutFile_mainDijetScoutingMonitor.txt"
 
 parser = optparse.OptionParser("submitAllGJetsID.py")
-parser.add_option('-q', '--queue',       action='store',     dest='queue',       
-    help='run in batch in queue specified as option (default -q cmslong)', 
+parser.add_option('-q', '--queue',       action='store',     dest='queue',
+    help='run in batch in queue specified as option (default -q cmslong)',
     default='cmslong',
     metavar="QUEUE")
 
@@ -34,30 +35,30 @@ parser.add_option("--split", dest="filesperjob", type=int,
     help="files to analyze per job ",
     default=10)
 
-parser.add_option('-I', '--interactive',      
+parser.add_option('-I', '--interactive',
     action='store_true',
-    dest='interactive',      
+    dest='interactive',
     help='run the jobs interactively, 2 jobs at a time',
     default=False)
 
 parser.add_option("-c", "--cut", dest="cutfile",
-    help="cutfile",                  
+    help="cutfile",
     )
 
 (opt, args) = parser.parse_args()
 ################################################
 
+pwd = os.environ['PWD']
 ###
 current_time = datetime.datetime.now()
-simpletimeMarker = "_%04d%02d%02d_%02d%02d%02d" % (current_time.year,current_time.month,current_time.day,current_time.hour,current_time.minute,current_time.second) 
-timeMarker = "mycutFile_%04d%02d%02d_%02d%02d%02d__" % (current_time.year,current_time.month,current_time.day,current_time.hour,current_time.minute,current_time.second) 
+simpletimeMarker = "_%04d%02d%02d_%02d%02d%02d" % (current_time.year,current_time.month,current_time.day,current_time.hour,current_time.minute,current_time.second)
+timeMarker = "mycutFile_%04d%02d%02d_%02d%02d%02d__" % (current_time.year,current_time.month,current_time.day,current_time.hour,current_time.minute,current_time.second)
 cutfileName = timeMarker+os.path.split(opt.cutfile)[1]
 print cutfileName
 ###
 os.system("mkdir -p "+opt.output+simpletimeMarker)
 #os.system("rm -rf batch")
 os.system("mkdir -p batch")
-pwd = os.environ['PWD']
 ###
 os.system("cp "+opt.cutfile+" batch/"+cutfileName)
 ###
@@ -70,7 +71,7 @@ if not opt.match:
 else:
   os.system("ls "+opt.input+" | grep "+opt.match+"  > config/lists_to_run.txt")
 
-ins = open("config/lists_to_run.txt", "r") 
+ins = open("config/lists_to_run.txt", "r")
 
 
 #lists of lists (in each position there is a list of commads)
@@ -95,11 +96,11 @@ for line in  ins:
   #filenames_skim.append(opt.output+simpletimeMarker+"/rootfile_"+sample+"_"+newTag+"_"+str(jj)+"_reduced_skim.root")
   # list of commands for current dataset
   #commands_dataset = []
-  
+
   jf=0  ##counter for num of files
   jj=0  ##counter for num of jobs
   #open list
-  list = open(opt.input+"/"+line,"r") 
+  list = open(opt.input+"/"+line,"r")
   ## remove splitted lists if they already exist (necessary beacuse we append to txt file)
   os.system("rm "+opt.input+"/"+splittedDir+"/"+sample+"_"+newTag+"*.txt")
   for file in list:
@@ -112,10 +113,10 @@ for line in  ins:
     if ( modulo == 0 ):
       lists_dataset.append(opt.input+"/"+splittedDir+"/"+sample+"_"+newTag+"_"+str(jj)+".txt")
       print "job "+str(jj)+"   appending "+opt.input+"/"+splittedDir+"/"+sample+"_"+newTag+"_"+str(jj)+".txt"
-      jj += 1 #increment counter of jobs  
-    jf += 1   #increment counter of files         
+      jj += 1 #increment counter of jobs
+    jf += 1   #increment counter of files
   print "job "+str(jj)+"   appending "+opt.input+"/"+splittedDir+"/"+sample+"_"+newTag+"_"+str(jj)+".txt"
-  lists_dataset.append(opt.input+"/"+splittedDir+"/"+sample+"_"+newTag+"_"+str(jj)+".txt")  
+  lists_dataset.append(opt.input+"/"+splittedDir+"/"+sample+"_"+newTag+"_"+str(jj)+".txt")
   njobs_list.append(jj)
   inputlists.append(lists_dataset)
 
@@ -126,7 +127,7 @@ print inputlists
 print "inputlists size = "+str(len(inputlists))
 
 i_f = 0
-ins = open("config/lists_to_run.txt", "r") 
+ins = open("config/lists_to_run.txt", "r")
 for line in  ins:
   lists_dataset = []
   sample = os.path.splitext(line)[0]
@@ -135,36 +136,50 @@ for line in  ins:
   splittedlist = inputlists[i_f]
   print splittedlist
   for jj in range(0,njobs_list[i_f]+1):
+    logfile = "batch/"+newTag+"/logfile_"+sample+"_"+newTag+"_"+str(jj)+".log"
     print sample+"  job "+str(jj)
     #command = "./main "+splittedlist[jj]+" config/cutFile_mainDijetSelection.txt dijets/events "+opt.output+simpletimeMarker+"/rootfile_"+sample+"_"+newTag+"_"+str(jj)+" "+opt.output+simpletimeMarker+"/cutEfficiencyFile_"+sample+"_"+newTag+"_"+str(jj)
     #command = "./main "+splittedlist[jj]+" config/cutFile_mainDijetSelection.txt dijets/events /tmp/rootfile_"+sample+"_"+newTag+"_"+str(jj)+" /tmp/cutEfficiencyFile_"+sample+"_"+newTag+"_"+str(jj)
     #command = "./main "+splittedlist[jj]+" batch/"+cutfileName+" dijets/events /tmp/rootfile_"+sample+"_"+newTag+"_"+str(jj)+" /tmp/cutEfficiencyFile_"+sample+"_"+newTag+"_"+str(jj)
-    command = "./main "+splittedlist[jj]+" batch/"+cutfileName+" dijetscouting/events /tmp/rootfile_"+sample+"_"+newTag+"_"+str(jj)+" /tmp/cutEfficiencyFile_"+sample+"_"+newTag+"_"+str(jj)
+    command = "./main "+splittedlist[jj]+" batch/"+cutfileName+" dijetscouting/events /tmp/rootfile_"+sample+"_"+newTag+"_"+str(jj)+" /tmp/cutEfficiencyFile_"+sample+"_"+newTag+"_"+str(jj) + " >& "+pwd+"/"+logfile
     print "submit "+command
     print ""
-    
-    logfile = "batch/"+newTag+"/logfile_"+sample+"_"+newTag+"_"+str(jj)+".log"
+
     outputname = "batch/"+newTag+"/submit_"+sample+"_"+newTag+"_"+str(jj)+".src"
     outputfile = open(outputname,'w')
     outputfile.write('#!/bin/bash\n')
     #outputfile.write('export SCRAM_ARCH=slc6_amd64_gcc481\n')
-    outputfile.write('export SCRAM_ARCH=slc6_amd64_gcc491\n')
+    outputfile.write('source /cvmfs/cms.cern.ch/cmsset_default.sh\n')
+    outputfile.write('export SCRAM_ARCH=slc6_amd64_gcc530\n')
     outputfile.write('cd '+pwd+' \n')
     outputfile.write('eval `scramv1 runtime -sh`\n')
     outputfile.write(command+"\n")
-    outputfile.write("dccp /tmp/rootfile_"+sample+"_"+newTag+"_"+str(jj)+"_reduced_skim.root "+opt.output+simpletimeMarker+"\n")
-    outputfile.write("dccp /tmp/rootfile_"+sample+"_"+newTag+"_"+str(jj)+".root "+opt.output+simpletimeMarker+"\n")
-    outputfile.write("dccp /tmp/cutEfficiencyFile_"+sample+"_"+newTag+"_"+str(jj)+".dat "+opt.output+simpletimeMarker+"\n")
+    outputfile.write("echo xrdcp --force --recursive /tmp/rootfile_"+sample+"_"+newTag+"_"+str(jj)+"_reduced_skim.root "+opt.output+simpletimeMarker+"\n")
+    outputfile.write("xrdcp --force --recursive /tmp/rootfile_"+sample+"_"+newTag+"_"+str(jj)+"_reduced_skim.root "+opt.output+simpletimeMarker+"\n")
+    outputfile.write("xrdcp --force --recursive /tmp/rootfile_"+sample+"_"+newTag+"_"+str(jj)+"_reduced_skim.root "+opt.output+simpletimeMarker+"\n")
+    outputfile.write("xrdcp --force --recursive /tmp/rootfile_"+sample+"_"+newTag+"_"+str(jj)+".root "+opt.output+simpletimeMarker+"\n")
+    outputfile.write("xrdcp --force --recursive /tmp/cutEfficiencyFile_"+sample+"_"+newTag+"_"+str(jj)+".dat "+opt.output+simpletimeMarker+"\n")
     outputfile.write("rm /tmp/rootfile_"+sample+"_"+newTag+"_"+str(jj)+"_reduced_skim.root\n")
     outputfile.write("rm /tmp/rootfile_"+sample+"_"+newTag+"_"+str(jj)+".root\n")
     outputfile.write("rm /tmp/cutEfficiencyFile_"+sample+"_"+newTag+"_"+str(jj)+".dat\n")
-    
-    print outputname 
+    outputfile.close()
+
+    os.system("chmod +x "+pwd+"/"+outputname)
+    print outputname
     if opt.interactive==False:
-      os.system("bsub -q "+opt.queue+" -o "+logfile+" source "+pwd+"/"+outputname)
+      command2 = "qsub -q "+opt.queue+" -o "+pwd+"/"+logfile+" "+pwd+"/"+outputname
+      print ("Final command")
+      print    (command2)
+      print ()
+      os.system(command2)
     else:
       print logfile
-      if imc==0: os.system(command+" >&! "+logfile+"&")
-      else: os.system(command+" >&! "+logfile)
+#      command2 = command+" >& "+logfile+" "
+      command2 = pwd+"/"+outputname+">&"+pwd+"/"+logfile+" &"
+      print ("Final command")
+      print(command2)
+      print ()
+      if imc==0: os.system(command2)
+      else: os.system(command2)
   i_f += 1
-      
+

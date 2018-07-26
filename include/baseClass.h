@@ -131,26 +131,26 @@ class baseClass : public rootNtupleClass {
   map<string,int> triggerMap_;
   int passJSON(int run, int ls, bool isData);
   double getPileupWeight ( int npileup, bool this_is_data );
-  void setPileupWeight ( double weight ) { PileupWeight_ = weight; } 
+  void setPileupWeight ( double weight ) { PileupWeight_ = weight; }
   bool triggerFired    ( const char* name );
   int  triggerPrescale ( const char* name );
   void fillTriggerVariable ( const char * hlt_path, const char* variable_name ) ;
   void printTriggers();
-  void getTriggers(std::string * HLTKey ,   
-		   std::vector<std::string> * names, 
+  void getTriggers(std::string * HLTKey ,
+		   std::vector<std::string> * names,
 		   std::vector<bool>        * decisions,
 		   std::vector<int >        * prescales);
-    
+
   void resetCuts(const std::string& s = "newEvent");
   void fillVariableWithValue(const std::string&, const double&, const double& w = 1.);
   void evaluateCuts();
-  
-  void fillSkim                           ( bool b ) { fillSkim_                          = b; } 
-  void fillAllPreviousCuts                ( bool b ) { fillAllPreviousCuts_               = b; } 
-  void fillAllOtherCuts                   ( bool b ) { fillAllOtherCuts_                  = b; } 
-  void fillAllSameLevelAndLowerLevelCuts  ( bool b ) { fillAllSameLevelAndLowerLevelCuts_ = b; } 
-  void fillAllCuts                        ( bool b ) { fillAllCuts_                       = b; } 
-  
+
+  void fillSkim                           ( bool b ) { fillSkim_                          = b; }
+  void fillAllPreviousCuts                ( bool b ) { fillAllPreviousCuts_               = b; }
+  void fillAllOtherCuts                   ( bool b ) { fillAllOtherCuts_                  = b; }
+  void fillAllSameLevelAndLowerLevelCuts  ( bool b ) { fillAllSameLevelAndLowerLevelCuts_ = b; }
+  void fillAllCuts                        ( bool b ) { fillAllCuts_                       = b; }
+
   bool passedCut(const string& s);
   bool passedAllPreviousCuts(const string& s);
   bool passedAllOtherCuts(const string& s);
@@ -169,6 +169,20 @@ class baseClass : public rootNtupleClass {
   double getCutMaxValue1(const string& s);
   double getCutMinValue2(const string& s);
   double getCutMaxValue2(const string& s);
+	TH1F *dijetMassHisto;
+	TH1F *dijetMassHisto_40_50;
+	TH1F *dijetMassHisto_50_60;
+	TH1F *dijetMassHisto_60_70;
+	TH1F *dijetMassHisto_70_80;
+	TH1F *dijetMassHisto_80_90;
+	TH1F *dijetMassHisto_90_100;
+	TH1F *dijetMassHisto_100_150;
+	TH1F *dijetMassHisto_150_200;
+	TH1F *dijetMassHisto_200_300;
+	TH1F *dijetMassHisto_300;
+	TH1F *dijetMassHisto_50;
+	TH1F *dijetMassHisto_50_HT_270;
+	TH1F *dijetMassHisto_50_L1_HTT240_L1_HTT270;
 
   const TH1F& getHisto_noCuts_or_skim(const string& s);
   const TH1F& getHisto_allPreviousCuts(const string& s);
@@ -180,7 +194,7 @@ class baseClass : public rootNtupleClass {
   double getHistoMin(const string& s);
   double getHistoMax(const string& s);
 
-  baseClass(string * inputList, string * cutFile, string * treeName, string *outputFileName=0, string * cutEfficFile=0);
+  baseClass(string * inputList, string * cutFile, string * treeName, string *outputFileName=0, string * cutEfficFile=0, bool store_ntuple = true);
   virtual ~baseClass();
 
   // Optimization stuff
@@ -202,7 +216,8 @@ class baseClass : public rootNtupleClass {
   PileupReweighter pileupReweighter_;
 
   TFile * output_root_;
-
+	TFile *reduced_skim_file_;
+	bool store_ntuple_;
   private :
   void getHltMap(char*);
 
@@ -244,9 +259,9 @@ class baseClass : public rootNtupleClass {
   std::string jsonFileName_;
 
   // Trigger stuff
-  std::string oldKey_; 
-  std::map<std::string, bool> triggerDecisionMap_; 
-  std::map<std::string, int > triggerPrescaleMap_; 
+  std::string oldKey_;
+  std::map<std::string, bool> triggerDecisionMap_;
+  std::map<std::string, int > triggerPrescaleMap_;
 
   // PILEUP stuff
 
@@ -254,7 +269,7 @@ class baseClass : public rootNtupleClass {
   bool pileupDataFileWasUsed_;
   std::string pileupMCFileName_;
   std::string pileupDataFileName_;
-  
+
   // Which plots to fill
   bool fillSkim_;
   bool fillAllPreviousCuts_;
@@ -275,7 +290,7 @@ class baseClass : public rootNtupleClass {
   bool produceReducedSkim_;
   int NAfterReducedSkim_;
   double getReducedSkimPreCutValue(const string& s);
-  TFile *reduced_skim_file_;
+
   TTree *reduced_skim_tree_;
   TH1I* hReducedCount_;
   bool writeReducedSkimTree();
