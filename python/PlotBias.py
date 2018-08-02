@@ -175,9 +175,9 @@ if __name__ == '__main__':
                   help="mass of resonance")
     parser.add_option('-r',dest="r",default=1,type="float",
                   help="expect signal r value")
-    parser.add_option('--gen-pdf',dest="genPdf", default="modexp", choices=['modexp','fourparam','fiveparam','atlas','atlas6'],
+    parser.add_option('--gen-pdf',dest="genPdf", default="modexp", choices=['modexp','fourparam','fiveparam','atlas','atlas6','silvio5','silvio6'],
                   help="pdf for generating")
-    parser.add_option('--fit-pdf',dest="fitPdf", default="fourparam", choices=['modexp','fourparam','fiveparam','atlas','atlas6'],
+    parser.add_option('--fit-pdf',dest="fitPdf", default="fourparam", choices=['modexp','fourparam','fiveparam','atlas','atlas6','silvio5','silvio6'],
                   help="pdf for fitting")
     parser.add_option('--asymptotic-file',dest="asymptoticFile",default=None,type="string",
                   help="load asymptotic cross section results file")

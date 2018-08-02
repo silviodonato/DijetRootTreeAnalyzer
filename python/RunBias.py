@@ -124,8 +124,8 @@ if __name__ == '__main__':
         freezeStringGen += ',pa1_CaloTrijet2016,pa2_CaloTrijet2016,pa3_CaloTrijet2016,pa4_CaloTrijet2016'
     if options.genPdf != 'atlas6':
         freezeStringGen += ',pa61_CaloTrijet2016,pa62_CaloTrijet2016,pa63_CaloTrijet2016,pa64_CaloTrijet2016,pa65_CaloTrijet2016'
-    if options.genPdf != 'fourparam':
-        freezeStringGen += ',p1_CaloTrijet2016,p2_CaloTrijet2016,p3_CaloTrijet2016'
+#    if options.genPdf != 'fourparam':
+#        freezeStringGen += ',p1_CaloTrijet2016,p2_CaloTrijet2016,p3_CaloTrijet2016'
     if options.fitPdf != 'silvio5':
         freezeStringGen += ',p1s5_CaloTrijet2016,p2s5_CaloTrijet2016,p3s5_CaloTrijet2016,p4s5_CaloTrijet2016'
     if options.fitPdf != 'silvio6':
@@ -143,8 +143,8 @@ if __name__ == '__main__':
         freezeStringFit += ',pa1_CaloTrijet2016,pa2_CaloTrijet2016,pa3_CaloTrijet2016,pa4_CaloTrijet2016'
     if options.fitPdf != 'atlas6':
         freezeStringFit += ',pa61_CaloTrijet2016,pa62_CaloTrijet2016,pa63_CaloTrijet2016,pa64_CaloTrijet2016,pa65_CaloTrijet2016'
-    if options.fitPdf != 'fourparam':
-        freezeStringFit += ',p1_CaloTrijet2016,p2_CaloTrijet2016,p3_CaloTrijet2016'
+#    if options.fitPdf != 'fourparam':
+#        freezeStringFit += ',p1_CaloTrijet2016,p2_CaloTrijet2016,p3_CaloTrijet2016'
     if options.fitPdf != 'silvio5':
         freezeStringFit += ',p1s5_CaloTrijet2016,p2s5_CaloTrijet2016,p3s5_CaloTrijet2016,p4s5_CaloTrijet2016'
     if options.fitPdf != 'silvio6':
