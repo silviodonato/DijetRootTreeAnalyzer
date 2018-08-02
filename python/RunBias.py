@@ -41,9 +41,9 @@ if __name__ == '__main__':
                   help="Output directory to store everything")
     parser.add_option('-t','--toys',dest="toys",default=1000,type="int",
                   help="number of toys")
-    parser.add_option('--gen-pdf',dest="genPdf", default="fiveparam", choices=['modexp','fiveparam','atlas','atlas6','silvio'],
+    parser.add_option('--gen-pdf',dest="genPdf", default="fiveparam", choices=['modexp','fiveparam','atlas','atlas6','silvio5','silvio6'],
                   help="pdf for generating")
-    parser.add_option('--fit-pdf',dest="fitPdf", default="fiveparam", choices=['modexp','fiveparam','atlas','atlas6','silvio'],
+    parser.add_option('--fit-pdf',dest="fitPdf", default="fiveparam", choices=['modexp','fiveparam','atlas','atlas6','silvio5','silvio6'],
                   help="pdf for fitting")
     parser.add_option('--asymptotic-file',dest="asymptoticFile",default=None,type="string",
                   help="load asymptotic cross section results file")
@@ -55,7 +55,8 @@ if __name__ == '__main__':
                    'fiveparam': 1,
                    'atlas': 2,
                    'atlas6': 3,
-                   'silvio': 4,
+                   'silvio5': 4,
+                   'silvio6': 5
                    }
 
     box = options.box
@@ -123,10 +124,14 @@ if __name__ == '__main__':
         freezeStringGen += ',pa1_CaloTrijet2016,pa2_CaloTrijet2016,pa3_CaloTrijet2016,pa4_CaloTrijet2016'
     if options.genPdf != 'atlas6':
         freezeStringGen += ',pa61_CaloTrijet2016,pa62_CaloTrijet2016,pa63_CaloTrijet2016,pa64_CaloTrijet2016,pa65_CaloTrijet2016'
-    if options.genPdf != 'silvio':
-        freezeStringGen += ',ps1_CaloTrijet2016,ps2_CaloTrijet2016,ps3_CaloTrijet2016,ps4_CaloTrijet2016,ps5_CaloTrijet2016'
     if options.genPdf != 'fourparam':
         freezeStringGen += ',p1_CaloTrijet2016,p2_CaloTrijet2016,p3_CaloTrijet2016'
+    if options.fitPdf != 'silvio5':
+        freezeStringGen += ',p1s5_CaloTrijet2016,p2s5_CaloTrijet2016,p3s5_CaloTrijet2016,p4s5_CaloTrijet2016'
+    if options.fitPdf != 'silvio6':
+        freezeStringGen += ',p1s6_CaloTrijet2016,p2s6_CaloTrijet2016,p3s6_CaloTrijet2016,p4s6_CaloTrijet2016,p5s6_CaloTrijet2016'
+
+
 
     fixStringFit = '--setPhysicsModelParameters pdf_index=%i'%(pdfIndexMap[options.fitPdf])
     freezeStringFit = '--freezeNuisances pdf_index'
@@ -138,11 +143,12 @@ if __name__ == '__main__':
         freezeStringFit += ',pa1_CaloTrijet2016,pa2_CaloTrijet2016,pa3_CaloTrijet2016,pa4_CaloTrijet2016'
     if options.fitPdf != 'atlas6':
         freezeStringFit += ',pa61_CaloTrijet2016,pa62_CaloTrijet2016,pa63_CaloTrijet2016,pa64_CaloTrijet2016,pa65_CaloTrijet2016'
-    if options.fitPdf != 'silvio':
-        freezeStringFit += ',ps1_CaloTrijet2016,ps2_CaloTrijet2016,ps3_CaloTrijet2016,ps4_CaloTrijet2016,ps5_CaloTrijet2016'
     if options.fitPdf != 'fourparam':
         freezeStringFit += ',p1_CaloTrijet2016,p2_CaloTrijet2016,p3_CaloTrijet2016'
-
+    if options.fitPdf != 'silvio5':
+        freezeStringFit += ',p1s5_CaloTrijet2016,p2s5_CaloTrijet2016,p3s5_CaloTrijet2016,p4s5_CaloTrijet2016'
+    if options.fitPdf != 'silvio6':
+        freezeStringFit += ',p1s6_CaloTrijet2016,p2s6_CaloTrijet2016,p3s6_CaloTrijet2016,p4s6_CaloTrijet2016,p5s6_CaloTrijet2016'
 
 
     for massPoint in massIterable(options.mass):
