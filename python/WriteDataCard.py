@@ -45,7 +45,7 @@ def initializeWorkspace(w,cfg,box,scaleFactor=1.,penalty=False,multi=False,x=Non
             continue
         w.factory(parameter)
 
-    constPars = ['sqrts','p0_%s'%box, 'sqrts5', 'p50_%s'%box, 'sqrtsm', 'pm0_%s'%box, 'sqrtsa', 'pa0_%s'%box,  'sqrtsa6', 'pa60_%s'%box]
+    constPars = ['sqrts','p0_%s'%box, 'sqrts5', 'p50_%s'%box, 'sqrtsm', 'pm0_%s'%box, 'sqrtsa', 'pa0_%s'%box]
     if w.var('meff_%s'%box).getVal()<0 and w.var('seff_%s'%box).getVal()<0:
         constPars.extend(['meff_%s'%box,'seff_%s'%box])
     if  w.var('pa4_%s'%box)!=None and w.var('pa4_%s'%box).getVal()==0:
@@ -54,8 +54,7 @@ def initializeWorkspace(w,cfg,box,scaleFactor=1.,penalty=False,multi=False,x=Non
         constPars.extend(['pm3_%s'%box])
     if  w.var('pm4_%s'%box)!=None and w.var('pm4_%s'%box).getVal()==0:
         constPars.extend(['pm4_%s'%box])
-    if  w.var('pa65_%s'%box)!=None and w.var('pa65_%s'%box).getVal()==0:
-        constPars.extend(['pa65_%s'%box])
+
 
     for parameter in parameters:
         paramName = parameter.split('[')[0]
@@ -430,15 +429,14 @@ if __name__ == '__main__':
                 signalFileName = f
             else:
                 rootFile = rt.TFile(f)
-                obj = rootFile.Get(histoName)
-                if issubclass(obj.__class__, rt.TH1):
-                    myTH1 = obj
+                names = [k.GetName() for k in rootFile.GetListOfKeys()]
+                try:
+                    myTH1 = rootFile.Get(histoName)
                     myTH1.Print('v')
-                # rootFile = rt.TFile(f)
-                # names = [k.GetName() for k in rootFile.GetListOfKeys()]
-                # if histoName in names:
-                #     myTH1 = rootFile.Get(histoName)
-                #     myTH1.Print('v')
+                except:
+                    print("%s not found in %s"%(histoName,f))
+    print("signalFileName",signalFileName)
+    print("myTH1",myTH1)
 
     w = rt.RooWorkspace("w"+box)
 

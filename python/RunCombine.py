@@ -155,11 +155,14 @@ def main(options,args):
     rRangeStringList = []
     sysStringList = []
     
-    pdfIndexMap = {'modexp': 0,
+    pdfIndexMap = {#'fourparam': 0,
+                   'modexp': 0,
                    'fiveparam': 1,
                    'atlas': 2,
+                   'atlas6': 3,
+                   'silvio': 4,
                    }
-        
+    
     for box,lumi in zip(boxes,lumiFloat):
 
         paramDict = {}
@@ -192,10 +195,13 @@ def main(options,args):
             elif box=='CaloDijet2016':
                 signalSys  =   '--jesUp inputs/ResonanceShapes_%s_13TeV_CaloScouting_Spring16_JESUP.root --jesDown inputs/ResonanceShapes_%s_13TeV_CaloScouting_Spring16_JESDOWN.root'%(model,model)
                 signalSys += ' --jerUp inputs/ResonanceShapes_%s_13TeV_CaloScouting_Spring16_JERUP.root --jerDown inputs/ResonanceShapes_%s_13TeV_CaloScouting_Spring16_JERDOWN.root'%(model,model)
+            elif box=='CaloTrijet2016':
+                signalSys  =   '--jesUp inputs/ResonanceShapes_%s_13TeV_CaloScouting_2016_JESUP.root --jesDown inputs/ResonanceShapes_%s_13TeV_CaloScouting_2016_JESDOWN.root'%(model,model)
+                signalSys += ' --jerUp inputs/ResonanceShapes_%s_13TeV_CaloScouting_2016_JERUP.root --jerDown inputs/ResonanceShapes_%s_13TeV_CaloScouting_2016_JERDOWN.root'%(model,model)
             elif box=='PFDijet2016':
                 signalSys  =   '--jesUp inputs/ResonanceShapes_%s_13TeV_Spring16_JESUP.root --jesDown inputs/ResonanceShapes_%s_13TeV_Spring16_JESDOWN.root'%(model,model)
                 signalSys += ' --jerUp inputs/ResonanceShapes_%s_13TeV_Spring16_JERUP.root'%(model)
-        
+       
         penaltyString = ''
         if options.penalty:
             penaltyString = '--penalty'
@@ -209,6 +215,8 @@ def main(options,args):
             signalDsName = 'inputs/ResonanceShapes_%s_13TeV_CaloScouting_Spring15.root'%model
         elif box=='CaloDijet2016':
             signalDsName = 'inputs/ResonanceShapes_%s_13TeV_CaloScouting_Spring16.root'%model
+        elif box=='CaloTrijet2016':
+            signalDsName = 'inputs/ResonanceShapes_%s_13TeV_CaloScouting_2016.root'%model
         elif box=='PFDijet2016':
             signalDsName = 'inputs/ResonanceShapes_%s_13TeV_Spring16.root'%model
         elif 'PFDijetbb2016' in box:
@@ -217,6 +225,7 @@ def main(options,args):
         backgroundDsName = {'CaloDijet2015':'inputs/data_CaloScoutingHT_Run2015D_BiasCorrected_CaloDijet2015.root',
                             #'CaloDijet2016':'inputs/data_CaloScoutingHT_Run2016BCD_NewBiasCorrectedFlat_Golden12910pb_CaloDijet2016.root',
                             'CaloDijet2016':'inputs/data_CaloScoutingHT_Run2016BCDEFG_BiasCorrected_Mjj300_Golden27637pb_CaloDijet2016.root',
+                            'CaloTrijet2016':'inputs/full.root',
                             #'PFDijet2016':'inputs/data_PFRECOHT_Run2016BCD_Golden12910pb_PFDijet2016.root',
                             'CaloDijet20152016':'inputs/data_CaloScoutingHT_Run2015D2016B_CaloDijet20152016.root',
                             'PFDijet2016':'inputs/JetHT_run2016_moriond17_red_cert_v2.root',
@@ -245,6 +254,8 @@ def main(options,args):
                 sysString += ',pm1_CaloDijet2016,pm2_CaloDijet2016,pm3_CaloDijet2016,pm4_CaloDijet2016'
             if options.fitPdf != 'atlas':
                 sysString += ',pa1_CaloDijet2016,pa2_CaloDijet2016,pa3_CaloDijet2016,pa4_CaloDijet2016'
+            if options.fitPdf != 'silvio':
+                sysString += ',ps1_CaloTrijet2016,ps2_CaloTrijet2016,ps3_CaloDijet2016,ps4_CaloTrijet2016,ps5_CaloTrijet2016'
             
         sysStringList.append(sysString)
 
