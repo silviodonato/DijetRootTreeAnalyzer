@@ -101,9 +101,9 @@ def getHybridCLsArrays(directory, model, Box, bayes):
         expectedLimit_plus1sigma.append(xsecULExpPlus - xsecULExp)#*crossSections[i])
         expectedLimit_minus2sigma.append(xsecULExp - xsecULExpMinus2)#*crossSections[i])
         expectedLimit_plus2sigma.append(xsecULExpPlus2 - xsecULExp)#*crossSections[i])
-    
 
     #return gluinoMassArray, gluinoMassArray_er, observedLimit, observedLimit_er, expectedLimit, expectedLimit_minus1sigma, expectedLimit_plus1sigma, expectedLimit_minus2sigma, expectedLimit_plus2sigma
+    
     # sort arrays first by gluino mass (in case tree entries are out of order)
     allTuples = zip(*sorted(zip(gluinoMassArray, gluinoMassArray_er, observedLimit, observedLimit_er, expectedLimit, expectedLimit_minus1sigma, expectedLimit_plus1sigma, expectedLimit_minus2sigma, expectedLimit_plus2sigma)))
     allArrays = []
@@ -112,80 +112,6 @@ def getHybridCLsArrays(directory, model, Box, bayes):
     return tuple(allArrays)
 
 def getHybridCLsArraysRSG(directory, Box):
-    
-    tfilersg = rt.TFile.Open("%s/rsg/xsecUL_Asymptotic_rsg_%s.root"%(directory,Box))
-    xsecTreersg = tfilersg.Get("xsecTree")
-    
-    dict_RSG_BR_qq = {}
-    dict_RSG_BR_gg = {}
-    rsg_br_file = open("data/rsg_lhc13TeV.out")
-    for line in rsg_br_file:
-      if not line.startswith("#"):
-        massRSG = float(line.split()[0])
-        RSG_BR_qqbar = float(line.split()[2]) + float(line.split()[4])
-        RSG_BR_gg = float(line.split()[3]) + float(line.split()[5])
-        dict_RSG_BR_qq[massRSG] = RSG_BR_qqbar
-        dict_RSG_BR_gg[massRSG] = RSG_BR_gg
-    
-    gluinoMassArray = array('d')
-    gluinoMassArray_er = array('d')
-    observedLimit = array('d')
-    observedLimit_er = array('d')
-    expectedLimit = array('d')
-    expectedLimit_minus1sigma = array('d')
-    expectedLimit_plus1sigma = array('d')
-    expectedLimit_minus2sigma = array('d')
-    expectedLimit_plus2sigma = array('d')
-
-    
-    xsecTreersg.Draw('>>elist','','entrylist')
-    elist = rt.gDirectory.Get('elist')
-    entry = -1
-    while True:
-        entry = elist.Next()
-        if entry == -1: break
-        xsecTreersg.GetEntry(entry)
-        
-	mass = xsecTreersg.mass
-        gluinoMassArray.append(xsecTreersg.mass)
-        gluinoMassArray_er.append(0.0)
-        
-        exec 'xsecULObs_rsg = xsecTreersg.xsecULObs_%s'%Box
-        exec 'xsecULExp_rsg = xsecTreersg.xsecULExp_%s'%Box
-        exec 'xsecULExpPlus_rsg = xsecTreersg.xsecULExpPlus_%s'%Box
-        exec 'xsecULExpMinus_rsg = xsecTreersg.xsecULExpMinus_%s'%Box
-        exec 'xsecULExpPlus2_rsg = xsecTreersg.xsecULExpPlus2_%s'%Box
-        exec 'xsecULExpMinus2_rsg = xsecTreersg.xsecULExpMinus2_%s'%Box
-        
-            
-            
-        xsecULObs_rsg = xsecULObs_rsg
-        xsecULExp_rsg = xsecULExp_rsg
-        observedLimit.append(xsecULObs_rsg)#*crossSections[i])
-        observedLimit_er.append(0.0)#*crossSections[i])
-        expectedLimit.append(xsecULExp_rsg)#*crossSections[i])
-        
-            
-        xsecULExpPlus_rsg = max(xsecULExpPlus_rsg,xsecULExp_rsg)
-        xsecULExpMinus_rsg = min(xsecULExpMinus_rsg,xsecULExp_rsg)
-        xsecULExpPlus2_rsg = max(xsecULExpPlus2_rsg,xsecULExpPlus_rsg)
-        xsecULExpMinus2_rsg = min(xsecULExpMinus2_rsg,xsecULExpMinus_rsg)
-
-        expectedLimit_minus1sigma.append(xsecULExp_rsg - xsecULExpMinus_rsg)#*crossSections[i])
-        expectedLimit_plus1sigma.append(xsecULExpPlus_rsg - xsecULExp_rsg)#*crossSections[i])
-        expectedLimit_minus2sigma.append(xsecULExp_rsg - xsecULExpMinus2_rsg)#*crossSections[i])
-        expectedLimit_plus2sigma.append(xsecULExpPlus2_rsg - xsecULExp_rsg)#*crossSections[i])
-    
-
-    #return gluinoMassArray, gluinoMassArray_er, observedLimit, observedLimit_er, expectedLimit, expectedLimit_minus1sigma, expectedLimit_plus1sigma, expectedLimit_minus2sigma, expectedLimit_plus2sigma
-    # sort arrays first by gluino mass (in case tree entries are out of order)
-    allTuples = zip(*sorted(zip(gluinoMassArray, gluinoMassArray_er, observedLimit, observedLimit_er, expectedLimit, expectedLimit_minus1sigma, expectedLimit_plus1sigma, expectedLimit_minus2sigma, expectedLimit_plus2sigma)))
-    allArrays = []
-    for t in allTuples:
-        allArrays.append(array('d',t))
-    return tuple(allArrays)
-
-def getHybridCLsArraysRSG_average(directory, Box):
     
     tfileqq = rt.TFile.Open("%s/qq/xsecUL_Asymptotic_qq_%s.root"%(directory,Box))
     tfilegg = rt.TFile.Open("%s/gg/xsecUL_Asymptotic_gg_%s.root"%(directory,Box))
@@ -296,6 +222,7 @@ def getHybridCLsArraysRSG_average(directory, Box):
 
     return gluinoMassArray, gluinoMassArray_er, observedLimit, observedLimit_er, expectedLimit, expectedLimit_minus1sigma, expectedLimit_plus1sigma, expectedLimit_minus2sigma, expectedLimit_plus2sigma
 
+
 def getSignificanceArrays(directory, model, Box):
     tfile = rt.TFile.Open("%s/xsecUL_ProfileLikelihood_%s_%s.root"%(directory,model,Box))
     xsecTree = tfile.Get("xsecTree")
@@ -350,8 +277,14 @@ def getSignificanceArrays(directory, model, Box):
         expectedLimit_minus2sigma.append(xsecULExp - xsecULExpMinus2)#*crossSections[i])
         expectedLimit_plus2sigma.append(xsecULExpPlus2 - xsecULExp)#*crossSections[i])
     
-
-    return gluinoMassArray, gluinoMassArray_er, observedLimit, observedLimit_er, expectedLimit, expectedLimit_minus1sigma, expectedLimit_plus1sigma, expectedLimit_minus2sigma, expectedLimit_plus2sigma
+    
+    #return gluinoMassArray, gluinoMassArray_er, observedLimit, observedLimit_er, expectedLimit, expectedLimit_minus1sigma, expectedLimit_plus1sigma, expectedLimit_minus2sigma, expectedLimit_plus2sigma    
+    # sort arrays first by gluino mass (in case tree entries are out of order)
+    allTuples = zip(*sorted(zip(gluinoMassArray, gluinoMassArray_er, observedLimit, observedLimit_er, expectedLimit, expectedLimit_minus1sigma, expectedLimit_plus1sigma, expectedLimit_minus2sigma, expectedLimit_plus2sigma)))
+    allArrays = []
+    for t in allTuples:
+        allArrays.append(array('d',t))
+    return tuple(allArrays)
     
 def setstyle():
     # For the canvas:
@@ -452,9 +385,9 @@ if __name__ == '__main__':
                   help="minimum mass")
     parser.add_option('--massMax',dest="massMax", default=8000.,type="float",
                   help="maximum mass")
-    parser.add_option('--xsecMin',dest="xsecMin", default=1e-5,type="float",
+    parser.add_option('--xsecMin',dest="xsecMin", default=1e-4,type="float",
                   help="minimum mass")
-    parser.add_option('--xsecMax',dest="xsecMax", default=1e5,type="float",
+    parser.add_option('--xsecMax',dest="xsecMax", default=1e4,type="float",
                   help="maximum mass")
     parser.add_option('--signif',dest="doSignificance",default=False,action='store_true',
                   help="for significance instead of limit")
@@ -462,8 +395,6 @@ if __name__ == '__main__':
                   help="for bayesian limits")
     parser.add_option('--no-sys',dest="noSys",default=False,action='store_true',
                   help="for no systematics limits")
-    parser.add_option('--cl',dest="cl",default=0.95,type="float",
-                  help="number of toys per job(for bayesian expected limits)")
     
     (options,args) = parser.parse_args()
     Boxes = options.box.split('_')
@@ -502,13 +433,13 @@ if __name__ == '__main__':
         thyModelsToDraw = ['String','q*','AxigluonNLO','E6Diquark','S8',"W'","Z'",'DM1GeV','RSGraviton']
     elif options.model=='gg_qg_qq_gaus' or options.model=='gg_qg_qq_gaus10':
         thyModelsToDraw = ['q*','AxigluonkNLO','E6Diquark','RSGraviton',"W'","Z'","DM1GeV"]
-    elif 'rsg' in options.model:        
+    elif options.model=='rsg':        
         thyModelsToDraw = ['RSGraviton']            
 
 
     lineStyle = {'RSGravitonGG':4,
-                 'RSGraviton':2,
-                 'Axigluon':3,
+                 'RSGraviton':4,
+                 'Axigluon':2,
                  'AxigluonkNLO':3,
                  'AxigluonNLO':3,
                  'E6Diquark':9,
@@ -549,15 +480,14 @@ if __name__ == '__main__':
                  'qq':20,
                  'qg':23,
                  'gaus':26,
-                 'gaus10':26,
-                 'RSGraviton':20
+                 'gaus10':26
                  }
         
     legendLabel = {'RSGravitonGG':'RS graviton (gg#rightarrowG#rightarrowgg)',
                    'RSGraviton':'RS graviton',
-                   'Axigluon':     'Axigluon/coloron      ',
-                   'AxigluonkNLO': 'Axigluon/coloron      ',
-                   'AxigluonNLO':  'Axigluon/coloron      ',
+                   'Axigluon':     'Axiguon/coloron      ',
+                   'AxigluonkNLO': 'Axiguon/coloron      ',
+                   'AxigluonNLO':  'Axiguon/coloron      ',
                    'E6Diquark':'Scalar diquark',
                    'S8':'Color-octet scalar (k_{s}^{2} = 1/2) ',
                    #'S8':'Color-octet scalar',
@@ -580,32 +510,13 @@ if __name__ == '__main__':
     sig_xsec = {}
     N_g_xsec = {}
     xsec_gr_nom = {}
-    print thyModelsToDraw
     for thyModel in thyModelsToDraw:        
         mass_xsec[thyModel] = array('d')
         sig_xsec[thyModel] = array('d')
         for mg in sorted(thyXsecDict[thyModel].keys()):
-	  if options.model =="gg_qg_qq":
-	    mass_xsec[thyModel].append(mg)
+            mass_xsec[thyModel].append(mg)
             sig_xsec[thyModel].append(thyXsecDict[thyModel][mg])
-
-	  elif "Axigluon" in thyModel and mg>=1200:
-	    mass_xsec[thyModel].append(mg)
-            sig_xsec[thyModel].append(thyXsecDict[thyModel][mg])
-	  elif thyModel=="S8" and mg>=1300:
-	    mass_xsec[thyModel].append(mg)
-            sig_xsec[thyModel].append(thyXsecDict[thyModel][mg])
-	  elif thyModel=="q*" and mg>=1300:
-	    mass_xsec[thyModel].append(mg)
-            sig_xsec[thyModel].append(thyXsecDict[thyModel][mg])
-          elif thyModel=="String" and mg>=3000:
-	    mass_xsec[thyModel].append(mg)
-            sig_xsec[thyModel].append(thyXsecDict[thyModel][mg])
-	  elif not(thyModel=="S8" or thyModel=="q*" or thyModel=="String"  or "Axigluon" in thyModel):
-	    mass_xsec[thyModel].append(mg)
-            sig_xsec[thyModel].append(thyXsecDict[thyModel][mg])
-
-
+            
         N_g_xsec[thyModel] = len(mass_xsec[thyModel])
         xsec_gr_nom[thyModel] = rt.TGraph(N_g_xsec[thyModel], mass_xsec[thyModel], sig_xsec[thyModel])
         xsec_gr_nom[thyModel].SetMarkerSize(0)
@@ -637,26 +548,25 @@ if __name__ == '__main__':
     expectedLimit_plus2sigma = {}
     
     if options.doSignificance:
-        h_limit.SetTitle(" ;Resonance mass [GeV];Local significance [Std. Dev.]")
+        h_limit.SetTitle(" ;Resonance mass [GeV];Local significance n#sigma")
     else:
-        h_limit.SetTitle(" ;Resonance mass [GeV]; #sigma #bf{#it{#Beta}} #bf{#it{#Alpha}} [pb]")
+        h_limit.SetTitle(" ;Resonance mass [GeV]; #sigma #times #bf{#it{#Beta}} #times #bf{#it{#Alpha}} [pb]")
 
     for Box in Boxes:
         for model in models:
-	    if not 'rsg' in model:
-	        if len(models)>1:
+	    if not model=='rsg':
+                if len(models)>1:
                     #directory =  options.outDir+'/%s_IntermediateRange'%model
                     directory =  options.outDir+'/%s'%model
                 if options.doSignificance:
                     gluinoMassArray[(Box,model)], gluinoMassArray_er[(Box,model)], observedLimit[(Box,model)], observedLimit_er[(Box,model)], expectedLimit[(Box,model)], expectedLimit_minus1sigma[(Box,model)], expectedLimit_plus1sigma[(Box,model)], expectedLimit_minus2sigma[(Box,model)], expectedLimit_plus2sigma[(Box,model)] = getSignificanceArrays(directory, model, Box)
                 else:        
                     gluinoMassArray[(Box,model)], gluinoMassArray_er[(Box,model)], observedLimit[(Box,model)], observedLimit_er[(Box,model)], expectedLimit[(Box,model)], expectedLimit_minus1sigma[(Box,model)], expectedLimit_plus1sigma[(Box,model)], expectedLimit_minus2sigma[(Box,model)], expectedLimit_plus2sigma[(Box,model)] = getHybridCLsArrays(directory, model, Box, options.bayes)
-	    elif model=="rsgAverage":
-                    gluinoMassArray[(Box,model)], gluinoMassArray_er[(Box,model)], observedLimit[(Box,model)], observedLimit_er[(Box,model)], expectedLimit[(Box,model)], expectedLimit_minus1sigma[(Box,model)], expectedLimit_plus1sigma[(Box,model)], expectedLimit_minus2sigma[(Box,model)], expectedLimit_plus2sigma[(Box,model)] = getHybridCLsArraysRSG_average(directory,  Box)
-	    elif model=="rsg":
+	    else:
                     gluinoMassArray[(Box,model)], gluinoMassArray_er[(Box,model)], observedLimit[(Box,model)], observedLimit_er[(Box,model)], expectedLimit[(Box,model)], expectedLimit_minus1sigma[(Box,model)], expectedLimit_plus1sigma[(Box,model)], expectedLimit_minus2sigma[(Box,model)], expectedLimit_plus2sigma[(Box,model)] = getHybridCLsArraysRSG(directory,  Box)
-            
-	    nPoints = len(observedLimit[(Box,model)])
+
+
+            nPoints = len(observedLimit[(Box,model)])
 
             gr_observedLimit[(Box,model)] = rt.TGraph(nPoints, gluinoMassArray[(Box,model)], observedLimit[(Box,model)])
             gr_observedLimit[(Box,model)].SetMarkerColor(1)
@@ -723,10 +633,11 @@ if __name__ == '__main__':
     for Box in Boxes:
         for model in models:    
             if options.doSignificance:
-                gr_observedLimit[(Box,model)].SetLineColor(lineColor[model])
-                gr_observedLimit[(Box,model)].SetMarkerColor(lineColor[model])
-                gr_observedLimit[(Box,model)].SetMarkerStyle(markerStyle[model])
-                gr_observedLimit[(Box,model)].Draw("cp SAME")
+                gr_observedLimit[(Box,model)].SetMarkerStyle(21)
+                gr_observedLimit[(Box,model)].SetMarkerSize(1)
+                gr_observedLimit[(Box,model)].SetLineColor(rt.kRed)
+                gr_observedLimit[(Box,model)].SetMarkerColor(rt.kBlue)
+                gr_observedLimit[(Box,model)].Draw("lp SAME")
             else:
                 if len(models)==1:
                     gr_expectedLimit[(Box,model)].Draw("c same")
@@ -734,25 +645,18 @@ if __name__ == '__main__':
                     xsec_gr_nom[thyModel].Draw("c same")
                 gr_observedLimit[(Box,model)].Draw("lp SAME")
 
-            #gr_expectedLimit1sigma[(Box,model)].SetLineStyle(2)
-            #gr_expectedLimit1sigma[(Box,model)].SetLineWidth(3)
-            #gr_expectedLimit1sigma[(Box,model)].SetLineColor(rt.kBlack)
-            #gr_expectedLimit2sigma[(Box,model)].SetLineStyle(2)
-            #gr_expectedLimit2sigma[(Box,model)].SetLineWidth(3)
-            #gr_expectedLimit2sigma[(Box,model)].SetLineColor(rt.kBlack)
+            gr_expectedLimit1sigma[(Box,model)].SetLineStyle(2)
+            gr_expectedLimit1sigma[(Box,model)].SetLineWidth(3)
+            gr_expectedLimit1sigma[(Box,model)].SetLineColor(rt.kBlack)
+            gr_expectedLimit2sigma[(Box,model)].SetLineStyle(2)
+            gr_expectedLimit2sigma[(Box,model)].SetLineWidth(3)
+            gr_expectedLimit2sigma[(Box,model)].SetLineColor(rt.kBlack)
     
     l = rt.TLatex()
     l.SetTextAlign(11)
     l.SetTextSize(0.045)
     l.SetNDC()
     l.SetTextFont(62)
-    #l.DrawLatex(0.17,0.92,"CMS")    
-    #if len(Boxes)>1 and len(models)>1:
-    #    l.DrawLatex(0.3,0.77,"CMS")
-    #elif len(Boxes)>1:
-    #    l.DrawLatex(0.41,0.835,"CMS")
-    #else:
-    #    l.DrawLatex(0.2,0.835,"CMS")
     #l.DrawLatex(0.17,0.92,"CMS")    
     if len(Boxes)>1 and len(models)>1:
         l.DrawLatex(0.3,0.77,"CMS")
@@ -761,16 +665,11 @@ if __name__ == '__main__':
     else:
         l.DrawLatex(0.2,0.835,"CMS")
         
-    l.SetTextSize(0.04)
     l.SetTextFont(52)
     #l.DrawLatex(0.28,0.92,"Preliminary")
-    l.SetTextSize(0.045)
     l.SetTextFont(42)
     #l.DrawLatex(0.65,0.92,"%.0f pb^{-1} (13 TeV)"%(options.lumi*1000))
-    if len(Boxes)>1:
-      l.DrawLatex(0.50,0.92,"27 fb^{-1} & 36 fb^{-1} (13 TeV)")
-    else: 
-      l.DrawLatex(0.65,0.92,"%d fb^{-1} (13 TeV)"%(options.lumi))
+    l.DrawLatex(0.63,0.92,"%.1f fb^{-1} (13 TeV)"%(options.lumi))
     
     if options.model=="gg":
         if len(Boxes)>1:
@@ -815,7 +714,7 @@ if __name__ == '__main__':
 
     if options.doSignificance:
         c.SetGridy()
-        leg = rt.TLegend(0.55,0.75,0.92,0.87)      
+        leg = rt.TLegend(0.55,0.79,0.92,0.87)      
     elif options.model =="gg_qg_qq" and options.box=="CaloDijet2016_PFDijet2016":
         leg = rt.TLegend(0.19,0.17,0.57,0.35)        
     else:        
@@ -825,11 +724,7 @@ if __name__ == '__main__':
     leg.SetFillColorAlpha(0,0)
     leg.SetLineColor(0)
     if not options.doSignificance:
-        if options.cl==0.90:
-          leg.SetHeader("90% CL limits")
-	elif options.cl==0.95:
-          leg.SetHeader("95% CL limits")
-
+        leg.SetHeader("95% CL limits")
     if len(models)==1:
         if options.doSignificance:
             leg.AddEntry(gr_observedLimit[(Box,model)], "Observed","lp")
@@ -838,10 +733,9 @@ if __name__ == '__main__':
             #leg.AddEntry(None,"90% CL limits","")
             leg.AddEntry(gr_observedLimit[(Box,model)], "Observed","lp")
         if not options.doSignificance:
-            leg.AddEntry(gr_expectedLimit[(Box,model)], "Expected","l")    
-            leg.AddEntry(gr_expectedLimit1sigma[(Box,model)], "#pm 1 s.d.","f")    
+            leg.AddEntry(gr_expectedLimit1sigma[(Box,model)], "Expected #pm 1 s.d.","lf")    
         if not options.doSignificance:
-            leg.AddEntry(gr_expectedLimit2sigma[(Box,model)], "#pm 2 s.d.","f")
+            leg.AddEntry(gr_expectedLimit2sigma[(Box,model)], "Expected #pm 2 s.d.","lf")
     else:
         #leg.AddEntry(None,"95% CL limits","")
         #leg.AddEntry(None,"90% CL limits","")
@@ -861,14 +755,10 @@ if __name__ == '__main__':
             legThyModel2.SetFillColorAlpha(0,0)
             legThyModel2.SetLineColorAlpha(0,0)
         elif options.model =="gg":
-            legThyModel = rt.TLegend(0.2,0.17,0.68,0.4)
-            #legThyModel = rt.TLegend(0.2,0.17,0.7,0.4)
-        elif options.model =="qg":
-            legThyModel = rt.TLegend(0.2,0.2,0.6,0.3)
-        elif "rsg" in options.model:
-            legThyModel = rt.TLegend(0.2,0.2,0.6,0.25)
+            #legThyModel = rt.TLegend(0.2,0.17,0.6,0.4)
+            legThyModel = rt.TLegend(0.2,0.17,0.7,0.4)
         else:
-            legThyModel = rt.TLegend(0.2,0.17,0.6,0.4)
+            legThyModel = rt.TLegend(0.2,0.17,0.55,0.4)
         legThyModel.SetTextFont(42)
         legThyModel.SetFillColor(rt.kWhite)
         legThyModel.SetLineColor(rt.kWhite)
@@ -897,7 +787,9 @@ if __name__ == '__main__':
 
     for Box in Boxes:
         for model in models:    
-            if not options.doSignificance:
+            if options.doSignificance:
+                gr_observedLimit[(Box,model)].Draw("lp SAME")
+            else:
                 if len(models)==1:
                     gr_expectedLimit[(Box,model)].Draw("c same")
                 for thyModel in thyModelsToDraw:
@@ -906,10 +798,10 @@ if __name__ == '__main__':
 
 
     if 'PF' in Box or options.massMax>1600:
-        if 'rsg' in model:
+        if model=='rsg':
             h_limit.GetXaxis().SetTitle('RS Graviton mass [TeV]')
         else:
-            h_limit.GetXaxis().SetTitle('Resonance mass [TeV]')
+	    h_limit.GetXaxis().SetTitle('Resonance mass [TeV]')
 	h_limit.GetXaxis().SetLabelOffset(1000)
         #h_fit_residual_vs_mass.GetXaxis().SetNoExponent()
         #h_fit_residual_vs_mass.GetXaxis().SetMoreLogLabels()    
@@ -920,20 +812,17 @@ if __name__ == '__main__':
         xLab.SetTextSize(0.05)
         if options.doSignificance:
             yOffset = -0.138
-	    xOffset = -0.138
         else:
             #yOffset = 6.5e-5 # for 1e-4 min
             #yOffset = 5.25e-6 # for 1e-5 min
             yOffset = 5.25e-8 # for 1e-5 min
-	    xOffset = 0.000005
         for i in range(1,10):
             if i*1000>=options.massMin:
-                xLab.DrawLatex(i*1000, xOffset, "%g"%i)
+                xLab.DrawLatex(i*1000, yOffset, "%g"%i)
 
     else:
-        print "++++++++ not PF in Box ++++++++++++++"
-        if 'rsg' in model:
-            h_limit.GetXaxis().SetTitle('RS Graviton mass [GeV]')
+        if model=='rsg':
+            h_limit.GetXaxis().SetTitle('RS Graviton mass [TeV]')
         else:
             h_limit.GetXaxis().SetTitle('Resonance mass [GeV]')
         h_limit.GetXaxis().SetNdivisions(408,True)
@@ -943,7 +832,7 @@ if __name__ == '__main__':
         line1 = rt.TLine(1600,1e-1,1600,options.xsecMax)
         line1.SetLineStyle(2)
         line1.SetLineWidth(2)
-        line1.SetLineColor(rt.kGray+2)
+        line1.SetLineColor(rt.kGray+1)
         line1.Draw()
         #line2 = rt.TLine(1600,1e-1,1600,2)
         #line2.SetLineStyle(2)
@@ -955,28 +844,17 @@ if __name__ == '__main__':
         lab = rt.TLatex()
         lab.SetTextSize(0.035)
         lab.SetTextFont(42)
-        lab.SetTextColor(rt.kGray+2)
-	if options.model=="gg_qg_qq":
-          lab.SetTextAlign(33)
-          lab.DrawLatex(1600-10,6e4,"#leftarrow")
-          lab.SetTextAlign(13)
-          lab.DrawLatex(1600+10,6e4,"#rightarrow") 
-          lab.SetTextAlign(23)
-	  lab.DrawLatex(1600-400,3.5e4,"Low")
-	  lab.DrawLatex(1600-400,1.2e4,"mass")
-          lab.DrawLatex(1600+400,3.5e4,"High")
-          lab.DrawLatex(1600+400,1.2e4,"mass")
-	else:
-          lab.SetTextAlign(33)
-          lab.DrawLatex(1600-10,7e2,"#leftarrow")
-          lab.SetTextAlign(13)
-          lab.DrawLatex(1600+10,7e2,"#rightarrow") 
-          lab.SetTextAlign(23)
-	  lab.DrawLatex(1600-400,5e2,"Low")
-	  lab.DrawLatex(1600-400,2e2,"mass")
-          lab.DrawLatex(1600+400,5e2,"High")
-          lab.DrawLatex(1600+400,2e2,"mass")
-
+        lab.SetTextColor(rt.kGray+1)
+        lab.SetTextAlign(33)
+        lab.DrawLatex(1600-10,6e4,"#leftarrow")
+        lab.SetTextAlign(13)
+        lab.DrawLatex(1600+10,6e4,"#rightarrow") 
+        lab.SetTextAlign(23)
+        lab.DrawLatex(1600-400,3.5e4,"Low")
+        lab.DrawLatex(1600-400,1.2e4,"mass")
+        lab.DrawLatex(1600+400,3.5e4,"High")
+        lab.DrawLatex(1600+400,1.2e4,"mass")
+        
 
     #c.SetLogx()    
     c.RedrawAxis() # request from David
@@ -1010,3 +888,4 @@ if __name__ == '__main__':
                     for (Box,model), graph in graphs.iteritems():
                         graph.SetName('%s_%s_%s'%(limitType,model,Box.lower()))
                         graph.Write()
+

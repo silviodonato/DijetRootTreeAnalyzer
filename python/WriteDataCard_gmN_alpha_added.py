@@ -253,7 +253,7 @@ def writeDataCard(box,model,txtfileName,bkgs,paramNames,w,penalty,fixed,shapes=[
         txtfile.write(datacard)
         txtfile.close()
         
-def writeDataCardMC(box,model,txtfileName,bkgs,paramNames,w,x,useRooParametricHist,penalty):  #this function creates the datacard.txt file when mcFile argument is given
+def writeDataCardMC(box,model,txtfileName,bkgs,paramNames,w,x):  #this function creates the datacard.txt file when mcFile argument is given
         obsRate = w.data("data_obs").sumEntries() #gets the Total entries of the data histo stored in w
         nBkgd = len(bkgs)
         rootFileName = txtfileName.replace('.txt','.root')
@@ -264,8 +264,6 @@ def writeDataCardMC(box,model,txtfileName,bkgs,paramNames,w,x,useRooParametricHi
                 if '2015' in box:
                         lumiErrs = [1.027 for sig in model.split('p')]
                 elif '2016' in box:
-                        lumiErrs = [1.062 for sig in model.split('p')]        #number of lumi's error 
-		elif '2017' in box:
                         lumiErrs = [1.062 for sig in model.split('p')]        #number of lumi's error          
         else:                                  #does all the above only once since there is only 1 signal 
                 rates = [w.data("%s_%s"%(box,model)).sumEntries()]#rates=prediction's total entries (rates is an array)
@@ -273,19 +271,12 @@ def writeDataCardMC(box,model,txtfileName,bkgs,paramNames,w,x,useRooParametricHi
                 if '2015' in box:
                         lumiErrs = [1.027]
                 elif '2016' in box:
-                        lumiErrs = [1.062]   
-		elif '2017' in box:
                         lumiErrs = [1.062]            
-        if not useRooParametricHist:
-            rates.extend([w.var('Ntot_%s_%s'%(bkg,box)).getVal() for bkg in bkgs])#extends array 'rates' and stores the value of parameters with "Ntot_" name
-        else:
-            rates.extend([1 for bkg in bkgs])#extends array 'rates' and stores the value of parameters with "Ntot_" name
+        rates.extend([w.var('Ntot_%s_%s'%(bkg,box)).getVal() for bkg in bkgs])#extends array 'rates' and stores the value of parameters with "Ntot_" name
         processes.extend(["%s_%s"%(box,bkg) for bkg in bkgs])
         if '2015' in box:
                 lumiErrs.extend([1.027 for bkg in bkgs])
         elif '2016' in box:
-                lumiErrs.extend([1.000 for bkg in bkgs])
-	elif '2017' in box:
                 lumiErrs.extend([1.000 for bkg in bkgs])
         divider = "------------------------------------------------------------\n"
         datacard = "imax 1 number of channels\n" + \
@@ -314,10 +305,9 @@ def writeDataCardMC(box,model,txtfileName,bkgs,paramNames,w,x,useRooParametricHi
         #datacard += "PFDijet2016MC_bkg_stat\tgmN\t1335274\t-\t0.2918187\n"  #normal CR statistics
         #datacard += "PFDijet2016MC_bkg_stat\tgmN\t44509\t-\t8.7545440\n"    #30 times less CR statistics
         #datacard += "PFDijet2016MC_bkg_stat\tgmN\t6676\t-\t58.36374\n"       #200 times less CR statistics
-        if not useRooParametricHist:
-            datacard += "alpha\tshape\t-\t1\n"
-            for i in range(1,len(x)):
-                datacard += "mcstat%i\tshape\t-\t1\n"%i
+        datacard += "alpha\tshape\t-\t1\n"
+        for i in range(1,len(x)):
+            datacard += "mcstat%i\tshape\t-\t1\n"%i
         for shape in shapes:
             shapeString = '%s\tshape\t'%shape
             for sig in range(0,signals):
@@ -326,16 +316,6 @@ def writeDataCardMC(box,model,txtfileName,bkgs,paramNames,w,x,useRooParametricHi
                 shapeString += '\t-'
             shapeString += '\n'
             datacard+=shapeString
-        if penalty:
-            slopeString = 'slope\tparam\t5.2\t0.8\n'
-            betaString = 'beta\tparam\t0.976\t0.001\n'
-            epsilonString = 'epsilon\tflatParam\n'
-        else:
-            slopeString = 'slope\tflatParam\n'
-            betaString = 'beta\tflatParam\n'
-            epsilonString = 'epsilon\tflatParam\n'            
-        datacard+=slopeString+betaString+epsilonString
-        
         txtfile = open(txtfileName,"w")
         txtfile.write(datacard)
         txtfile.close()
@@ -433,9 +413,6 @@ if __name__ == '__main__':    #THIS IS THE MAIN FUNCTION WHICH  CALLS THE REST
                   help="using RooMultiPdf for total background")
     parser.add_option('--mc',dest="mcFile", default=None,type="string",
                   help="file containing MC-based background prediciton inputs")
-    parser.add_option('--use-rooparametrichist',dest="useRooParametricHist", default=False,action='store_true',
-                  help="use RooParametricHist")
-
 
 
     (options,args) = parser.parse_args()
@@ -709,112 +686,54 @@ if __name__ == '__main__':    #THIS IS THE MAIN FUNCTION WHICH  CALLS THE REST
         bkgs = ['bkg']
         mcFile = rt.TFile.Open(options.mcFile,'read')   #reads the .root file with the prediction
         mcName = cfg.getVariables(box, "mcName")        #gets the name 'h_mjj_prediction_1GeVbin' as string
-        mcRatioName = cfg.getVariables(box, "mcRatioName")   #gets the name mc ratio hist name
-        if not options.useRooParametricHist:
-            mcHist = mcFile.Get(mcName)                     #gets the prediction histo
-            mcHist.Rebin(len(x)-1,'mc_rebin',x)             #Rebins the prediction according to th1x
-            mcHist_rebin = rt.gDirectory.Get('mc_rebin')    #gets the rebinned histo
-            mcHist_th1x = convertToTh1xHist(mcHist_rebin)   #calls a function to get the rebinned histo with '_th1x' added in name (search convertToTh1xHist)
-            mcDataHist = rt.RooDataHist('%s_%s'%(box,'bkg'),'%s_%s'%(box,'bkg'), rt.RooArgList(th1x), rt.RooFit.Import(mcHist_th1x)) #recreates the prediction as rooFit histo
-            mcDataHist_mjj = rt.RooDataHist('%s_%s_mjj'%(box,'bkg'),'%s_%s_mjj'%(box,'bkg'), rt.RooArgList(w.var('mjj')), rt.RooFit.Import(mcHist))
-            rootTools.Utils.importToWS(w,mcDataHist)
-            rootTools.Utils.importToWS(w,mcDataHist_mjj)
+        mcHist = mcFile.Get(mcName)                     #gets the prediction histo
+        mcHist.Rebin(len(x)-1,'mc_rebin',x)             #Rebins the prediction according to th1x
+        mcHist_rebin = rt.gDirectory.Get('mc_rebin')    #gets the rebinned histo
+        mcHist_th1x = convertToTh1xHist(mcHist_rebin)   #calls a function to get the rebinned histo with '_th1x' added in name (search convertToTh1xHist)
+        mcDataHist = rt.RooDataHist('%s_%s'%(box,'bkg'),'%s_%s'%(box,'bkg'), rt.RooArgList(th1x), rt.RooFit.Import(mcHist_th1x)) #recreates the prediction as rooFit histo
+        mcDataHist_mjj = rt.RooDataHist('%s_%s_mjj'%(box,'bkg'),'%s_%s_mjj'%(box,'bkg'), rt.RooArgList(w.var('mjj')), rt.RooFit.Import(mcHist))
+        rootTools.Utils.importToWS(w,mcDataHist)
+        rootTools.Utils.importToWS(w,mcDataHist_mjj)
         
-    if options.mcFile is not None and 'MC' in box and 'MCCR' not in box: #THIS IS USED FOR THE RATIO-PREDICTION
-        if not options.useRooParametricHist:
-            myTH1predUp = mcFile.Get('h_mjj_prediction_1GeVbin_plus_sigma')
-            myTH1predUp.Rebin(len(x)-1,'pred_Up_rebin',x)
-            myRebinnedTH1predUp = rt.gDirectory.Get('pred_Up_rebin')
-            myRebinnedTH1predUp.SetDirectory(0)
-            myRealTH1predUp = convertToTh1xHist(myRebinnedTH1predUp)
-            predHistUp = rt.RooDataHist("%s_bkg_alphaUp"%box, "%s_bkg_alphaUp"%box, rt.RooArgList(th1x), rt.RooFit.Import(myRealTH1predUp))
-            rootTools.Utils.importToWS(w,predHistUp) 
+        myTH1predUp = mcFile.Get('h_mjj_prediction_1GeVbin_plus_sigma')
+        myTH1predUp.Print('v')
+        myTH1predDown = mcFile.Get('h_mjj_prediction_1GeVbin_minus_sigma')
+        
+        myTH1predUp.Rebin(len(x)-1,'pred_Up_rebin',x)
+        myRebinnedTH1predUp = rt.gDirectory.Get('pred_Up_rebin')
+        myRebinnedTH1predUp.SetDirectory(0)
+        myRealTH1predUp = convertToTh1xHist(myRebinnedTH1predUp)
+        predHistUp = rt.RooDataHist("PFDijet2016MC_bkg_alphaUp", "PFDijet2016MC_bkg_alphaUp", rt.RooArgList(th1x), rt.RooFit.Import(myRealTH1predUp))
+        rootTools.Utils.importToWS(w,predHistUp) 
 
-            myTH1predDown = mcFile.Get('h_mjj_prediction_1GeVbin_minus_sigma')
-            myTH1predDown.Rebin(len(x)-1,'pred_Down_rebin',x)
-            myRebinnedTH1predDown = rt.gDirectory.Get('pred_Down_rebin')
-            myRebinnedTH1predDown.SetDirectory(0)
-            myRealTH1predDown = convertToTh1xHist(myRebinnedTH1predDown)
-            predHistDown = rt.RooDataHist("%s_bkg_alphaDown"%box, "%s_bkg_alphaDown"%box, rt.RooArgList(th1x), rt.RooFit.Import(myRealTH1predDown))
-            
-        myMCRatio = mcFile.Get(mcRatioName)
-        #myMCRatio.Rebin(len(x)-1,'mcRatio_rebin',x)        
-        #myRebinnedMCRatio = rt.gDirectory.Get('mcRatio_rebin')
-        #myRebinnedMCRatio.SetDirectory(0)
-        #myRealMCRatio = convertToTh1xHist(myRebinnedMCRatio)
-        
-        myCR = mcFile.Get(cfg.getVariables(box+'CR', "histoName"))
-        myCR.Rebin(len(x)-1,'cr_rebin',x)        
-        myRebinnedCR = rt.gDirectory.Get('cr_rebin')
-        myRebinnedCR.SetDirectory(0)
-        myRealCR = convertToTh1xHist(myRebinnedCR)
-        
+        myTH1predDown.Rebin(len(x)-1,'pred_Down_rebin',x)
+        myRebinnedTH1predDown = rt.gDirectory.Get('pred_Down_rebin')
+        myRebinnedTH1predDown.SetDirectory(0)
+        myRealTH1predDown = convertToTh1xHist(myRebinnedTH1predDown)
+        predHistDown = rt.RooDataHist("PFDijet2016MC_bkg_alphaDown", "PFDijet2016MC_bkg_alphaDown", rt.RooArgList(th1x), rt.RooFit.Import(myRealTH1predDown))
+        rootTools.Utils.importToWS(w,predHistDown) 
+
+
         # make one shape Up/Down for each bin (uncorrelated mcstat uncertainty)
-        if not options.useRooParametricHist:
-            for iBinX in range(1,myRealTH1.GetNbinsX()+1):
+        for iBinX in range(1,mcHist_th1x.GetNbinsX()+1):
             
-                if mcHist_th1x.GetBinContent(iBinX) > 0: 
-                    print 'mcstat bin %i percent uncertainty: %f%%'%(iBinX,mcHist_th1x.GetBinError(iBinX)*100./mcHist_th1x.GetBinContent(iBinX))
-                myRealTH1mcstatUp = mcHist_th1x.Clone('hist_mcstat%iUp'%iBinX) # clone the original histogram
-                myRealTH1mcstatUp.SetBinContent(iBinX, mcHist_th1x.GetBinContent(iBinX)+mcHist_th1x.GetBinError(iBinX)) # set only bin iBinX to (Nominal+Error) to get "Up" prediction
-                predHistUp = rt.RooDataHist("%s_bkg_mcstat%iUp"%(box,iBinX), "%s_bkg_mcstat%iUp"%(box,iBinX), rt.RooArgList(th1x), rt.RooFit.Import(myRealTH1mcstatUp))
-                rootTools.Utils.importToWS(w,predHistUp)
-                            
-                myRealTH1mcstatDown = mcHist_th1x.Clone('hist_mcstat%iDown'%iBinX) # clone the original histogram
-                myRealTH1mcstatDown.SetBinContent(iBinX, mcHist_th1x.GetBinContent(iBinX)-mcHist_th1x.GetBinError(iBinX)) # set only bin iBinX to (Nominal-Error) to get "Down" prediction
-                predHistDown = rt.RooDataHist("%s_bkg_mcstat%iDown"%(box,iBinX), "%s_bkg_mcstat%iDown"%(box,iBinX), rt.RooArgList(th1x), rt.RooFit.Import(myRealTH1mcstatDown))
-                rootTools.Utils.importToWS(w,predHistDown) 
+            print 'mcstat bin %i percent uncertainty: %f%%'%(iBinX,mcHist_th1x.GetBinError(iBinX)*100./mcHist_th1x.GetBinContent(iBinX))
+            myRealTH1mcstatUp = mcHist_th1x.Clone('hist_mcstat%iUp'%iBinX) # clone the original histogram
+            myRealTH1mcstatUp.SetBinContent(iBinX, mcHist_th1x.GetBinContent(iBinX)+mcHist_th1x.GetBinError(iBinX)) # set only bin iBinX to (Nominal+Error) to get "Up" prediction
+            predHistUp = rt.RooDataHist("PFDijet2016MC_bkg_mcstat%iUp"%iBinX, "PFDijet2016MC_bkg_mcstat%iUp"%iBinX, rt.RooArgList(th1x), rt.RooFit.Import(myRealTH1mcstatUp))
+            rootTools.Utils.importToWS(w,predHistUp)
+            
+            myRealTH1mcstatDown = mcHist_th1x.Clone('hist_mcstat%iDown'%iBinX) # clone the original histogram
+            myRealTH1mcstatDown.SetBinContent(iBinX, mcHist_th1x.GetBinContent(iBinX)-mcHist_th1x.GetBinError(iBinX)) # set only bin iBinX to (Nominal-Error) to get "Down" prediction
+            predHistDown = rt.RooDataHist("PFDijet2016MC_bkg_mcstat%iDown"%iBinX, "PFDijet2016MC_bkg_mcstat%iDown"%iBinX, rt.RooArgList(th1x), rt.RooFit.Import(myRealTH1mcstatDown))
+            rootTools.Utils.importToWS(w,predHistDown) 
  
-        # Use RooParametricHist                                               
-        if options.useRooParametricHist:
-            binFunctions = rt.RooArgList()
-            w.factory('slope[5.2,0,10]') # here is where I change slope # 5.14 for data # 1.0 for corrected ratio
-            w.factory('beta[0.976,0.9,1.1]') # here is where I change beta # 0.976 for data # 1.018 for corrected ratio
-            w.factory('epsilon[1.,0.,2.]') # overall normalization term
-        
-            for iBinX in range(1,myRealTH1.GetNbinsX()+1):
-                # Bin center calculation
-                #mjjBin = myRebinnedTH1.GetXaxis().GetBinCenter(iBinX) 
-                # L-W method assuming exponential fit exp(-b*mjj) to CR 
-                # with Eqn. 8 of http://www.sciencedirect.com/science/article/pii/0168900294011125a
-                mjjCen = myRebinnedTH1.GetXaxis().GetBinCenter(iBinX) 
-                mjjLow = myRebinnedTH1.GetXaxis().GetBinLowEdge(iBinX) 
-                mjjUp = myRebinnedTH1.GetXaxis().GetBinUpEdge(iBinX) 
-                mjjBinWidth = mjjUp-mjjLow
-                expB = 2.5E-03 # from fit of CR
-                mjjBin = mjjLow + (1./expB) *(rt.TMath.Log(expB * mjjBinWidth) - rt.TMath.Log(1. - rt.TMath.Exp(-1. * expB * mjjBinWidth)))
-                w.factory('mjjBin%i[%f]'%(iBinX,mjjBin))
-                #print mjjCen, mjjBin
-                #w.factory('mcRatioBin%i[%f]'%(iBinX,myRealMCRatio.GetBinContent(iBinX)))
-                w.factory('mcRatioBin%i[%f]'%(iBinX,myMCRatio.GetBinContent(myMCRatio.FindBin(mjjBin))))
-                w.factory('crBin%i[%f,%f,%f]'%(iBinX,myRealCR.GetBinContent(iBinX),0,myRealCR.GetBinContent(iBinX)+myRealCR.GetBinError(iBinX)*50.))
-                w.factory("expr::bin%iFunc('(@0+@1*(@2/@3)**4)*@4*@5*@6',beta,slope,mjjBin%i,sqrts,mcRatioBin%i,crBin%i,epsilon)"%(iBinX,iBinX,iBinX,iBinX))
-
-                binFunctions.add(w.function('bin%iFunc'%iBinX))
-                print iBinX, w.var('beta').getVal(), w.var('beta').getError(), w.var('slope').getVal(), w.var('mjjBin%i'%iBinX).getVal(), myMCRatio.GetBinContent(myMCRatio.FindBin(mjjBin)), myRealCR.GetBinContent(iBinX), w.function('bin%iFunc'%iBinX).getVal(), myRealTH1.GetBinContent(iBinX)
-            rph = rt.RooParametricHist('%s_bkg'%box,'%s_bkg'%box,th1x,binFunctions,myRealTH1)
-            rph_norm = rt.RooAddition('%s_bkg_norm'%box,'%s_bkg_norm'%box,binFunctions)
-            rootTools.Utils.importToWS(w,rph)
-            rootTools.Utils.importToWS(w,rph_norm,rt.RooFit.RecycleConflictNodes())
-    elif options.mcFile is not None and 'MCCR' in box: #THIS IS USED FOR THE RATIO-PREDICTION
-        # Use RooParametricHist                                               
-        if options.useRooParametricHist:
-            binVariablesCR = rt.RooArgList()
-            for iBinX in range(1,myRealTH1.GetNbinsX()+1):
-                w.factory('crBin%i[%f,%f,%f]'%(iBinX,myRealTH1.GetBinContent(iBinX),0,myRealTH1.GetBinContent(iBinX)+myRealTH1.GetBinError(iBinX)*50.))
-                binVariablesCR.add(w.var('crBin%i'%iBinX))
-            rph = rt.RooParametricHist('%s_bkg'%box,'%s_bkg'%box,th1x,binVariablesCR,myRealTH1)
-            rph_norm = rt.RooAddition('%s_bkg_norm'%box,'%s_bkg_norm'%box,binVariablesCR)
-            rootTools.Utils.importToWS(w,rph)
-            rootTools.Utils.importToWS(w,rph_norm,rt.RooFit.RecycleConflictNodes())
-
     outFile = 'dijet_combine_%s_%i_lumi-%.3f_%s.root'%(model,massPoint,lumi/1000.,box) #creates the name of the output .root file
     outputFile = rt.TFile.Open(options.outDir+"/"+outFile,"recreate")                  #creates the output file
     if options.mcFile is not None:
-        writeDataCardMC(box,model,options.outDir+"/"+outFile.replace(".root",".txt"),bkgs,paramNames,w,x,options.useRooParametricHist,options.penalty)
+        writeDataCardMC(box,model,options.outDir+"/"+outFile.replace(".root",".txt"),bkgs,paramNames,w,x)
     else:
         writeDataCard(box,model,options.outDir+"/"+outFile.replace(".root",".txt"),bkgs,paramNames,w,options.penalty,options.fixed,shapes=shapes,multi=options.multi)
     w.Write() #writes the workspace in the output file
     w.Print('v')
     os.system("cat %s"%options.outDir+"/"+outFile.replace(".root",".txt"))
-

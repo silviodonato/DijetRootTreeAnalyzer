@@ -30,11 +30,9 @@ gROOT.SetStyle('tdrStyle')
 gROOT.ForceStyle()
 
 #change the CMS_lumi variables (see CMS_lumi.py)
-CMS_lumi.cmsTextSize = 0.57
 CMS_lumi.writeExtraText = 1
 CMS_lumi.extraText = "Simulation"
 CMS_lumi.lumi_sqrtS = "(13 TeV)" # used with iPeriod = 0, e.g. for simulation-only plots (default is an empty string)
-CMS_lumi.lumiTextSize = 0.6
 
 iPos = 11
 if( iPos==0 ): CMS_lumi.relPosX = 0.12
@@ -53,19 +51,16 @@ L = 0.12*W_ref
 R = 0.04*W_ref
 
 lineStyle={
-    "rsg":1,
     "qq":1,
     "qg":1,
     "gg":1 }
 
 lineColor={
-    "rsg":kBlue,
     "qq":kRed,
     "qg":kBlue,
     "gg":kGreen }
    
 label={
-    "rsg":"RSG template",
     "qq":"quark-quark",
     "qg":"quark-gluon",
     "gg":"gluon-gluon" }
@@ -82,8 +77,8 @@ def massIterable(massList):
 
 
 
-def DrawSignals(hist_dict, box, smooth, rsg):
-  #testfile = TFile("testfile.root","recreate")
+def DrawSignals(hist_dict, box, smooth):
+  testfile = TFile("testfile.root","recreate")
   count = 0;
   canvas = TCanvas("c","c",50,50,W,H)
   canvas.SetFillColor(0)
@@ -109,7 +104,7 @@ def DrawSignals(hist_dict, box, smooth, rsg):
   #Pave text
   pave_fit = TPaveText(0.56,0.65,0.95,0.75,"NDC")
 
-  pave_fit.AddText("Wide jets")
+  pave_fit.AddText("Wide Jets")
   pave_fit.AddText("|#eta| < 2.5, |#Delta#eta| < 1.3")
   pave_fit.SetFillColor(0)
   pave_fit.SetLineColor(0)
@@ -119,15 +114,9 @@ def DrawSignals(hist_dict, box, smooth, rsg):
   pave_fit.SetTextSize(0.038)
   pave_fit.SetTextAlign(23) 
 
-  #testfile.cd()
+  testfile.cd()
   i=0
-  if rsg:
-    list_to_draw = ("qq","rsg","gg")
-  else:
-    list_to_draw = ("qq","qg","gg")
-
-
-  for key in list_to_draw:
+  for key in ("qq","qg","gg"):
     j=0
     for hist in hist_dict[key]:
       hist.Scale(1000.)
@@ -166,7 +155,7 @@ def DrawSignals(hist_dict, box, smooth, rsg):
           xLab.DrawLatex(i*1000, yOffset, "%g"%i)
 
 
-      #hist.Write()
+      hist.Write()
       i+=1
       j+=1
       
@@ -176,20 +165,14 @@ def DrawSignals(hist_dict, box, smooth, rsg):
   pave_fit.Draw()
   #draw the lumi text on the canvas
   CMS_lumi.CMS_lumi(canvas, iPeriod, iPos)
-  if smooth and rsg:
-    canvas.SaveAs("shapes_rsg_smoothing_"+box+".pdf")
-    canvas.SaveAs("shapes_rsg_smoothing_"+box+".png")
-  elif smooth and rsg:
+  if smooth:
     canvas.SaveAs("shapes_smoothing_"+box+".pdf")
     canvas.SaveAs("shapes_smoothing_"+box+".png")
-  elif rsg:
-    canvas.SaveAs("shapes_rsg_"+box+".pdf")
-    canvas.SaveAs("shapes_rsg_"+box+".png")
   else:
     canvas.SaveAs("shapes_"+box+".pdf")
     canvas.SaveAs("shapes_"+box+".png")
-  
-  #testfile.Close()
+  canvas.SaveAs("shapes.C")
+  testfile.Close()
 
 
 def Binning():
@@ -220,8 +203,6 @@ if __name__ == '__main__':
       help="Output directory to store cards")
   parser.add_option('--smooth',dest="smooth",default=False,action="store_true",
       help="Apply smoothing")
-  parser.add_option('--rsg',dest="rsg", default=False, action="store_true",
-                  help="plot RSG templates")
   #parser.add_option('-k','--coupling',dest="coupling",default=0.54,type="string",
   #   help="number of toys per job(for bayesian expected limits)")
 
@@ -233,21 +214,17 @@ if __name__ == '__main__':
   hist_mass_list_qq=[]
   hist_mass_list_qg=[]
   hist_mass_list_gg=[]
-  hist_mass_list_rsg=[]
   hist_mass_list_qq_rebin=[]
   hist_mass_list_qg_rebin=[]
   hist_mass_list_gg_rebin=[]
-  hist_mass_list_rsg_rebin=[]
   if "PF" in  options.box:
     res_file_qq = TFile("inputs/ResonanceShapes_qq_13TeV_Spring16.root","read")
     res_file_qg = TFile("inputs/ResonanceShapes_qg_13TeV_Spring16.root","read")
     res_file_gg = TFile("inputs/ResonanceShapes_gg_13TeV_Spring16.root","read")
-    res_file_rsg = TFile("inputs/RSGtemplates/ResonanceShapes_rsg_13TeV_Spring16.root","read")
   elif "Calo" in  options.box:
     res_file_qq = TFile("inputs/ResonanceShapes_qq_13TeV_CaloScouting_Spring16.root","read")
     res_file_qg = TFile("inputs/ResonanceShapes_qg_13TeV_CaloScouting_Spring16.root","read")
     res_file_gg = TFile("inputs/ResonanceShapes_gg_13TeV_CaloScouting_Spring16.root","read")
-    res_file_rsg = TFile("inputs/RSGtemplates/ResonanceShapes_rsg_13TeV_CaloScouting_Spring16.root","read")
     
   binning_smoothing_dict = {}
   binning_smoothing_dict_v = {}
@@ -259,9 +236,6 @@ if __name__ == '__main__':
     hist_mass_list_qg.append( res_file_qg.Get("h_qg_%s"%massPoint))
     res_file_gg.cd()
     hist_mass_list_gg.append( res_file_gg.Get("h_gg_%s"%massPoint))
-    if options.rsg:
-      res_file_rsg.cd()
-      hist_mass_list_rsg.append( res_file_rsg.Get("h_rsg_%s"%massPoint))
     
     binsmooth1 = 0
     binsmooth2 = 0
@@ -322,40 +296,28 @@ if __name__ == '__main__':
     #hist_mass_list_gg_rebin[i].Scale(1./30)
     ##hist_mass_list_gg[i].Smooth(50)
     #hist_mass_list_gg_rebin.append(TH1D(hist_mass_list_gg[i].Rebin(len(binning)-1,"rebinned_hist_gg_"+str(massPoint),binning)))
-    if options.rsg:
-      hist_mass_list_rsg_rebin.append(TH1D(hist_mass_list_rsg[i].Rebin(len(binning_smoothing_dict_v[massPoint])-1,"rebinned_hist_rsg_"+str(massPoint),binning_smoothing_dict_v[massPoint])))
     ##############################
     for jj in range(1,int(binsmooth1/binning1)+1):
       hist_mass_list_qq_rebin[i].SetBinContent(jj,hist_mass_list_qq_rebin[i].GetBinContent(jj)/binning1)
       hist_mass_list_qg_rebin[i].SetBinContent(jj,hist_mass_list_qg_rebin[i].GetBinContent(jj)/binning1)
       hist_mass_list_gg_rebin[i].SetBinContent(jj,hist_mass_list_gg_rebin[i].GetBinContent(jj)/binning1)
-      if options.rsg:
-        hist_mass_list_rsg_rebin[i].SetBinContent(jj,hist_mass_list_rsg_rebin[i].GetBinContent(jj)/binning1)
     for jj in range(int(binsmooth1/binning1)+1, int(binsmooth1/binning1 + (binsmooth2 - binsmooth1)/binning2)+1):
       hist_mass_list_qq_rebin[i].SetBinContent(jj,hist_mass_list_qq_rebin[i].GetBinContent(jj)/binning2)
       hist_mass_list_qg_rebin[i].SetBinContent(jj,hist_mass_list_qg_rebin[i].GetBinContent(jj)/binning2)
       hist_mass_list_gg_rebin[i].SetBinContent(jj,hist_mass_list_gg_rebin[i].GetBinContent(jj)/binning2)
-      if options.rsg:
-        hist_mass_list_rsg_rebin[i].SetBinContent(jj,hist_mass_list_rsg_rebin[i].GetBinContent(jj)/binning2)
     for jj in range(int(binsmooth1/binning1 + (binsmooth2 - binsmooth1)/binning2)+1, hist_mass_list_qq_rebin[i].GetNbinsX()+1):
       hist_mass_list_qq_rebin[i].SetBinContent(jj,hist_mass_list_qq_rebin[i].GetBinContent(jj)/binning3)
       hist_mass_list_qg_rebin[i].SetBinContent(jj,hist_mass_list_qg_rebin[i].GetBinContent(jj)/binning3)
       hist_mass_list_gg_rebin[i].SetBinContent(jj,hist_mass_list_gg_rebin[i].GetBinContent(jj)/binning3)
-      if options.rsg:
-	hist_mass_list_rsg_rebin[i].SetBinContent(jj,hist_mass_list_rsg_rebin[i].GetBinContent(jj)/binning3)
     
     if "PF" in options.box:
       hist_mass_list_qq_rebin[i].Smooth(50)
       hist_mass_list_qg_rebin[i].Smooth(50)
       hist_mass_list_gg_rebin[i].Smooth(50)
-      if options.rsg:
-	hist_mass_list_rsg_rebin[i].Smooth(50)
     elif "Calo" in options.box:
       hist_mass_list_qq_rebin[i].Smooth(30)
       hist_mass_list_qg_rebin[i].Smooth(30)
       hist_mass_list_gg_rebin[i].Smooth(30)
-      if options.rsg:
-	hist_mass_list_rsg_rebin[i].Smooth(30)
    
    ###########################
     #hist_mass_list_qq[i].Rebin(40)
@@ -373,10 +335,8 @@ if __name__ == '__main__':
   hist_dict["qq"]=hist_mass_list_qq_rebin
   hist_dict["qg"]=hist_mass_list_qg_rebin
   hist_dict["gg"]=hist_mass_list_gg_rebin
-  if options.rsg:
-    hist_dict["rsg"]=hist_mass_list_rsg_rebin
   #hist_dict["qq"]=hist_mass_list_qq
   #hist_dict["qg"]=hist_mass_list_qg
   #hist_dict["gg"]=hist_mass_list_gg
 
-  DrawSignals(hist_dict, options.box, options.smooth, options.rsg)
+  DrawSignals(hist_dict, options.box, options.smooth)
