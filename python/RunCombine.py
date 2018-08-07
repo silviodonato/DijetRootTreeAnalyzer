@@ -141,7 +141,37 @@ def submit_jobs(options,args):
             if not options.dryRun:
                 time.sleep(3)
                 os.system("bsub -q "+options.queue+" -o "+pwd+"/"+ffDir+"/log.log source "+pwd+"/"+outputname)
-    
+
+def submit_jobs_uzh(options,args):    
+    pwd = os.environ['PWD']
+    exec_me("mkdir -p %s"%(options.outDir),False)
+    exec_me("mkdir -p submit_limits",False)
+    exec_me("mkdir -p submit_limits/log",False)
+    opts = sys.argv[:]
+    idx = opts.index("--queue")
+    del opts[idx]
+    del opts[idx]
+    idx = opts.index("--mass")
+    del opts[idx]
+    del opts[idx]
+    command = " ".join(opts)
+    for massPoint in massIterable(options.mass):
+        commandMass = "python " + command + " --mass "+str(massPoint)
+        fileName = 'submit_limits/lauch_%s.sh'%(str(massPoint))
+        pwd = os.environ['PWD']
+        print('######### Creating %s ############'%fileName)
+        txt = open(fileName,'w')
+        txt.write("""
+#!/bin/bash
+source /cvmfs/cms.cern.ch/cmsset_default.sh
+export SCRAM_ARCH=slc6_amd64_gcc530
+cd %s
+eval `scramv1 runtime -sh`
+%s
+"""%(pwd,commandMass))
+        txt.close()
+        exec_me("qsub %s -o %s/submit_limits/log -e %s/submit_limits/log -q %s.q "%(pwd+"/"+fileName,pwd,pwd,options.queue.replace(".q","")),options.dryRun)
+
 def main(options,args):
     
     boxes = options.box.split('_')
@@ -393,7 +423,7 @@ if __name__ == '__main__':
                   help="decorrelate shape parameters")
     parser.add_option('--tag',dest="tag", default='master',type="string",
                   help="tag for repository")
-    parser.add_option('-q','--queue',dest="queue",default="1nh",type="string",
+    parser.add_option('-q','--queue',dest="queue",default=None,type="string",
                   help="queue: 1nh, 8nh, 1nd, etc.")
     parser.add_option('-t','--toys',dest="toys",default=-1,type="int",
                   help="number of toys per job(for bayesian expected limits)")
@@ -406,7 +436,9 @@ if __name__ == '__main__':
     (options,args) = parser.parse_args()
 
 
-    if options.jobs:
+    if options.queue and options.queue.replace(".q","") in ["short", "long", "all",]:
+        submit_jobs_uzh(options,args)
+    elif options.jobs:
         submit_jobs(options,args)
     else:            
         main(options,args)
