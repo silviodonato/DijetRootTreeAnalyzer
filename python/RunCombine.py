@@ -170,7 +170,7 @@ eval `scramv1 runtime -sh`
 %s
 """%(pwd,commandMass))
         txt.close()
-        exec_me("qsub %s -o %s/submit_limits/log -e %s/submit_limits/log -q %s.q "%(pwd+"/"+fileName,pwd,pwd,options.queue.replace(".q","")),options.dryRun)
+        exec_me("qsub -o %s/submit_limits/log -e %s/submit_limits/log -q %s.q %s"%(pwd,pwd,options.queue.replace(".q",""),fileName),options.dryRun)
 
 def main(options,args):
     
@@ -190,7 +190,8 @@ def main(options,args):
                    'fiveparam': 1,
                    'atlas': 2,
                    'atlas6': 3,
-                   'silvio': 4,
+                   'silvio5': 4,
+                   'silvio6': 5,
                    }
     
     for box,lumi in zip(boxes,lumiFloat):
@@ -284,7 +285,11 @@ def main(options,args):
                 sysString += ',pm1_CaloDijet2016,pm2_CaloDijet2016,pm3_CaloDijet2016,pm4_CaloDijet2016'
             if options.fitPdf != 'atlas':
                 sysString += ',pa1_CaloDijet2016,pa2_CaloDijet2016,pa3_CaloDijet2016,pa4_CaloDijet2016'
-            if options.fitPdf != 'silvio':
+            if options.fitPdf != 'atlas6':
+                sysString += ',pa1_CaloDijet2016,pa2_CaloDijet2016,pa3_CaloDijet2016,pa4_CaloDijet2016,pa5_CaloDijet2016'
+            if options.fitPdf != 'silvio5':
+                sysString += ',ps1_CaloTrijet2016,ps2_CaloTrijet2016,ps3_CaloDijet2016,ps4_CaloTrijet2016'
+            if options.fitPdf != 'silvio6':
                 sysString += ',ps1_CaloTrijet2016,ps2_CaloTrijet2016,ps3_CaloDijet2016,ps4_CaloTrijet2016,ps5_CaloTrijet2016'
             
         sysStringList.append(sysString)
