@@ -20,14 +20,14 @@ massBoundaries = [1, 3, 6, 10, 16, 23, 31, 40, 50, 61, 74, 88, 103, 119, 137, 15
 histoNames = [
 #    "dijetMassHisto_isrptcut_50",
 #    "dijetMassHisto_isrptcut_40_50",
-#    "dijetMassHisto_isrptcut_50_60",
+    "dijetMassHisto_isrptcut_50_60",
 #    "dijetMassHisto_isrptcut_60_70",
 
 #    "dijetMassHisto_isrptcut_70_80",
 #    "dijetMassHisto_isrptcut_80_90",
 #    "dijetMassHisto_isrptcut_90_100",
 #    "dijetMassHisto_isrptcut_100_150",
-    "dijetMassHisto_isrptcut_150_200",
+#    "dijetMassHisto_isrptcut_150_200",
 #    "dijetMassHisto_isrptcut_200_300",
 #    "dijetMassHisto_isrptcut_300",
 ]
@@ -90,8 +90,6 @@ print(fitX_min,fitX_max)
 #function = "TMath::Exp([0]) / TMath::Power(x + [2] , 5 + [3] * TMath::Log(x/13000) ) / ( TMath::Exp([1]/(x+[3])) - 1) * (TMath::Cos(TMath::ASin(2*[5]/ TMath::Max((x-[4]),20.) )))"
 
 function = "exp([0])*exp(-[2]*(x/13000))/pow(x/13000,[1])  * (1. - [4]/TMath::Max((x-[3]),1.))"
-#function = "exp([0])*exp(-[2]*(x/13000)-[3]*pow(x/13000,2))/pow(x/13000,[1]) * (1. - [5]/TMath::Max((x-[4]),1.))"
-
 
 #(cos(asin(2*[4]/(x-[5]) * (x>[5]))))
 
@@ -270,7 +268,7 @@ if redoPlot:
 else:
     file_ = ROOT.TFile.Open(fileName)
     try:
-        histoOrig = file_.Get("DijetFilter/dijetMassHisto/dijetMassHisto_isrptcut_80_90").Clone("histoOrig")
+        histoOrig = file_.Get("DijetFilter/dijetMassHisto/dijetMassHisto_isrptcut_50").Clone("histoOrig")
     except:
         pass
         #histoOrig = file_.Get("DijetFilter/dijetMassHisto/dijetMassHisto_isrptcut_50_60").Clone("histoOrig")

@@ -14,8 +14,8 @@ varX_min,  varX_max = 100,1000
 fitX_min,  fitX_max = 250,900
 
 
-massBoundaries = [1, 3, 6, 10, 16, 23, 31, 40, 50, 61, 74, 88, 103, 119, 137, 156, 176, 197, 220, 244, 270, 296, 325, 354, 386, 419, 453, 489, 526, 565, 606, 649, 693, 740, 788, 838,  890, 944, 1000, 1058, 1118, 1181, 1246, 1313, 1383, 1455, 1530, 1607, 1687, 1770, 1856, 1945, 2037, 2132, 2231, 2332, 2438, 2546, 2659, 2775, 2895, 3019, 3147, 3279, 3416, 3558, 3704, 3854, 4010, 4171, 4337, 4509, 4686, 4869, 5058, 5253, 5455, 5663, 5877, 6099, 6328, 6564, 6808,  7060, 7320, 7589, 7866, 8152, 8447, 8752, 9067, 9391, 9726, 10072, 10430, 10798, 11179, 11571, 11977, 12395, 12827, 13272, 13732, 14000]
-#massBoundaries = [i*10 for i in range(1000)]
+#massBoundaries = [1, 3, 6, 10, 16, 23, 31, 40, 50, 61, 74, 88, 103, 119, 137, 156, 176, 197, 220, 244, 270, 296, 325, 354, 386, 419, 453, 489, 526, 565, 606, 649, 693, 740, 788, 838,  890, 944, 1000, 1058, 1118, 1181, 1246, 1313, 1383, 1455, 1530, 1607, 1687, 1770, 1856, 1945, 2037, 2132, 2231, 2332, 2438, 2546, 2659, 2775, 2895, 3019, 3147, 3279, 3416, 3558, 3704, 3854, 4010, 4171, 4337, 4509, 4686, 4869, 5058, 5253, 5455, 5663, 5877, 6099, 6328, 6564, 6808,  7060, 7320, 7589, 7866, 8152, 8447, 8752, 9067, 9391, 9726, 10072, 10430, 10798, 11179, 11571, 11977, 12395, 12827, 13272, 13732, 14000]
+massBoundaries = [i*10 for i in range(1000)]
 
 histoNames = [
 #    "dijetMassHisto_isrptcut_50",
@@ -25,11 +25,11 @@ histoNames = [
 
 #    "dijetMassHisto_isrptcut_70_80",
 #    "dijetMassHisto_isrptcut_80_90",
-#    "dijetMassHisto_isrptcut_90_100",
-#    "dijetMassHisto_isrptcut_100_150",
+    "dijetMassHisto_isrptcut_90_100",
+    "dijetMassHisto_isrptcut_100_150",
     "dijetMassHisto_isrptcut_150_200",
-#    "dijetMassHisto_isrptcut_200_300",
-#    "dijetMassHisto_isrptcut_300",
+    "dijetMassHisto_isrptcut_200_300",
+    "dijetMassHisto_isrptcut_300",
 ]
 
 
@@ -89,15 +89,19 @@ print(fitX_min,fitX_max)
 #function = "exp([0]) / pow(x + [2] , 5 + [3] * log(x/13000) ) / ( exp([1]/(x+[3])) - 1) * (1 - exp(-(x - [4])/[5]))"
 #function = "TMath::Exp([0]) / TMath::Power(x + [2] , 5 + [3] * TMath::Log(x/13000) ) / ( TMath::Exp([1]/(x+[3])) - 1) * (TMath::Cos(TMath::ASin(2*[5]/ TMath::Max((x-[4]),20.) )))"
 
-function = "exp([0])*exp(-[2]*(x/13000))/pow(x/13000,[1])  * (1. - [4]/TMath::Max((x-[3]),1.))"
-#function = "exp([0])*exp(-[2]*(x/13000)-[3]*pow(x/13000,2))/pow(x/13000,[1]) * (1. - [5]/TMath::Max((x-[4]),1.))"
+#function = "exp([0])*exp(-[2]*(x/13000))/pow(x/13000,[1])  * (1. - [4]/TMath::Max((x-[3]),1.))"
+function = "exp([0]*(x/1000)^5+[1]*(x/1000)^4*(1-x/1000)+[2]*(x/1000)^3*(1-x/1000)^2 + [3]*(x/1000)^2*(1-x/1000)^3) + [4]*(x/1000)*(1-x/1000)^4  + [5]*(1-x/1000)^5"
+#function = "exp([0]*(x/1000)^6+[1]*(x/1000)^5*(1-x/1000)+[2]*(x/1000)^4*(1-x/1000)^2 + [3]*(x/1000)^3*(1-x/1000)^3 + [4]*(x/1000)^2*(1-x/1000)^4  + [5]*(x/1000)*(1-x/1000)^5 + [6]*(1-x/1000)^6)"
+#function = "exp([0] + [1]*(x/1000) + [2]*(x/1000)^2 + [3]*(x/1000)^3 + [4]*(x/1000)^4 + [5]*(x/1000)^5 + [6]*(x/1000)^6)"
 
 
-#(cos(asin(2*[4]/(x-[5]) * (x>[5]))))
 
 funct = ROOT.TF1("funct",function,fitX_min,fitX_max)
 
 Npar = funct.GetNpar()
+
+
+funct.SetParameters(7.,2,3,2,2,2,2,0) 
 
 #funct.SetParameter(0,6.800771236849048e-11)
 #funct.SetParameter(0,6.800771236849048e-11*1E7)
@@ -106,75 +110,11 @@ Npar = funct.GetNpar()
 
 #funct.SetParameters(20,10,20,1,-2000,50)
 
-funct.SetParameters(
--2.82676e+00,
-4.49891e+00,
-1.59588e+01,
--1.18618e+02,
-2.79225e+02) ## for exp([0])*exp(-[2]*(x/13000))/pow(x/13000,[1])  * (1. - [4]/TMath::Max((x-[3]),1.))
 
 
+#funct.Draw("")
+#1/0
 
-
-#function = "exp([0]) / pow(x + [2] , 5 + [3] * log(x/13000) ) / ( exp([1]/(x+[3])) - 1) * (1 - exp(-(x - [4])/[5]))"
-   #1  p0           1.89567e+01   9.79767e-03   0.00000e+00   6.70051e-03
-   #2  p1           2.89233e-04   3.24927e-06   0.00000e+00  -5.27674e+01
-   #3  p2           3.03340e+02   1.93413e+00   0.00000e+00  -1.72013e-05
-   #4  p3           4.92751e-01   6.46256e-04   0.00000e+00  -1.74971e+00
-   #5  p4           1.88610e+02   7.41504e-02  -0.00000e+00  -9.24711e-05
-   #6  p5           2.88584e+01   1.47549e-01   0.00000e+00  -6.08030e-05
-
-#function = "exp([0]) / pow(x + [2] , 5 + [3] * log(x/13000) ) / ( exp([1]/(x+[3])) - 1) * (1+TMath::Erf((x - [4])/[5]))"
-   #1  p0           3.41916e+01   6.04875e-02   1.27535e-05   4.63443e-03
-   #2  p1           7.71566e+02   1.94456e+01   3.17761e-03   3.37978e-05
-   #3  p2          -3.83541e+01   4.10499e+00  -7.05108e-04   2.19556e-04
-   #4  p3           3.85846e-01   2.48905e-03  -5.18208e-07  -9.84197e-03
-   #5  p4           2.01895e+02   7.18531e-02   7.20095e-06  -7.70982e-07
-   #6  p5           3.08297e+01   1.79590e-01   9.24568e-06   5.13748e-05
-
-
-funct.FixParameter(Npar-2,-200)
-funct.FixParameter(Npar-1,10)
-
-releaseParam = True
-
-#funct.FixParameter(Npar-3,0)
-#funct.FixParameter(Npar-2,350)
-#funct.FixParameter(Npar-1,30)
-
-#funct.FixParameter(Npar-3,0)
-#funct.FixParameter(Npar-2,350)
-#funct.FixParameter(Npar-1,-10000)
-
-#funct.SetParLimits(Npar-2,250,500)
-#funct.SetParLimits(Npar-1,10,50)
-
-#funct.FixParameter(9,0)
-#funct.FixParameter(10,400)
-#funct.FixParameter(11,400*0.15)
-
-#funct.SetParameters(40,-5,700,-1000,5000)
-
-#funct.FixParameter(4,0)
-#funct.FixParameter(5,100)
-
-#funct.SetParameters(20,10,10,0.1)
-#funct.SetParameters(20,-0.02)
-#funct.SetParameters(4,20)
-#funct.SetParameters(5,-0.02)
-
-#funct.FixParameter(7,-50)
-#funct.FixParameter(8,30)
-#funct.SetParameters(3.42202e+08, -4.19391e+06, 22457.7, -68.0658, 0.127261, 1E-9)
-
-##Exp([0]+[1]*x)
-#funct.SetParameter(0,20)
-#funct.SetParameter(1,-0.02)
-
-#funct.SetParameters(1E-4,10,10,1,150,30)
-#funct.SetParameters(20,-1E-2,1E-6,1E-9,-1E-12)
-#funct.FixParameter(5,0)
-#funct.FixParameter(2,0)
 
 title = "Di-jet mass plot"
 
@@ -241,7 +181,7 @@ canv2 = ROOT.TCanvas()
 canv = ROOT.TCanvas("canv","",640,480)
 canv.SetGridx()
 canv.SetGridy()
-canv.SetLogy(1)
+#canv.SetLogy(1)
 
 ROOT.gStyle.SetOptStat(0)
 #fileName = "/eos/cms/store/group/phys_exotica/dijet/Dijet13TeVScouting/rootTrees_reduced/ScoutingCaloCommissioning_2017-01-18/CommissioningG/rootfile_CaloScoutingCommissioning2016G_JEC_CaloHLT_plus_V10p2_20170119_001201_reduced_skim.root"
@@ -271,6 +211,9 @@ else:
     file_ = ROOT.TFile.Open(fileName)
     try:
         histoOrig = file_.Get("DijetFilter/dijetMassHisto/dijetMassHisto_isrptcut_80_90").Clone("histoOrig")
+        histoOrig.Reset()
+        for h in histoNames:
+            histoOrig.Add(file_.Get("DijetFilter/dijetMassHisto/%s"%h))
     except:
         pass
         #histoOrig = file_.Get("DijetFilter/dijetMassHisto/dijetMassHisto_isrptcut_50_60").Clone("histoOrig")
@@ -342,26 +285,22 @@ histo.Fit(funct,"L","",fitX_min,fitX_max)
 #histo.Fit(funct,"L","",fitX_min,fitX_max )
 #histo.Fit(funct,"L","",fitX_min,fitX_max)
 
+
 print(fitX_min,fitX_max)
 print(funct.GetExpFormula("P"))
-res = histo.Fit(funct,"LS","",fitX_min,fitX_max)
 
+
+
+histo.Fit(funct,"W","",fitX_min,fitX_max)
 histo.Fit(funct,"LS","",fitX_min,fitX_max)
 
-for i in range (10): res = histo.Fit(funct,"IL","",fitX_min,fitX_max)
-print("X"*50)
-if releaseParam:
-    funct.ReleaseParameter(Npar-2)
-    funct.ReleaseParameter(Npar-1)
-    funct.SetParameter(Npar-2,200)
-    funct.SetParameter(Npar-1,40)
 for i in range (10): res = histo.Fit(funct,"IL","",fitX_min,fitX_max)
 print("X"*50)
 res = histo.Fit(funct,"IL","",fitX_min,fitX_max)
 res = histo.Fit(funct,"ILS","",fitX_min,fitX_max)
 
-#res = histo.Fit(funct,"ILSW","",fitX_min,fitX_max)
-#res = histo.Fit(funct,"ILSW","",fitX_min,fitX_max)
+res = histo.Fit(funct,"ILSW","",fitX_min,fitX_max)
+res = histo.Fit(funct,"ILSW","",fitX_min,fitX_max)
 
 
 '''
@@ -382,26 +321,15 @@ res = histo.Fit(funct,"LS","",fitX_min,fitX_max)
 
 
 
-print(res.Prob())
-print(res.Chi2())
+try:
+    print(res.Prob())
+    print(res.Chi2())
+except:
+    pass
 
-#funct.FixParameter(3,0)
-#funct.FixParameter(4,0)
-#histo.Fit(funct)
-#funct.ReleaseParameter(2)
-#funct.ReleaseParameter(3)
-#funct.ReleaseParameter(4)
-#funct.SetParameter(2,1000)
-#funct.SetParameter(3,200)
-#funct.SetParameter(4,30)
-#histo.Fit(funct)
-#histo.Fit(funct)
-#histo.Fit(funct)
-#histo.Fit(funct)
 histo.SetTitle(title)
 
 canv.Draw()
-
 yPadSeparation = 0.25
 padPlot = ROOT.TPad("padPlot","",0.,yPadSeparation,1.,1.)
 padPlot.SetBottomMargin(.02)
@@ -414,10 +342,11 @@ padRatio.SetGridx()
 padRatio.SetGridy()
 padPlot.SetGridx()
 padPlot.SetGridy()
-padPlot.SetLogy(1)
+#padPlot.SetLogy(1)
 padPlot.cd()
 histo.Draw("HIST")
 funct.Draw("same")
+
 
 
 padPlot.SetTitle(title)
@@ -436,3 +365,58 @@ padRatio.Draw()
 canv.SaveAs(histo.GetName()+".png")
 canv.SaveAs(histo.GetName()+".root")
 canv.SaveAs(histo.GetName()+".C")
+
+print(funct.GetExpFormula("P"))
+
+
+"""
+############################
+
+
+
+#function = "exp([0]*x+[1]*(1000.-x))"
+#funct = ROOT.TF1("funct",function,fitX_min,fitX_max)
+#funct.SetParameters(7.34831e-03, 7.34831e-03) 
+
+#function = "exp([0]*x^2+2*[1]*(1000.-(x*500))*(x/500)+[2]*(1000.-(x/500))^2) "
+#funct = ROOT.TF1("funct",function,fitX_min,fitX_max)
+#funct.SetParameters(4.00778e-06,1.31945e-05,1.93936e-06) 
+
+#function = "exp([0]*(x/1000)^2+[1]*(x/1000)*(1-x/1000)+[2]*(1-x/1000)) "
+#funct = ROOT.TF1("funct",function,fitX_min,fitX_max)
+#funct.SetParameters(4.,20,2) 
+
+
+
+
+#function = "exp([0]*(x/500)^3+2*[1]*(1000.-(x/500))*(x/500)^2+[2]*(1000.-(x/500))^2*(x/3))  + [3]*(1000.-(x/500))^3"
+#funct = ROOT.TF1("funct",function,fitX_min,fitX_max)
+#funct.SetParameters(3.62874e+00,-7.77232e-03,4.06293e-08,-1.22258e-06) 
+
+#function = "exp([0]*(x/1000)^3+[1]*(x/1000)^2*(1-x/1000)+[2]*(x/1000)*(1-x/1000)^2 + [3]*(1-x/1000)^3) "
+#funct = ROOT.TF1("funct",function,fitX_min,fitX_max)
+#funct.SetParameters(4.,2,3,2) 
+
+#function = "exp([0]*(x/1000)^4+[1]*(x/1000)^3*(1-x/1000)+[2]*(x/1000)^2*(1-x/1000)^2 + [3]*(x/1000)*(1-x/1000)^3) + [4]*(1-x/1000)^4 "
+#funct = ROOT.TF1("funct",function,fitX_min,fitX_max)
+#funct.SetParameters(4.,2,3,2,2) 
+
+function = "exp([0]*(x/1000)^5+[1]*(x/1000)^4*(1-x/1000)+[2]*(x/1000)^3*(1-x/1000)^2 + [3]*(x/1000)^2*(1-x/1000)^3) + [4]*(x/1000)*(1-x/1000)^4  + [5]*(1-x/1000)^5"
+funct = ROOT.TF1("funct",function,fitX_min,fitX_max)
+funct.SetParameters(4.,2,3,2,2,2) 
+
+
+
+#function = "exp([0] + [1]*(x/1000) + [2]*(x/1000)^2 + [3]*(x/1000)^3)"
+#funct = ROOT.TF1("funct",function,fitX_min,fitX_max)
+#funct.SetParameters(-7,0.01,0.0001,0.00001, 0.01) 
+
+
+#res = histo.Fit(funct,"W","",fitX_min,fitX_max)
+#for i in range(10): res = histo.Fit(funct,"L","",fitX_min,fitX_max)
+#funct.Draw("")
+#1/0
+#res = histo.Fit(funct,"L","",fitX_min,fitX_max)
+#res = histo.Fit(funct,"L","",fitX_min,fitX_max)
+
+"""

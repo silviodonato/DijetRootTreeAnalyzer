@@ -9,7 +9,7 @@ import re
 
 gStyle.SetOptStat(0)
 default_dir = "output_20180418_163054"
-default_mass = "300,400,500,600"
+default_mass = "150,200,300,400,500,600,800,1000"
 usage = "usage: %prog [options]"
 parser = optparse.OptionParser(usage)
 
@@ -33,9 +33,9 @@ massBoundaries = array('f',[  1, 3, 6, 10, 16, 23, 31, 40, 50, 61, 74, 88, 103, 
                     5455, 5663, 5877, 6099, 6328, 6564, 6808, 7060, 7320, 7589, 7866,
                     8152, 8447, 8752, 9067, 9391, 9726, 10072, 10430, 10798, 11179,
                     11571, 11977, 12395, 12827, 13272, 13732, 14000])
-getHistoNBins = {"mjj": 10000, "mjj_ratio": 75  }
+getHistoNBins = {"mjj": 10000, "mjj_ratio": 50  }
 getHistoMin   = {"mjj": 0,     "mjj_ratio": 0   }
-getHistoMax   = {"mjj": 10000, "mjj_ratio": 1.5 }
+getHistoMax   = {"mjj": 10000, "mjj_ratio": 5.0 }
 
 # h_mjj_fullSel_varBin = TH1F("h_mjj_fullSel_varBin", "",
 #                                       103, massBoundaries)
@@ -132,7 +132,8 @@ h_mjj_ratio_jerUp_array = {}
 h_mjj_ratio_jerDown_array = {}
 h_mjj_ratio_jesUp_array = {}
 h_mjj_ratio_jesDown_array = {}
-def prob_mass(rootTree, var, outputFileName):
+def prob_mass(rootTree, var, outputFileName, acceptances):
+    print("acceptances = ",acceptances)
     mass_array = []
     f = {}
     for m,t in rootTree.iteritems():
@@ -141,6 +142,18 @@ def prob_mass(rootTree, var, outputFileName):
     for i,m in enumerate(mass_array):
         mass = m
         tree = rootTree[str(int(m))]
+        nentries    = tree.Draw("","")
+        acceptance  = acceptances[str(int(m))]
+        print("m = "  + str(int(m)))
+        print("acceptance"  + str(acceptance))
+    
+        h_mjj_ratio.SetBinContent(0,1.*nentries*(1.-acceptance))
+        h_mjj_ratio_nom.SetBinContent(0,1.*nentries*(1.-acceptance))
+        h_mjj_ratio_jerUp.SetBinContent(0,1.*nentries*(1.-acceptance))
+        h_mjj_ratio_jerDown.SetBinContent(0,1.*nentries*(1.-acceptance))
+        h_mjj_ratio_jesUp.SetBinContent(0,1.*nentries*(1.-acceptance))
+        h_mjj_ratio_jesDown.SetBinContent(0,1.*nentries*(1.-acceptance))
+        
         for entry in tree:
             isr_pt      = tree.isr_pt
             jet2_pt     = tree.jet2_pt
@@ -148,15 +161,16 @@ def prob_mass(rootTree, var, outputFileName):
             jet1_pt     = tree.jet1_pt
             dijet_mass  = tree.dijet_mass
             mjj         = dijet_mass
-
+           
+            
             if isr_pt > 50 and jet2_pt>45  and abs(dijet_deta)<1.2 and jet1_pt>90:
                 x1 = r.Gaus()
                 x2 = r.Gaus()
                 x3 = r.Gaus()
 
                 mjj_nom = dijet_mass*(1.+jes)*(1.+smearFunc.Eval(dijet_mass)*x1)
-                mjj_jerUp = dijet_mass*(1.+jes)*(1.+smearJerUpFunc.Eval(dijet_mass)*x2)
-                mjj_jerDown = dijet_mass*(1.+jes)*(1.+smearJerDownFunc.Eval(dijet_mass)*x3)
+                mjj_jerUp = dijet_mass*(1.+jes)*(1.+smearJerUpFunc.Eval(dijet_mass)*x1) ## it was x2
+                mjj_jerDown = dijet_mass*(1.+jes)*(1.+smearJerDownFunc.Eval(dijet_mass)*x1) ## it was x3
                 mjj_jesUp = dijet_mass*(1.+jesUp)*(1.+smearFunc.Eval(dijet_mass)*x1)
                 mjj_jesDown = dijet_mass*(1.+jesDown)*(1.+smearFunc.Eval(dijet_mass)*x1)
                 mjj_ratio = dijet_mass/mass
@@ -191,7 +205,15 @@ def prob_mass(rootTree, var, outputFileName):
                 # h_mjj_ratio_jerDown.SetBinError(mjj_ratio_jerDown)
                 # h_mjj_ratio_jesUp.Fill(mjj_ratio_jesUp)
                 # h_mjj_ratio_jesDown.Fill(mjj_ratio_jesDown)
-
+            else:
+                h_mjj_ratio.Fill(-1)
+                h_mjj_ratio_nom.Fill(-1)
+                h_mjj_ratio_jerUp.Fill(-1)
+                h_mjj_ratio_jerDown.Fill(-1)
+                h_mjj_ratio_jesUp.Fill(-1)
+                h_mjj_ratio_jesDown.Fill(-1)
+        print("total acceptance"  + str((h_mjj_ratio.Integral()/h_mjj_ratio.Integral(0,100000))))
+        
         # h_mjj_ratio_array[str(int(mass))] = h_mjj_ratio.Clone()
         # h_mjj_ratio_array[str(int(mass))].SetName("h_qq_"+'CaloScoutingNotTheRightOne_'+str(int(mass))+'_WJ')
 
@@ -210,7 +232,7 @@ def prob_mass(rootTree, var, outputFileName):
         h_mjj_ratio_jesDown_array[str(int(mass))] = h_mjj_ratio_jesDown.Clone()
         h_mjj_ratio_jesDown_array[str(int(mass))].SetName("h_qq_"+'CaloScoutingJESDOWN_'+str(int(mass))+'_WJ')
 
-
+        
         # h_mjj_fullSel_varBin.Write()
         # h_mjj_nom_fullSel_varBin.Write()
         # h_mjj_jerUp_fullSel_varBin.Write()
@@ -242,16 +264,32 @@ def prob_mass(rootTree, var, outputFileName):
 
 def mass_shapes(directory, mass, var, outputFileName):
     rootTree = {}
+    eventCounter = {}
+    acceptances = {}
     pathlist = os.listdir(directory)
     # print data
     mass = re.split(",|, ", mass)
     for m in mass:
         rootTree[m] = TChain("rootTupleTree/tree")
+        pass_ = 0
+        total_ = 0
         for file in pathlist:
             if ('rootfile_list_VectorDiJet1Jet_'+m) in file and 'reduced_skim.root' in file:
                 rootTree[m].Add(directory+"/"+file)
                 fileName = file
-    prob_mass(rootTree, var, outputFileName)
+                file_ = TFile.Open(directory+"/"+file)
+                histoCount = file_.Get("DijetFilter/EventCount/EventCounter")
+                print(directory+"/"+file)
+                total_ += histoCount.GetBinContent(1)
+                pass_ += histoCount.GetBinContent(3)
+        print(pass_ , total_)
+        if total_>0:
+                acceptances[m] = 1.* pass_ / total_
+                print("acceptances " + str(m) + " " + str(acceptances[m]))
+        else:
+                acceptances[m] = 0
+                print("total = 0")
+    prob_mass(rootTree, var, outputFileName, acceptances)
 
 
 mass_shapes(options.dir, options.mass, options.var, outputFileName)
