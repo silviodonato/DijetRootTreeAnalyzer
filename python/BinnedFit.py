@@ -917,7 +917,7 @@ if __name__ == '__main__':
         else:
             myRebinnedDensityTH1.SetMinimum(2e-5)
     elif 'CaloTrijet' in box:
-        myRebinnedDensityTH1.SetMaximum(2e3)
+        myRebinnedDensityTH1.SetMaximum(2e4)
         myRebinnedDensityTH1.SetMinimum(2e-5)
     myRebinnedDensityTH1.Draw("axis")
 
@@ -1025,6 +1025,7 @@ if __name__ == '__main__':
     pave_sel.SetTextFont(42)
     pave_sel.SetTextSize(0.045)
     pave_sel.SetTextAlign(11)
+    print("Chi2: %s"%list_chi2AndNdf_background[4])
     pave_sel.AddText("#chi^{{2}} / NDF = {0:.1f} / {1:d} = {2:.1f}".format(
                           list_chi2AndNdf_background[4], list_chi2AndNdf_background[5],
                           list_chi2AndNdf_background[4]/list_chi2AndNdf_background[5]))
