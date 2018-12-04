@@ -430,9 +430,13 @@ if __name__ == '__main__':
             else:
                 rootFile = rt.TFile(f)
                 names = [k.GetName() for k in rootFile.GetListOfKeys()]
-                if histoName in names:
+                try:
                     myTH1 = rootFile.Get(histoName)
                     myTH1.Print('v')
+                except:
+                    print("%s not found in %s"%(histoName,f))
+    print("signalFileName",signalFileName)
+    print("myTH1",myTH1)
 
     w = rt.RooWorkspace("w"+box)
 

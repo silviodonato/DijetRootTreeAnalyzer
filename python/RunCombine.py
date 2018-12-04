@@ -141,7 +141,37 @@ def submit_jobs(options,args):
             if not options.dryRun:
                 time.sleep(3)
                 os.system("bsub -q "+options.queue+" -o "+pwd+"/"+ffDir+"/log.log source "+pwd+"/"+outputname)
-    
+
+def submit_jobs_uzh(options,args):    
+    pwd = os.environ['PWD']
+    exec_me("mkdir -p %s"%(options.outDir),False)
+    exec_me("mkdir -p submit_limits",False)
+    exec_me("mkdir -p submit_limits/log",False)
+    opts = sys.argv[:]
+    idx = opts.index("--queue")
+    del opts[idx]
+    del opts[idx]
+    idx = opts.index("--mass")
+    del opts[idx]
+    del opts[idx]
+    command = " ".join(opts)
+    for massPoint in massIterable(options.mass):
+        commandMass = "python " + command + " --mass "+str(massPoint)
+        fileName = 'submit_limits/lauch_%s.sh'%(str(massPoint))
+        pwd = os.environ['PWD']
+        print('######### Creating %s ############'%fileName)
+        txt = open(fileName,'w')
+        txt.write("""
+#!/bin/bash
+source /cvmfs/cms.cern.ch/cmsset_default.sh
+export SCRAM_ARCH=slc6_amd64_gcc530
+cd %s
+eval `scramv1 runtime -sh`
+%s
+"""%(pwd,commandMass))
+        txt.close()
+        exec_me("qsub -o %s/submit_limits/log -e %s/submit_limits/log -q %s.q %s"%(pwd,pwd,options.queue.replace(".q",""),fileName),options.dryRun)
+
 def main(options,args):
     
     boxes = options.box.split('_')
@@ -155,11 +185,15 @@ def main(options,args):
     rRangeStringList = []
     sysStringList = []
     
-    pdfIndexMap = {'modexp': 0,
+    pdfIndexMap = {#'fourparam': 0,
+                   'modexp': 0,
                    'fiveparam': 1,
                    'atlas': 2,
+                   'atlas6': 3,
+                   'silvio5': 4,
+                   'silvio6': 5,
                    }
-        
+    
     for box,lumi in zip(boxes,lumiFloat):
 
         paramDict = {}
@@ -192,10 +226,13 @@ def main(options,args):
             elif box=='CaloDijet2016':
                 signalSys  =   '--jesUp inputs/ResonanceShapes_%s_13TeV_CaloScouting_Spring16_JESUP.root --jesDown inputs/ResonanceShapes_%s_13TeV_CaloScouting_Spring16_JESDOWN.root'%(model,model)
                 signalSys += ' --jerUp inputs/ResonanceShapes_%s_13TeV_CaloScouting_Spring16_JERUP.root --jerDown inputs/ResonanceShapes_%s_13TeV_CaloScouting_Spring16_JERDOWN.root'%(model,model)
+            elif box=='CaloTrijet2016':
+                signalSys  =   '--jesUp inputs/ResonanceShapes_%s_13TeV_CaloScouting_2016_JESUP.root --jesDown inputs/ResonanceShapes_%s_13TeV_CaloScouting_2016_JESDOWN.root'%(model,model)
+                signalSys += ' --jerUp inputs/ResonanceShapes_%s_13TeV_CaloScouting_2016_JERUP.root --jerDown inputs/ResonanceShapes_%s_13TeV_CaloScouting_2016_JERDOWN.root'%(model,model)
             elif box=='PFDijet2016':
                 signalSys  =   '--jesUp inputs/ResonanceShapes_%s_13TeV_Spring16_JESUP.root --jesDown inputs/ResonanceShapes_%s_13TeV_Spring16_JESDOWN.root'%(model,model)
                 signalSys += ' --jerUp inputs/ResonanceShapes_%s_13TeV_Spring16_JERUP.root'%(model)
-        
+       
         penaltyString = ''
         if options.penalty:
             penaltyString = '--penalty'
@@ -209,6 +246,8 @@ def main(options,args):
             signalDsName = 'inputs/ResonanceShapes_%s_13TeV_CaloScouting_Spring15.root'%model
         elif box=='CaloDijet2016':
             signalDsName = 'inputs/ResonanceShapes_%s_13TeV_CaloScouting_Spring16.root'%model
+        elif box=='CaloTrijet2016':
+            signalDsName = 'inputs/ResonanceShapes_%s_13TeV_CaloScouting_2016.root'%model
         elif box=='PFDijet2016':
             signalDsName = 'inputs/ResonanceShapes_%s_13TeV_Spring16.root'%model
         elif 'PFDijetbb2016' in box:
@@ -217,6 +256,7 @@ def main(options,args):
         backgroundDsName = {'CaloDijet2015':'inputs/data_CaloScoutingHT_Run2015D_BiasCorrected_CaloDijet2015.root',
                             #'CaloDijet2016':'inputs/data_CaloScoutingHT_Run2016BCD_NewBiasCorrectedFlat_Golden12910pb_CaloDijet2016.root',
                             'CaloDijet2016':'inputs/data_CaloScoutingHT_Run2016BCDEFG_BiasCorrected_Mjj300_Golden27637pb_CaloDijet2016.root',
+                            'CaloTrijet2016':'inputs/full.root',
                             #'PFDijet2016':'inputs/data_PFRECOHT_Run2016BCD_Golden12910pb_PFDijet2016.root',
                             'CaloDijet20152016':'inputs/data_CaloScoutingHT_Run2015D2016B_CaloDijet20152016.root',
                             'PFDijet2016':'inputs/JetHT_run2016_moriond17_red_cert_v2.root',
@@ -245,6 +285,12 @@ def main(options,args):
                 sysString += ',pm1_CaloDijet2016,pm2_CaloDijet2016,pm3_CaloDijet2016,pm4_CaloDijet2016'
             if options.fitPdf != 'atlas':
                 sysString += ',pa1_CaloDijet2016,pa2_CaloDijet2016,pa3_CaloDijet2016,pa4_CaloDijet2016'
+            if options.fitPdf != 'atlas6':
+                sysString += ',pa1_CaloDijet2016,pa2_CaloDijet2016,pa3_CaloDijet2016,pa4_CaloDijet2016,pa5_CaloDijet2016'
+            if options.fitPdf != 'silvio5':
+                sysString += ',ps1_CaloTrijet2016,ps2_CaloTrijet2016,ps3_CaloDijet2016,ps4_CaloTrijet2016'
+            if options.fitPdf != 'silvio6':
+                sysString += ',ps1_CaloTrijet2016,ps2_CaloTrijet2016,ps3_CaloDijet2016,ps4_CaloTrijet2016,ps5_CaloTrijet2016'
             
         sysStringList.append(sysString)
 
@@ -294,7 +340,7 @@ def main(options,args):
                         rRangeString =  '--setPhysicsModelParameterRanges r=0,%f'%(options.rMax)                
                         rRangeStringList.append(rRangeString)
                     if len(boxes)==1:
-                        exec_me('combine -M Asymptotic -H ProfileLikelihood %s/dijet_combine_%s_%s_lumi-%.3f_%s.txt -n %s_%s_lumi-%.3f_%s --minimizerTolerance %f --minimizerStrategy %i %s --saveWorkspace %s %s'%(options.outDir,model,massPoint,lumi,box,model,massPoint,lumi,box,options.min_tol,options.min_strat,rRangeString,blindString,sysString),options.dryRun)
+                        exec_me('combine  --minosAlgo bisection --newExpected false -M Asymptotic -H ProfileLikelihood %s/dijet_combine_%s_%s_lumi-%.3f_%s.txt -n %s_%s_lumi-%.3f_%s --minimizerTolerance %f --minimizerStrategy %i %s --saveWorkspace %s %s'%(options.outDir,model,massPoint,lumi,box,model,massPoint,lumi,box,options.min_tol,options.min_strat,rRangeString,blindString,sysString),options.dryRun)
                         exec_me('mv higgsCombine%s_%s_lumi-%.3f_%s.Asymptotic.mH120.root %s/'%(model,massPoint,lumi,box,options.outDir),options.dryRun)
     if len(boxes)>1:
         lumiTotal = sum(lumiFloat)
@@ -333,7 +379,7 @@ def main(options,args):
                 rRangeString = ''
                 if options.rMax>-1:                
                     rRangeString =  '--setPhysicsModelParameterRanges r=0,%f'%(options.rMax)
-                exec_me('combine -M Asymptotic -H ProfileLikelihood %s/dijet_combine_%s_%s_lumi-%.3f_%s.txt -n %s_%s_lumi-%.3f_%s --minimizerTolerance %f --minimizerStrategy %i %s --saveWorkspace %s %s'%(options.outDir,model,massPoint,lumiTotal,options.box,model,massPoint,lumiTotal,options.box,options.min_tol,options.min_strat,rRangeString,blindString,sysString),options.dryRun)
+                exec_me('combine  --minosAlgo bisection -M Asymptotic %s/dijet_combine_%s_%s_lumi-%.3f_%s.txt -n %s_%s_lumi-%.3f_%s --minimizerTolerance %f --minimizerStrategy %i %s --saveWorkspace %s %s'%(options.outDir,model,massPoint,lumiTotal,options.box,model,massPoint,lumiTotal,options.box,options.min_tol,options.min_strat,rRangeString,blindString,sysString),options.dryRun)
                 exec_me('mv higgsCombine%s_%s_lumi-%.3f_%s.Asymptotic.mH120.root %s/'%(model,massPoint,lumiTotal,options.box,options.outDir),options.dryRun)
             for box,lumi in zip(boxes,lumiFloat): exec_me('rm dijet_combine_%s_%s_lumi-%.3f_%s.txt'%(model,massPoint,lumi,box),options.dryRun)
     
@@ -382,7 +428,7 @@ if __name__ == '__main__':
                   help="decorrelate shape parameters")
     parser.add_option('--tag',dest="tag", default='master',type="string",
                   help="tag for repository")
-    parser.add_option('-q','--queue',dest="queue",default="1nh",type="string",
+    parser.add_option('-q','--queue',dest="queue",default=None,type="string",
                   help="queue: 1nh, 8nh, 1nd, etc.")
     parser.add_option('-t','--toys',dest="toys",default=-1,type="int",
                   help="number of toys per job(for bayesian expected limits)")
@@ -395,7 +441,9 @@ if __name__ == '__main__':
     (options,args) = parser.parse_args()
 
 
-    if options.jobs:
+    if options.queue and options.queue.replace(".q","") in ["short", "long", "all",]:
+        submit_jobs_uzh(options,args)
+    elif options.jobs:
         submit_jobs(options,args)
     else:            
         main(options,args)
