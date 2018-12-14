@@ -83,7 +83,7 @@ def main(options,args):
             entry = elist.Next()
             if entry == -1: break
             xsecTree.GetEntry(entry)
-            rDict[int(eval('xsecTree.mass'))] = eval('xsecTree.xsecULExp_%s'%box)/options.xsec
+            rDict[int(eval('xsecTree.mass'))] = eval('xsecTree.xsecULExp_%s'%box)/options.xsec * 5./2 # fact 5/2 is to pass from 2sigma exclusion to 5sigma excess 
     else:
         for massPoint in massIterable(options.mass):
             rDict[int(massPoint)] = options.r
@@ -110,7 +110,28 @@ def main(options,args):
         freezeStringGen += ',p1s5_CaloTrijet2016,p2s5_CaloTrijet2016,p3s5_CaloTrijet2016,p4s5_CaloTrijet2016'
     if options.fitPdf != 'silvio6':
         freezeStringGen += ',p1s6_CaloTrijet2016,p2s6_CaloTrijet2016,p3s6_CaloTrijet2016,p4s6_CaloTrijet2016,p5s6_CaloTrijet2016'
-
+#    if options.fitPdf != 'silviobias4':
+#        freezeStringGen += ',p1sb4_CaloTrijet2016,p2sb4_CaloTrijet2016,p3sb4_CaloTrijet2016'
+    if options.fitPdf != 'nom7':
+        freezeStringGen += ',p7nom1_CaloTrijet2016,p7nom2_CaloTrijet2016,p7nom3_CaloTrijet2016,p7nom4_CaloTrijet2016,p7nom5_CaloTrijet2016,p7nom6_CaloTrijet2016'
+    if options.fitPdf != 'nom6':
+        freezeStringGen += ',p6nom1_CaloTrijet2016,p6nom2_CaloTrijet2016,p6nom3_CaloTrijet2016,p6nom4_CaloTrijet2016,p6nom5_CaloTrijet2016'
+    if options.fitPdf != 'nom5':
+        freezeStringGen += ',p5nom1_CaloTrijet2016,p5nom2_CaloTrijet2016,p5nom3_CaloTrijet2016,p5nom4_CaloTrijet2016'
+    if options.fitPdf != 'nom4':
+        freezeStringGen += ',p4nom1_CaloTrijet2016,p4nom2_CaloTrijet2016,p4nom3_CaloTrijet2016'
+    if options.fitPdf != 'nom3':
+        freezeStringGen += ',p3nom1_CaloTrijet2016,p3nom2_CaloTrijet2016'
+    if options.fitPdf != 'alt7':
+        freezeStringGen += ',p7alt1_CaloTrijet2016,p7alt2_CaloTrijet2016,p7alt3_CaloTrijet2016,p7alt4_CaloTrijet2016,p7alt5_CaloTrijet2016,p7alt6_CaloTrijet2016'
+    if options.fitPdf != 'alt6':
+        freezeStringGen += ',p6alt1_CaloTrijet2016,p6alt2_CaloTrijet2016,p6alt3_CaloTrijet2016,p6alt4_CaloTrijet2016,p6alt5_CaloTrijet2016'
+    if options.fitPdf != 'alt5':
+        freezeStringGen += ',p5alt1_CaloTrijet2016,p5alt2_CaloTrijet2016,p5alt3_CaloTrijet2016,p5alt4_CaloTrijet2016'
+    if options.fitPdf != 'alt4':
+        freezeStringGen += ',p4alt1_CaloTrijet2016,p4alt2_CaloTrijet2016,p4alt3_CaloTrijet2016'
+    if options.fitPdf != 'alt3':
+        freezeStringGen += ',p3alt1_CaloTrijet2016,p3alt2_CaloTrijet2016'
 
 
     fixStringFit = '--setPhysicsModelParameters pdf_index=%i'%(pdfIndexMap[options.fitPdf])
@@ -131,7 +152,27 @@ def main(options,args):
         freezeStringFit += ',p1s5_CaloTrijet2016,p2s5_CaloTrijet2016,p3s5_CaloTrijet2016,p4s5_CaloTrijet2016'
     if options.fitPdf != 'silvio6':
         freezeStringFit += ',p1s6_CaloTrijet2016,p2s6_CaloTrijet2016,p3s6_CaloTrijet2016,p4s6_CaloTrijet2016,p5s6_CaloTrijet2016'
-    
+    if options.fitPdf != 'nom7':
+        freezeStringFit += ',p7nom1_CaloTrijet2016,p7nom2_CaloTrijet2016,p7nom3_CaloTrijet2016,p7nom4_CaloTrijet2016,p7nom5_CaloTrijet2016,p7nom6_CaloTrijet2016'
+    if options.fitPdf != 'nom6':
+        freezeStringFit += ',p6nom1_CaloTrijet2016,p6nom2_CaloTrijet2016,p6nom3_CaloTrijet2016,p6nom4_CaloTrijet2016,p6nom5_CaloTrijet2016'
+    if options.fitPdf != 'nom5':
+        freezeStringFit += ',p5nom1_CaloTrijet2016,p5nom2_CaloTrijet2016,p5nom3_CaloTrijet2016,p5nom4_CaloTrijet2016'
+    if options.fitPdf != 'nom4':
+        freezeStringFit += ',p4nom1_CaloTrijet2016,p4nom2_CaloTrijet2016,p4nom3_CaloTrijet2016'
+    if options.fitPdf != 'nom3':
+        freezeStringFit += ',p3nom1_CaloTrijet2016,p3nom2_CaloTrijet2016'
+    if options.fitPdf != 'alt7':
+        freezeStringFit += ',p7alt1_CaloTrijet2016,p7alt2_CaloTrijet2016,p7alt3_CaloTrijet2016,p7alt4_CaloTrijet2016,p7alt5_CaloTrijet2016,p7alt6_CaloTrijet2016'
+    if options.fitPdf != 'alt6':
+        freezeStringFit += ',p6alt1_CaloTrijet2016,p6alt2_CaloTrijet2016,p6alt3_CaloTrijet2016,p6alt4_CaloTrijet2016,p6alt5_CaloTrijet2016'
+    if options.fitPdf != 'alt5':
+        freezeStringFit += ',p5alt1_CaloTrijet2016,p5alt2_CaloTrijet2016,p5alt3_CaloTrijet2016,p5alt4_CaloTrijet2016'
+    if options.fitPdf != 'alt4':
+        freezeStringFit += ',p4alt1_CaloTrijet2016,p4alt2_CaloTrijet2016,p4alt3_CaloTrijet2016'
+    if options.fitPdf != 'alt3':
+        freezeStringFit += ',p3alt1_CaloTrijet2016,p3alt2_CaloTrijet2016'
+
     pwd = os.environ['PWD']
     for massPoint in massIterable(options.mass):
 #        rDict[int(massPoint)] = -0.1
@@ -183,9 +224,9 @@ if __name__ == '__main__':
                   help="Output directory to store everything")
     parser.add_option('-t','--toys',dest="toys",default=1000,type="int",
                   help="number of toys")
-    parser.add_option('--gen-pdf',dest="genPdf", default="fiveparam", choices=['modexp','fiveparam','atlas','atlas6','silvio4','silvio5','silvio6'],
+    parser.add_option('--gen-pdf',dest="genPdf", default="fiveparam", choices=['modexp','fiveparam','atlas','atlas6','silvio4','silvio5','silvio6','nom3','alt3','nom4','alt4','nom5','alt5','nom6','alt6','nom7','alt7'],
                   help="pdf for generating")
-    parser.add_option('--fit-pdf',dest="fitPdf", default="fiveparam", choices=['modexp','fiveparam','atlas','atlas6','silvio4','silvio5','silvio6'],
+    parser.add_option('--fit-pdf',dest="fitPdf", default="fiveparam", choices=['modexp','fiveparam','atlas','atlas6','silvio4','silvio5','silvio6','nom3','alt3','nom4','alt4','nom5','alt5','nom6','alt6','nom7','alt7'],
                   help="pdf for fitting")
     parser.add_option('--asymptotic-file',dest="asymptoticFile",default=None,type="string",
                   help="load asymptotic cross section results file")
@@ -202,7 +243,17 @@ if __name__ == '__main__':
                    'atlas6': 3,
                    'silvio4': 4,
                    'silvio5': 5,
-                   'silvio6': 6
+                   'silvio6': 6,
+                   'nom3': 7,
+                   'nom4': 8,
+                   'nom5': 9,
+                   'nom6': 10,
+                   'nom7': 11,
+                   'alt3': 12,
+                   'alt4': 13,
+                   'alt5': 14,
+                   'alt6': 15,
+                   'alt7': 16,
                    }
 
     box = options.box
