@@ -152,7 +152,8 @@ def getHybridCLsArrays(directory, model, Box, bayes):
         xsecULObs = xsecULObs
         xsecULExp = xsecULExp
 
-        acceptance = acc_dict[matching][int(xsecTree.mass)]
+        if isCouplingLimit:
+            acceptance = acc_dict[matching][int(xsecTree.mass)]
         xsec_table = table_xsec['DM1GeV'][int(xsecTree.mass)]
 
         if isCouplingLimit:
@@ -168,6 +169,8 @@ def getHybridCLsArrays(directory, model, Box, bayes):
             expectedLimit.append(gqULExp)
         else:
             expectedLimit.append(xsecULExp)#*crossSections[i])
+
+        print("%s\tMass %s\tLimit %s\tAcceptance %s\tXsect %s"%(matching, int(xsecTree.mass), xsecULExp, acceptance, xsec_table))
 
         xsecULExpPlus = max(xsecULExpPlus,xsecULExp)
         xsecULExpMinus = min(xsecULExpMinus,xsecULExp)
@@ -484,8 +487,8 @@ if __name__ == '__main__':
                   help="for no systematics limits")
     parser.add_option('--coupling',dest="isCouplingLimit",default=False,type="string",
                   help="calculate coupling limits")
-    parser.add_option('--matching',dest="matching",default="jets01",#type="string",
-                  help="apply matching", choices=["jets01", "jets02", "jets12", "jetsij"])
+#    parser.add_option('--matching',dest="matching",default="jets01",#type="string",
+#                  help="apply matching", choices=["jets01", "jets02", "jets12", "jetsij"])
 
 
     (options,args) = parser.parse_args()
@@ -496,7 +499,7 @@ if __name__ == '__main__':
     Box = Boxes[0]
     box = Box.lower()
     isCouplingLimit = options.isCouplingLimit
-    matching = options.matching
+    matching = options.isCouplingLimit
     # acc_dict = acceptance_func(matching)
 
     thyXsecDict = getThyXsecDict()
