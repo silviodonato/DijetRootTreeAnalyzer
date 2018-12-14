@@ -3,7 +3,7 @@ import array
 import copy
 #import RooFit
 
-ROOT.gROOT.SetBatch(0)
+ROOT.gROOT.SetBatch(1)
 
 matchings = [
 "jets12",
@@ -12,8 +12,8 @@ matchings = [
 ]
 
 masses = [
-    200, 300, 400, 500, 600, 800, 1000
-#    500
+#    200, 300, 400, 500, 600, 800, 1000
+    400
 ]
 
 
@@ -82,23 +82,27 @@ for matching in matchings:
         #w.factory("norm*Exponential::expo(x[0,1000],mean[-0.02,-10,10],norm[1000,0,1000000])")
         #w.factory("EXPR::expo('exp(x*mean  )',x[0,1000],mean[-0.002,-10,10])")
         #w.factory("norm*EXPR::expo('exp(x*mean  )',x[0,1000],mean[-0.002,-10,10],norm[1000,0,1000000])")
-        w.factory("EXPR::expo('exp(x*mean + x*x*p2  )',x[270,1000],mean[-0.002,-1,0],p2[0,-10,10])")
+        w.factory("EXPR::expo('exp(x*mean + x*x*p2  )',x[270,1000],mean[-0.015,-1,0],p2[0,-10,10])")
 #        w.factory("EXPR::expo_('exp(x*mean + x*x*p2  )',x[270,1000],mean[-0.002,-10,10],p2[0,-10,10])")
         w.factory("ExtendPdf::expoExt(expo,normBkg[1e3,0,1e9])")
+        w.factory("EXPR::expoSig('exp(x*meanSig)*(1-fractN) + fractN*exp( ((x-massCenter)/sigma)**2)',x[270,1000],meanSig[-0.015,-1,0],massCenter[500,200,1000],sigma[50,10,300],fractN[1,0,1])")
+#        w.factory("ExtendPdf::expoExt(expo,normSig[1e3,0,1e9])")
 
 
-        normSig = ROOT.RooRealVar("normSig","normSig",0,1e6)
+        normSig = ROOT.RooRealVar("normSig","normSig",-1e7,1e7)
 #        normTot = ROOT.RooRealVar("normTot","normTot",1,1E13)
 
         x = w.var('x')
-        #x.setBins(2)
+#        x.setBins(int((1000-270)/signal[matching][mass].GetBinWidth(10)))
+        expoSig = w.pdf('expoSig')
         expoExt = w.pdf('expoExt')
         expo = w.pdf('expo')
         mean = w.var('mean')
         normBkg = w.var('normBkg')
         p2 = w.var('p2')
         p2.setVal(0)
-        p2.setConstant()
+        p2.setRange(-1e-4,1e-4)
+#        p2.setConstant()
         mean.setVal(-0.01)
 #        mean.setConstant()
 #        normTot.setVal(1e4)
@@ -129,15 +133,16 @@ for matching in matchings:
         print("signal_=",signal_.sum(0))
         print("signal_=",signal_.sum(1))
 
-        normSig.setVal(1e-6)
+        normSig.setVal(1e-9)
         normSig.setConstant(1)
-        result = sigbkgExt.fitTo((data_),ROOT.RooFit.Range(270,1000),ROOT.RooFit.PrintLevel(0),ROOT.RooFit.Save()) #
-#        result = sigbkgExt.fitTo((data_),ROOT.RooFit.Range(270,1000),ROOT.RooFit.PrintLevel(0),ROOT.RooFit.Save()) #
+        result = sigbkgExt.fitTo((data_),ROOT.RooFit.PrintLevel(0),ROOT.RooFit.Save()) #
+        result = sigbkgExt.fitTo((data_),ROOT.RooFit.PrintLevel(0),ROOT.RooFit.Save()) #
+#        result = sigbkgExt.fitTo((data_),ROOT.RooFit.PrintLevel(0),ROOT.RooFit.Save()) #
 #        norm.setConstant()
 
         xframe = x.frame()
         data_.plotOn(xframe)
-        sigbkgExt.plotOn(xframe) #
+        sigbkgExt.plotOn(xframe,ROOT.RooFit.Normalization(1.0,ROOT.RooAbsReal.RelativeExpected)) #
         #signalPdf.plotOn(xframe,ROOT.RooFit.LineColor(2))
         #sigbkg.plotOn(xframe,ROOT.RooFit.LineColor(3))
 
@@ -155,11 +160,12 @@ for matching in matchings:
         frac2 = expo.createIntegral(ROOT.RooArgSet(x))
         print(frac2.getVal())
 
-        asimovScale = 10.
+        asimovScale = 1e4
+        normBkg.setVal(normBkg.getVal()*asimovScale)        
+#        normBkg.setVal(1e7)        
         asimov = sigbkgExt.generateBinned(ROOT.RooArgSet(x),1,ROOT.RooFit.Extended(),ROOT.RooFit.ExpectedData(),ROOT.RooFit.SumW2Error(ROOT.kTRUE)) #, ,ROOT.RooFit.ExpectedData() ,norm.getVal()
         asimov = sigbkgExt.generateBinned(ROOT.RooArgSet(x),asimovScale*data_.sum(ROOT.kTRUE)/asimov.sum(ROOT.kTRUE),ROOT.RooFit.Extended(),ROOT.RooFit.ExpectedData(),ROOT.RooFit.SumW2Error(ROOT.kTRUE)) #, ,ROOT.RooFit.ExpectedData() ,norm.getVal()
-        normBkg.setVal(normSig.getVal()*asimovScale)
-        asimov.plotOn(xframe,ROOT.RooFit.LineColor(4))
+#        asimov.plotOn(xframe,ROOT.RooFit.LineColor(4))
         xframe.Draw()
 
 
@@ -172,11 +178,22 @@ for matching in matchings:
         print("frac2.getVal()=",frac2.getVal())
 
         cnew = ROOT.TCanvas("cnew","")
-#        cnew.SetLogy()
+        cnew.SetLogy()
         normSig.setConstant(0)
-        result = sigbkgExt.fitTo((asimov),ROOT.RooFit.Range(270,1000),ROOT.RooFit.PrintLevel(0),ROOT.RooFit.Save(),ROOT.RooFit.SumW2Error(ROOT.kTRUE)) #
+        result = sigbkgExt.fitTo((asimov),ROOT.RooFit.PrintLevel(0),ROOT.RooFit.Save()) #,ROOT.RooFit.SumW2Error(ROOT.kTRUE) ROOT.RooFit.Range(270,1000),
         par = result.floatParsFinal().at(2)
         x2frame = x.frame()
+        w.var('fractN').setVal(0)
+        w.var('fractN').setConstant(1)
+        result = expoSig.fitTo((signal_),ROOT.RooFit.PrintLevel(0),ROOT.RooFit.Save()) #
+        w.var('fractN').setVal(0.7)
+        w.var('fractN').setConstant(0)
+        result = expoSig.fitTo((signal_),ROOT.RooFit.PrintLevel(0),ROOT.RooFit.Save()) #
+        signal_.plotOn(x2frame)
+        expoSig.plotOn(x2frame)
+        x2frame.Draw()
+        1/0
+        
 #        data_.plotOn(x2frame)
         
         # Overlay the background component of model with a dashed line
@@ -189,14 +206,19 @@ for matching in matchings:
         sig_range = signal[matching][mass].Integral(signal[matching][mass].FindBin(270),signal[matching][mass].FindBin(1000))
         acc = sig_range/sig_tot
         acceptance[matching][mass] = acc
-        mu_error[matching][mass] = par.getError()/acceptance[matching][mass]
-        mu[matching][mass] = par.getVal()/acceptance[matching][mass]
+        par.Print()
+        mu_error[matching][mass] = par.getError()
+        mu[matching][mass] = par.getVal()
 
-        normSig.setVal(5*normSig.getError())
+#        normSig.setVal(5*normSig.getError()*1e6)
+#        normSig.setVal(1e7)
+#        normBkg.setVal(0)
         asimov.plotOn(x2frame)
-#        sigbkgExt.plotOn(x2frame, ROOT.RooFit.Normalization(1.0,ROOT.RooAbsReal.RelativeExpected))
-        sigbkgExt.plotOn(x2frame)
+        sigbkgExt.plotOn(x2frame, ROOT.RooFit.Normalization(1.0,ROOT.RooAbsReal.RelativeExpected))
+#        sigbkgExt.plotOn(x2frame)
+#        sigbkgExt.plotOn(x2frame,ROOT.RooFit.Components(ROOT.RooArgSet(signalPdfExt)),ROOT.RooFit.LineStyle(ROOT.kDotted))
         x2frame.Draw()
+#        1/0
         cnew.SaveAs("matchingStudyPlot_"+matching+"_"+str(mass)+".png")
 
         '''
@@ -234,6 +256,7 @@ for matching in matchings:
 for mass in masses:
     print("Mass = %d"%mass)
     for matching in matchings:
+        mu_ = mu[matching][mass]
         mu_e = mu_error[matching][mass]
         acc = acceptance[matching][mass]
-        print("matching = %s\t%f\t%f\t%f"%(matching,mu_e,acc,mu_e*acc))
+        print("matching = %s\t%f\t%f\t%f\tBias: %f\t(%f)"%(matching,mu_e,acc,mu_e/acc,mu_/mu_e,mu_))

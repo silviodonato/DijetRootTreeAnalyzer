@@ -52,6 +52,7 @@ for file_ in files:
     chain.SetBranchStatus("event",1)
     chain.SetBranchStatus("HLT_CaloScoutingHT250",1)
     chain.SetBranchStatus("dijet_mass",1)
+    chain.SetBranchStatus("dijet_deta",1)
     chain.SetBranchStatus("htAK4",1)
 
     fileout.cd()
