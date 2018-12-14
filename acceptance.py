@@ -24,9 +24,7 @@ parser.add_option("-b", "--batch", action="store", type="string", dest="batch", 
 parser.add_option("", "--matching", action="store", type="string", dest="matching", default="")
 (options, args) = parser.parse_args()
 selection    = "isr_pt > 70 && jet2_pt>70 && jet1_pt>70 && abs(jet1_eta)<2.5 && abs(jet2_eta)<2.5 && abs(isr_eta)<2.5 && abs(dijet_deta) < 1.1 && dijet_mass > 296 && dijet_mass < 1000"
-#selection    = "isr_pt > 70 && jet2_pt>70 && jet1_pt>70 && abs(jet1_eta)<2.5 && abs(jet2_eta)<2.5 && abs(isr_eta)<2.5 && abs(dijet_deta) < 1.1"
 preselection = "abs(jet1MC_eta)<2.5 && abs(jet2MC_eta)<2.5 && abs(dijetMC_deta) < 1.1"
-#preselection = "HLT_CaloScoutingHT250 && isr_pt > 50 && jet2_pt>50 && jet1_pt>50"
 #selection    += " && "+preselection
 #if options.matching == "jets01":
 #    selection += " && abs(dijetMC_deta) < 1.1"
