@@ -1,3 +1,6 @@
+rm -rf input_jetsij
+mkdir -p input_jetsij
+
 hadd input_jetsij/ResonanceShapes_qq_13TeV_CaloScouting_2016.root \
 input_jets01/ResonanceShapes_qq_13TeV_CaloScouting_2016.root \
 input_jets02/ResonanceShapes_qq_13TeV_CaloScouting_2016.root \
