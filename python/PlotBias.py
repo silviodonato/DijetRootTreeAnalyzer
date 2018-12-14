@@ -146,7 +146,18 @@ def print1DBias(c,rootFile,h,func,printName,xTitle,yTitle,lumiLabel="",boxLabel=
                 'atlas6': '6-par. ATLAS/UA2',
                 'silvio4': '4-par. silvio',
                 'silvio5': '5-par. silvio',
-                'silvio6': '6-par. silvio'
+                'silvio6': '6-par. silvio',
+
+                'alt3': '3-par. alternative funct.',
+                'alt4': '4-par. alternative funct.',
+                'alt5': '5-par. alternative funct.',
+                'alt6': '6-par. alternative funct.',
+                'alt7': '7-par. alternative funct.',
+                'nom3': '3-par. nominal funct.',
+                'nom4': '4-par. nominal funct.',
+                'nom5': '5-par. nominal funct.',
+                'nom6': '6-par. nominal funct.',
+                'nom7': '7-par. nominal funct.',
                 }
     l.DrawLatex(0.15,0.82,'gen. pdf = %s'%pdf_dict[options.genPdf])
     l.DrawLatex(0.15,0.77,'fit pdf = %s'%pdf_dict[options.fitPdf])
@@ -176,9 +187,9 @@ if __name__ == '__main__':
                   help="mass of resonance")
     parser.add_option('-r',dest="r",default=1,type="float",
                   help="expect signal r value")
-    parser.add_option('--gen-pdf',dest="genPdf", default="modexp", choices=['modexp','fourparam','fiveparam','atlas','atlas6','silvio4','silvio5','silvio6'],
+    parser.add_option('--gen-pdf',dest="genPdf", default="modexp", choices=['modexp','fourparam','fiveparam','atlas','atlas6','silvio4','silvio5','silvio6','alt3','alt4','alt5','alt6','alt7','nom3','nom4','nom5','nom6','nom7'],
                   help="pdf for generating")
-    parser.add_option('--fit-pdf',dest="fitPdf", default="fourparam", choices=['modexp','fourparam','fiveparam','atlas','atlas6','silvio4','silvio5','silvio6'],
+    parser.add_option('--fit-pdf',dest="fitPdf", default="fourparam", choices=['modexp','fourparam','fiveparam','atlas','atlas6','silvio4','silvio5','silvio6','alt3','alt4','alt5','alt6','alt7','nom3','nom4','nom5','nom6','nom7'],
                   help="pdf for fitting")
     parser.add_option('--asymptotic-file',dest="asymptoticFile",default=None,type="string",
                   help="load asymptotic cross section results file")
@@ -207,7 +218,7 @@ if __name__ == '__main__':
             entry = elist.Next()
             if entry == -1: break
             xsecTree.GetEntry(entry)
-            rDict[int(eval('xsecTree.mass'))] = eval('xsecTree.xsecULExp_%s'%box)/options.xsec
+            rDict[int(eval('xsecTree.mass'))] = eval('xsecTree.xsecULExp_%s'%box)/options.xsec * 5./2 # fact 5/2 is to pass from 2sigma exclusion to 5sigma excess 
     else:
         for massPoint in massIterable(options.mass):
             rDict[int(massPoint)] = options.r
@@ -250,7 +261,7 @@ if __name__ == '__main__':
 
         gaus_func = rt.TF1("gaus_func","gaus(0)",-4,4)
         #gaus_func.SetParameter(0,100)
-        gaus_func.SetParameter(0,20)
+        gaus_func.SetParameter(0,5)
         gaus_func.SetParameter(1,0)
         gaus_func.SetParameter(2,1)
         print1DBias(c,tdirectory,h_bias,gaus_func,options.outDir+"/bias_%s_%s_lumi-%s_r-%s_%s_%s_%s.pdf"%(options.model,massPoint,('%.3f'%(options.lumi/1000.)).replace('.','p'),('%.3f'%rDict[int(massPoint)]).replace('.','p'),box,options.genPdf,options.fitPdf),"Bias (#hat{#mu} - #mu)/#sigma_{#mu}",eventsLabel,lumiLabel,boxLabel,'',None)
@@ -262,7 +273,7 @@ if __name__ == '__main__':
 
         gaus_func_divr = rt.TF1("gaus_func","gaus(0)",-1.5,1.5)
         #gaus_func.SetParameter(0,100)
-        gaus_func_divr.SetParameter(0,20)
+        gaus_func_divr.SetParameter(0,5)
         gaus_func_divr.SetParameter(1,0)
         gaus_func_divr.SetParameter(2,0.5)
         print1DBias(c,tdirectory,h_bias_divr,gaus_func_divr,options.outDir+"/bias_divr_%s_%s_lumi-%s_r-%s_%s_%s_%s.pdf"%(options.model,massPoint,('%.3f'%(options.lumi/1000.)).replace('.','p'),('%.3f'%rDict[int(massPoint)]).replace('.','p'),box,options.genPdf,options.fitPdf),"Bias (#hat{#mu} - #mu)/#mu",eventsLabel,lumiLabel,boxLabel,'',None)
@@ -311,7 +322,17 @@ if __name__ == '__main__':
                 'atlas6': '6-par. ATLAS/UA2',
                 'silvio4': '4-par. silvio',
                 'silvio5': '5-par. silvio',
-                'silvio6': '6-par. silvio'
+                'silvio6': '6-par. silvio',
+                'alt3': '3-par. alternative funct.',
+                'alt4': '4-par. alternative funct.',
+                'alt5': '5-par. alternative funct.',
+                'alt6': '6-par. alternative funct.',
+                'alt7': '7-par. alternative funct.',
+                'nom3': '3-par. nominal funct.',
+                'nom4': '4-par. nominal funct.',
+                'nom5': '5-par. nominal funct.',
+                'nom6': '6-par. nominal funct.',
+                'nom7': '7-par. nominal funct.',
                 }
     l.DrawLatex(0.15,0.82,'gen. pdf = %s'%pdf_dict[options.genPdf])
     l.DrawLatex(0.15,0.77,'fit pdf = %s'%pdf_dict[options.fitPdf])
