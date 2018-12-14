@@ -12,6 +12,7 @@ rnd = TRandom3()
 gStyle.SetOptStat(0)
 default_dir = "output_20180418_163054"
 default_mass = "150,200,300,400,500,600,800,1000"
+#default_mass = "1000"
 usage = "usage: %prog [options]"
 parser = optparse.OptionParser(usage)
 
@@ -153,6 +154,14 @@ def prob_mass(rootTree, var, outputFileName, acceptances):
         print("m = "  + str(int(m)))
         print("acceptance"  + str(acceptance))
     
+        h_mjj_ratio.Reset()
+        h_mjj_ratio_nom.Reset()
+        h_mjj_ratio_jerUp.Reset()
+        h_mjj_ratio_jerDown.Reset()
+        h_mjj_ratio_jesUp.Reset()
+        h_mjj_ratio_jesDown.Reset()
+        h_mjj_ratio_flat.Reset()
+
         h_mjj_ratio.SetBinContent(0,1.*nentries*(1.-acceptance))
         h_mjj_ratio_nom.SetBinContent(0,1.*nentries*(1.-acceptance))
         h_mjj_ratio_jerUp.SetBinContent(0,1.*nentries*(1.-acceptance))
@@ -164,13 +173,16 @@ def prob_mass(rootTree, var, outputFileName, acceptances):
         for entry in tree:
             isr_pt      = tree.isr_pt
             jet2_pt     = tree.jet2_pt
-            dijet_deta  = tree.dijet_deta
             jet1_pt     = tree.jet1_pt
+            isr_eta      = tree.isr_eta
+            jet2_eta     = tree.jet2_eta
+            jet1_eta     = tree.jet1_eta
+            dijet_deta  = tree.dijet_deta
             dijet_mass  = tree.dijet_mass
             mjj         = dijet_mass
            
             
-            if isr_pt > 70 and jet2_pt>70 and jet1_pt>70  and abs(dijet_deta)<1.1:
+            if isr_pt > 70 and jet2_pt>70 and jet1_pt>70  and abs(dijet_deta)<1.1 and abs(isr_eta)<2.5 and abs(jet1_eta)<2.5 and abs(jet2_eta)<2.5:
                 x1 = r.Gaus()
                 x2 = r.Gaus()
                 x3 = r.Gaus()
