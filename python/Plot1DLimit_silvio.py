@@ -148,9 +148,9 @@ def getHybridCLsArrays(directory, model, Box, bayes):
         exec 'xsecULExpMinus2 = xsecTree.xsecULExpMinus2_%s'%Box
 
 
-
         xsecULObs = xsecULObs
         xsecULExp = xsecULExp
+        if options.noData: xsecULObs = 0
 
         if isCouplingLimit:
             acceptance = acc_dict[matching][int(xsecTree.mass)]
@@ -487,6 +487,8 @@ if __name__ == '__main__':
                   help="for no systematics limits")
     parser.add_option('--coupling',dest="isCouplingLimit",default=False,type="string",
                   help="calculate coupling limits")
+    parser.add_option('--no-data',dest="noData",default=False,action='store_true',
+                  help="remove data plot")
 #    parser.add_option('--matching',dest="matching",default="jets01",#type="string",
 #                  help="apply matching", choices=["jets01", "jets02", "jets12", "jetsij"])
 
