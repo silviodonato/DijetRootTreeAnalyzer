@@ -371,8 +371,10 @@ def function3(function):
     function = function.replace("pars[0]","sqrts")
     function = function.replace("pars","p")
     function = function.replace("x","mjj")
+    function = function.replace("Emjjp","Exp")
     function = function.replace("emjjp","exp")
     function = function.replace("Mamjj","Max")
+    function = function.replace("mamjj","max")
     function = function.replace("[","")
     function = function.replace("]","_CaloTrijet2016")
     function = "p0_CaloTrijet2016 * " + function
@@ -406,37 +408,50 @@ def updateTxt(txt):
     
 
 '''
-("exp(pars[2]*x/pars[0]) * 1/pow(x/pars[0],pars[1])","DijetFisherNom3"),
-("exp(pars[2]*x/pars[0]) * TMath::Max((- 1 + x/pars[0]*pars[3]),0.)/pow(x/pars[0],pars[1])","DijetFisherNom4"),
-("exp(pars[2]*x/pars[0]) * TMath::Max((- 1 + x/pars[0]*pars[3] + pow(x/pars[0],3)*pars[4]),0.)/pow(x/pars[0],pars[1])","DijetFisherNom5"),
-("exp(pars[2]*x/pars[0]) * TMath::Max((- 1 + x/pars[0]*pars[3] + pow(x/pars[0],3)*pars[4] + pow(x/pars[0],5)*pars[5]),0.)/pow(x/pars[0],pars[1])","DijetFisherNom6"),
-("exp(pars[2]*x/pars[0]) * TMath::Max((- 1 + x/pars[0]*pars[3] + pow(x/pars[0],3)*pars[4] + pow(x/pars[0],5)*pars[5] + pow(x/pars[0],7)*pars[6]),0.)/pow(x/pars[0],pars[1])","DijetFisherNom7"),
+("TMath::Exp(pars[2]*x/TMath::Max(1.,pars[0])) * 1/pow(x/TMath::Max(1.,pars[0]),pars[1])","DijetFisherNom3"),
+("TMath::Exp(pars[2]*x/TMath::Max(1.,pars[0])) * TMath::Max((- 1 + x/TMath::Max(1.,pars[0])*pars[3]),0.)/pow(x/TMath::Max(1.,pars[0]),pars[1])","DijetFisherNom4"),
+("TMath::Exp(pars[2]*x/TMath::Max(1.,pars[0])) * TMath::Max((- 1 + x/TMath::Max(1.,pars[0])*pars[3] + pow(x/TMath::Max(1.,pars[0]),3)*pars[4]),0.)/pow(x/TMath::Max(1.,pars[0]),pars[1])","DijetFisherNom5"),
+("TMath::Exp(pars[2]*x/TMath::Max(1.,pars[0])) * TMath::Max((- 1 + x/TMath::Max(1.,pars[0])*pars[3] + pow(x/TMath::Max(1.,pars[0]),3)*pars[4] + pow(x/TMath::Max(1.,pars[0]),5)*pars[5]),0.)/pow(x/TMath::Max(1.,pars[0]),pars[1])","DijetFisherNom6"),
+("TMath::Exp(pars[2]*x/TMath::Max(1.,pars[0])) * TMath::Max((- 1 + x/TMath::Max(1.,pars[0])*pars[3] + pow(x/TMath::Max(1.,pars[0]),3)*pars[4] + pow(x/TMath::Max(1.,pars[0]),5)*pars[5] + pow(x/TMath::Max(1.,pars[0]),7)*pars[6]),0.)/pow(x/TMath::Max(1.,pars[0]),pars[1])","DijetFisherNom7"),
 '''
 
 '''
-("exp(log(std::max(double(1E-9),pars[2] * x/pars[0] - 1)))/pow(x/pars[0],pars[1])","DijetFisherNom3"),
-("exp(log(std::max(double(1E-9),pars[2] * x/pars[0] - 1)) + pars[3]*x/pars[0])/pow(x/pars[0],pars[1])","DijetFisherNom4"),
-("exp(log(std::max(double(1E-9),pars[2] * x/pars[0] - 1)) + pars[3]*x/pars[0] + pars[4]*pow(x/pars[0],2))/pow(x/pars[0],pars[1])","DijetFisherNom5"),
-("exp(log(std::max(double(1E-9),pars[2] * x/pars[0] - 1)) + pars[3]*x/pars[0] + pars[4]*pow(x/pars[0],2) + pars[5]*pow(x/pars[0],3))/pow(x/pars[0],pars[1])","DijetFisherNom6"),
-("exp(log(std::max(double(1E-9),pars[2] * x/pars[0] - 1)) + pars[3]*x/pars[0] + pars[4]*pow(x/pars[0],2) + pars[5]*pow(x/pars[0],3) + pars[6]*pow(x/pars[0],4))/pow(x/pars[0],pars[1])","DijetFisherNom7"),
-("exp(log(std::max(double(1E-9),pars[2] * x/pars[0] - 1)))/pow(x/pars[0],pars[1]) ","DijetFisherAlt3"),
-("exp(log(std::max(double(1E-9),pars[2] * x/pars[0] - 1)))/pow(x/pars[0],(pars[1] + pars[3]*log(std::max(double(1E-9),x/pars[0])))) ","DijetFisherAlt4"),
-("exp(log(std::max(double(1E-9),pars[2] * x/pars[0] - 1)))/pow(x/pars[0],(pars[1] + pars[3]*log(std::max(double(1E-9),x/pars[0])) + pars[4]*pow(log(std::max(double(1E-9),x/pars[0])),2))) ","DijetFisherAlt5"),
-("exp(log(std::max(double(1E-9),pars[2] * x/pars[0] - 1)))/pow(x/pars[0],(pars[1] + pars[3]*log(std::max(double(1E-9),x/pars[0])) + pars[4]*pow(log(std::max(double(1E-9),x/pars[0])),2) + pars[5]*pow(log(std::max(double(1E-9),x/pars[0])),3))) ","DijetFisherAlt6"),
-("exp(log(std::max(double(1E-9),pars[2] * x/pars[0] - 1)))/pow(x/pars[0],(pars[1] + pars[3]*log(std::max(double(1E-9),x/pars[0])) + pars[4]*pow(log(std::max(double(1E-9),x/pars[0])),2) + pars[5]*pow(log(std::max(double(1E-9),x/pars[0])),3) + pars[6]*pow(log(std::max(double(1E-9),x/pars[0])),4))) ","DijetFisherAlt7"),
+("TMath::Exp(TMath::Log(pars[2] * x/TMath::Max(1.,pars[0]) - 1))/pow(x/TMath::Max(1.,pars[0]),pars[1])","DijetFisherNom3"),
+("TMath::Exp(TMath::Log(pars[2] * x/TMath::Max(1.,pars[0]) - 1) + pars[3]*x/TMath::Max(1.,pars[0]))/pow(x/TMath::Max(1.,pars[0]),pars[1])","DijetFisherNom4"),
+("TMath::Exp(TMath::Log(pars[2] * x/TMath::Max(1.,pars[0]) - 1) + pars[3]*x/TMath::Max(1.,pars[0]) + pars[4]*pow(x/TMath::Max(1.,pars[0]),2))/pow(x/TMath::Max(1.,pars[0]),pars[1])","DijetFisherNom5"),
+("TMath::Exp(TMath::Log(pars[2] * x/TMath::Max(1.,pars[0]) - 1) + pars[3]*x/TMath::Max(1.,pars[0]) + pars[4]*pow(x/TMath::Max(1.,pars[0]),2) + pars[5]*pow(x/TMath::Max(1.,pars[0]),3))/pow(x/TMath::Max(1.,pars[0]),pars[1])","DijetFisherNom6"),
+("TMath::Exp(TMath::Log(pars[2] * x/TMath::Max(1.,pars[0]) - 1) + pars[3]*x/TMath::Max(1.,pars[0]) + pars[4]*pow(x/TMath::Max(1.,pars[0]),2) + pars[5]*pow(x/TMath::Max(1.,pars[0]),3) + pars[6]*pow(x/TMath::Max(1.,pars[0]),4))/pow(x/TMath::Max(1.,pars[0]),pars[1])","DijetFisherNom7"),
+("TMath::Exp(TMath::Log(pars[2] * x/TMath::Max(1.,pars[0]) - 1))/pow(x/TMath::Max(1.,pars[0]),pars[1]) ","DijetFisherAlt3"),
+("TMath::Exp(log(pars[2] * x/TMath::Max(1.,pars[0]) - 1))/pow(x/TMath::Max(1.,pars[0]),(pars[1] + pars[3]*TMath::Log(x/TMath::Max(1.,pars[0])))) ","DijetFisherAlt4"),
+("TMath::Exp(TMath::Log(pars[2] * x/TMath::Max(1.,pars[0]) - 1))/pow(x/TMath::Max(1.,pars[0]),(pars[1] + pars[3]*TMath::Log(x/TMath::Max(1.,pars[0])) + pars[4]*pow(TMath::Log(x/TMath::Max(1.,pars[0])),2))) ","DijetFisherAlt5"),
+("TMath::Exp(TMath::Log(pars[2] * x/TMath::Max(1.,pars[0]) - 1))/pow(x/TMath::Max(1.,pars[0]),(pars[1] + pars[3]*TMath::Log(x/TMath::Max(1.,pars[0])) + pars[4]*pow(TMath::Log(x/TMath::Max(1.,pars[0])),2) + pars[5]*pow(TMath::Log(x/TMath::Max(1.,pars[0])),3))) ","DijetFisherAlt6"),
+("TMath::Exp(TMath::Log(pars[2] * x/TMath::Max(1.,pars[0]) - 1))/pow(x/TMath::Max(1.,pars[0]),(pars[1] + pars[3]*TMath::Log(x/TMath::Max(1.,pars[0])) + pars[4]*pow(TMath::Log(x/TMath::Max(1.,pars[0])),2) + pars[5]*pow(TMath::Log(x/TMath::Max(1.,pars[0])),3) + pars[6]*pow(TMath::Log(x/TMath::Max(1.,pars[0])),4))) ","DijetFisherAlt7"),
+
+("TMath::Exp(TMath::Log(TMath::Max(1E-9,pars[2] * x/TMath::Max(1.,pars[0]) - 1)))/pow(x/TMath::Max(1.,pars[0]),pars[1])","DijetFisherNom3"),
+("TMath::Exp(TMath::Log(TMath::Max(1E-9,pars[2] * x/TMath::Max(1.,pars[0]) - 1)) + pars[3]*x/TMath::Max(1.,pars[0]))/pow(x/TMath::Max(1.,pars[0]),pars[1])","DijetFisherNom4"),
+("TMath::Exp(TMath::Log(TMath::Max(1E-9,pars[2] * x/TMath::Max(1.,pars[0]) - 1)) + pars[3]*x/TMath::Max(1.,pars[0]) + pars[4]*pow(x/TMath::Max(1.,pars[0]),2))/pow(x/TMath::Max(1.,pars[0]),pars[1])","DijetFisherNom5"),
+("TMath::Exp(TMath::Log(TMath::Max(1E-9,pars[2] * x/TMath::Max(1.,pars[0]) - 1)) + pars[3]*x/TMath::Max(1.,pars[0]) + pars[4]*pow(x/TMath::Max(1.,pars[0]),2) + pars[5]*pow(x/TMath::Max(1.,pars[0]),3))/pow(x/TMath::Max(1.,pars[0]),pars[1])","DijetFisherNom6"),
+("TMath::Exp(TMath::Log(TMath::Max(1E-9,pars[2] * x/TMath::Max(1.,pars[0]) - 1)) + pars[3]*x/TMath::Max(1.,pars[0]) + pars[4]*pow(x/TMath::Max(1.,pars[0]),2) + pars[5]*TMath::Power(x/TMath::Max(1.,pars[0]),3) + pars[6]*TMath::Power(x/TMath::Max(1.,pars[0]),4))/TMath::Power(x/TMath::Max(1.,pars[0]),pars[1])","DijetFisherNom7"),
+("TMath::Exp(TMath::Log(TMath::Max(1E-9,pars[2] * x/TMath::Max(1.,pars[0]) - 1)))/TMath::Power(x/TMath::Max(1.,pars[0]),pars[1]) ","DijetFisherAlt3"),
+("TMath::Exp(TMath::Log(TMath::Max(1E-9,pars[2] * x/TMath::Max(1.,pars[0]) - 1)))/TMath::Power(x/TMath::Max(1.,pars[0]),(pars[1] + pars[3]*TMath::Log(TMath::Max(1E-9,x/TMath::Max(1.,pars[0]))))) ","DijetFisherAlt4"),
+("TMath::Exp(TMath::Log(TMath::Max(1E-9,pars[2] * x/TMath::Max(1.,pars[0]) - 1)))/TMath::Power(x/TMath::Max(1.,pars[0]),(pars[1] + pars[3]*TMath::Log(TMath::Max(1E-9,x/TMath::Max(1.,pars[0]))) + pars[4]*TMath::Power(TMath::Log(TMath::Max(1E-9,x/TMath::Max(1.,pars[0]))),2))) ","DijetFisherAlt5"),
+("TMath::Exp(TMath::Log(TMath::Max(1E-9,pars[2] * x/TMath::Max(1.,pars[0]) - 1)))/TMath::Power(x/TMath::Max(1.,pars[0]),(pars[1] + pars[3]*TMath::Log(TMath::Max(1E-9,x/TMath::Max(1.,pars[0]))) + pars[4]*TMath::Power(TMath::Log(TMath::Max(1E-9,x/TMath::Max(1.,pars[0]))),2) + pars[5]*TMath::Power(TMath::Log(TMath::Max(1E-9,x/TMath::Max(1.,pars[0]))),3))) ","DijetFisherAlt6"),
+("TMath::Exp(TMath::Log(TMath::Max(1E-9,pars[2] * x/TMath::Max(1.,pars[0]) - 1)))/TMath::Power(x/TMath::Max(1.,pars[0]),(pars[1] + pars[3]*TMath::Log(TMath::Max(1E-9,x/TMath::Max(1.,pars[0]))) + pars[4]*TMath::Power(TMath::Log(TMath::Max(1E-9,x/TMath::Max(1.,pars[0]))),2) + pars[5]*TMath::Power(TMath::Log(TMath::Max(1E-9,x/TMath::Max(1.,pars[0]))),3) + pars[6]*TMath::Power(TMath::Log(TMath::Max(1E-9,x/TMath::Max(1.,pars[0]))),4))) ","DijetFisherAlt7"),
+
 '''
 
 functions = [
-("exp(log(pars[2] * x/pars[0] - 1))/pow(x/pars[0],pars[1])","DijetFisherNom3"),
-("exp(log(pars[2] * x/pars[0] - 1) + pars[3]*x/pars[0])/pow(x/pars[0],pars[1])","DijetFisherNom4"),
-("exp(log(pars[2] * x/pars[0] - 1) + pars[3]*x/pars[0] + pars[4]*pow(x/pars[0],2))/pow(x/pars[0],pars[1])","DijetFisherNom5"),
-("exp(log(pars[2] * x/pars[0] - 1) + pars[3]*x/pars[0] + pars[4]*pow(x/pars[0],2) + pars[5]*pow(x/pars[0],3))/pow(x/pars[0],pars[1])","DijetFisherNom6"),
-("exp(log(pars[2] * x/pars[0] - 1) + pars[3]*x/pars[0] + pars[4]*pow(x/pars[0],2) + pars[5]*pow(x/pars[0],3) + pars[6]*pow(x/pars[0],4))/pow(x/pars[0],pars[1])","DijetFisherNom7"),
-("exp(log(pars[2] * x/pars[0] - 1))/pow(x/pars[0],pars[1]) ","DijetFisherAlt3"),
-("exp(log(pars[2] * x/pars[0] - 1))/pow(x/pars[0],(pars[1] + pars[3]*log(x/pars[0]))) ","DijetFisherAlt4"),
-("exp(log(pars[2] * x/pars[0] - 1))/pow(x/pars[0],(pars[1] + pars[3]*log(x/pars[0]) + pars[4]*pow(log(x/pars[0]),2))) ","DijetFisherAlt5"),
-("exp(log(pars[2] * x/pars[0] - 1))/pow(x/pars[0],(pars[1] + pars[3]*log(x/pars[0]) + pars[4]*pow(log(x/pars[0]),2) + pars[5]*pow(log(x/pars[0]),3))) ","DijetFisherAlt6"),
-("exp(log(pars[2] * x/pars[0] - 1))/pow(x/pars[0],(pars[1] + pars[3]*log(x/pars[0]) + pars[4]*pow(log(x/pars[0]),2) + pars[5]*pow(log(x/pars[0]),3) + pars[6]*pow(log(x/pars[0]),4))) ","DijetFisherAlt7"),
+("pow(x/pars[0],-pars[1])","DijetFisherNom2"),
+("exp(log(TMath::Max(1E-9,pars[2] * x/pars[0] - 1)))/pow(x/pars[0],pars[1])","DijetFisherNom3"),
+("exp(log(TMath::Max(1E-9,pars[2] * x/pars[0] - 1)) + pars[3]*x/pars[0])/pow(x/pars[0],pars[1])","DijetFisherNom4"),
+("exp(log(TMath::Max(1E-9,pars[2] * x/pars[0] - 1)) + pars[3]*x/pars[0] + pars[4]*pow(x/pars[0],2))/pow(x/pars[0],pars[1])","DijetFisherNom5"),
+("exp(log(TMath::Max(1E-9,pars[2] * x/pars[0] - 1)) + pars[3]*x/pars[0] + pars[4]*pow(x/pars[0],2) + pars[5]*pow(x/pars[0],3))/pow(x/pars[0],pars[1])","DijetFisherNom6"),
+("exp(log(TMath::Max(1E-9,pars[2] * x/pars[0] - 1)) + pars[3]*x/pars[0] + pars[4]*pow(x/pars[0],2) + pars[5]*pow(x/pars[0],3) + pars[6]*pow(x/pars[0],4))/pow(x/pars[0],pars[1])","DijetFisherNom7"),
+("exp(log(TMath::Max(1E-9,pars[2] * x/pars[0] - 1)))/pow(x/pars[0],pars[1]) ","DijetFisherAlt3"),
+("exp(log(TMath::Max(1E-9,pars[2] * x/pars[0] - 1)))/pow(x/pars[0],(pars[1] + pars[3]*log(TMath::Max(1E-9,x/pars[0])))) ","DijetFisherAlt4"),
+("exp(log(TMath::Max(1E-9,pars[2] * x/pars[0] - 1)))/pow(x/pars[0],(pars[1] + pars[3]*log(TMath::Max(1E-9,x/pars[0])) + pars[4]*pow(log(TMath::Max(1E-9,x/pars[0])),2))) ","DijetFisherAlt5"),
+("exp(log(TMath::Max(1E-9,pars[2] * x/pars[0] - 1)))/pow(x/pars[0],(pars[1] + pars[3]*log(TMath::Max(1E-9,x/pars[0])) + pars[4]*pow(log(TMath::Max(1E-9,x/pars[0])),2) + pars[5]*pow(log(TMath::Max(1E-9,x/pars[0])),3))) ","DijetFisherAlt6"),
+("exp(log(TMath::Max(1E-9,pars[2] * x/pars[0] - 1)))/pow(x/pars[0],(pars[1] + pars[3]*log(TMath::Max(1E-9,x/pars[0])) + pars[4]*pow(log(TMath::Max(1E-9,x/pars[0])),2) + pars[5]*pow(log(TMath::Max(1E-9,x/pars[0])),3) + pars[6]*pow(log(TMath::Max(1E-9,x/pars[0])),4))) ","DijetFisherAlt7"),
     ]
 
 for function,Tag in functions:
