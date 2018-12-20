@@ -17,7 +17,7 @@ signal_mjj = [296, 325, 354, 386, 419, 453, 489, 526, 565, 606, 649, 693, 740, 7
 
 parametersNom = '''
 combine_parameters = [
-    'Ntot_bkg_CaloTrijet2016[3e+07]',
+    'Ntot_bkg_CaloTrijet2016[1e+07]',
     'p0_CaloTrijet2016[1]',
     'p1_CaloTrijet2016[5]', 
     'p2_CaloTrijet2016[65]',
@@ -91,8 +91,8 @@ RooXXXPdf::RooXXXPdf(const char *name, const char *title,
   xBins(0),
   xMax(0),
   xMin(0),
-  relTol(2E-32),
-  absTol(2E-32)
+  relTol(1E-12),
+  absTol(1E-12)
 {
   memset(&xArray, 0, sizeof(xArray));
 }
@@ -413,6 +413,18 @@ def updateTxt(txt):
 ("exp(pars[2]*x/pars[0]) * TMath::Max((- 1 + x/pars[0]*pars[3] + pow(x/pars[0],3)*pars[4] + pow(x/pars[0],5)*pars[5] + pow(x/pars[0],7)*pars[6]),0.)/pow(x/pars[0],pars[1])","DijetFisherNom7"),
 '''
 
+'''
+("exp(log(std::max(double(1E-9),pars[2] * x/pars[0] - 1)))/pow(x/pars[0],pars[1])","DijetFisherNom3"),
+("exp(log(std::max(double(1E-9),pars[2] * x/pars[0] - 1)) + pars[3]*x/pars[0])/pow(x/pars[0],pars[1])","DijetFisherNom4"),
+("exp(log(std::max(double(1E-9),pars[2] * x/pars[0] - 1)) + pars[3]*x/pars[0] + pars[4]*pow(x/pars[0],2))/pow(x/pars[0],pars[1])","DijetFisherNom5"),
+("exp(log(std::max(double(1E-9),pars[2] * x/pars[0] - 1)) + pars[3]*x/pars[0] + pars[4]*pow(x/pars[0],2) + pars[5]*pow(x/pars[0],3))/pow(x/pars[0],pars[1])","DijetFisherNom6"),
+("exp(log(std::max(double(1E-9),pars[2] * x/pars[0] - 1)) + pars[3]*x/pars[0] + pars[4]*pow(x/pars[0],2) + pars[5]*pow(x/pars[0],3) + pars[6]*pow(x/pars[0],4))/pow(x/pars[0],pars[1])","DijetFisherNom7"),
+("exp(log(std::max(double(1E-9),pars[2] * x/pars[0] - 1)))/pow(x/pars[0],pars[1]) ","DijetFisherAlt3"),
+("exp(log(std::max(double(1E-9),pars[2] * x/pars[0] - 1)))/pow(x/pars[0],(pars[1] + pars[3]*log(std::max(double(1E-9),x/pars[0])))) ","DijetFisherAlt4"),
+("exp(log(std::max(double(1E-9),pars[2] * x/pars[0] - 1)))/pow(x/pars[0],(pars[1] + pars[3]*log(std::max(double(1E-9),x/pars[0])) + pars[4]*pow(log(std::max(double(1E-9),x/pars[0])),2))) ","DijetFisherAlt5"),
+("exp(log(std::max(double(1E-9),pars[2] * x/pars[0] - 1)))/pow(x/pars[0],(pars[1] + pars[3]*log(std::max(double(1E-9),x/pars[0])) + pars[4]*pow(log(std::max(double(1E-9),x/pars[0])),2) + pars[5]*pow(log(std::max(double(1E-9),x/pars[0])),3))) ","DijetFisherAlt6"),
+("exp(log(std::max(double(1E-9),pars[2] * x/pars[0] - 1)))/pow(x/pars[0],(pars[1] + pars[3]*log(std::max(double(1E-9),x/pars[0])) + pars[4]*pow(log(std::max(double(1E-9),x/pars[0])),2) + pars[5]*pow(log(std::max(double(1E-9),x/pars[0])),3) + pars[6]*pow(log(std::max(double(1E-9),x/pars[0])),4))) ","DijetFisherAlt7"),
+'''
 
 functions = [
 ("exp(log(pars[2] * x/pars[0] - 1))/pow(x/pars[0],pars[1])","DijetFisherNom3"),
