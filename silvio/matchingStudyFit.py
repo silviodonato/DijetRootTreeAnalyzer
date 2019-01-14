@@ -12,8 +12,8 @@ matchings = [
 ]
 
 masses = [
-#    200, 300, 400, 500, 600, 800, 1000
-    400
+    200, 300, 400, 500, 600, 800, 1000
+#    400
 ]
 
 
@@ -192,7 +192,7 @@ for matching in matchings:
         signal_.plotOn(x2frame)
         expoSig.plotOn(x2frame)
         x2frame.Draw()
-        1/0
+#        1/0
         
 #        data_.plotOn(x2frame)
         

@@ -1,30 +1,17 @@
-signal_mjj = [1, 3, 6, 10, 16, 23, 31, 40, 50, 61, 74, 88, 103, 119, 137, 156, 176, 197, 220, 244, 270, 296, 325, 354, 386, 419, 453, 489, 526, 565, 606, 649, 693, 740, 788, 838, 890, 944, 1000, 1058, 1118, 1181, 1246, 1313, 1383, 1455, 1530, 1607, 1687, 1770, 1856, 1945, 2037, 2132, 2231, 2332, 2438, 2546, 2659, 2775, 2895, 3019, 3147, 3279, 3416, 3558, 3704, 3854, 4010, 4171, 4337, 4509, 4686, 4869, 5058, 5253, 5455, 5663, 5877, 6099, 6328, 6564, 6808, 7060, 7320, 7589, 7866, 8152, 8447, 8752, 9067, 9391, 9726, 10072, 10430, 10798, 11179, 11571, 11977, 12395, 12827, 13272, 13732, 14000]
-
-histos = {
-  50:'DijetFilter/dijetMassHisto/dijetMassHisto_isrptcut_50_60', 
-  60:'DijetFilter/dijetMassHisto/dijetMassHisto_isrptcut_60_70', 
-  70:'DijetFilter/dijetMassHisto/dijetMassHisto_isrptcut_70_80', 
-  80:'DijetFilter/dijetMassHisto/dijetMassHisto_isrptcut_80_90', 
-  90:'DijetFilter/dijetMassHisto/dijetMassHisto_isrptcut_90_100', 
-  100:'DijetFilter/dijetMassHisto/dijetMassHisto_isrptcut_100_150', 
-  150:'DijetFilter/dijetMassHisto/dijetMassHisto_isrptcut_150_200', 
-  200:'DijetFilter/dijetMassHisto/dijetMassHisto_isrptcut_200_300', 
-  300:'DijetFilter/dijetMassHisto/dijetMassHisto_isrptcut_300'
-}
 
 txtTempl_cfg = '''[CaloTrijet2016]
-variables = ['mjj[XMIN,XMIN,XMAX]','th1x[0,0,XMAX]']
+variables = ['mjj[244.,244.,1000.]','th1x[0,0,1000]']
 
-histoName = HISTOGRAMS
+histoName = 'DijetFilter/dijetMassHisto/dijetMassHisto_isrptcut_70'
 
-variables_range = ['mjj_Low[XMIN,XMAX]', 'mjj_Blind[XMIN,XMAX]', 'mjj_High[XMIN,XMAX]']
+variables_range = ['mjj_Low[244.,1000.]', 'mjj_Blind[244.,1000.]', 'mjj_High[244.,1000.]']
 
 combine_pdfs = ['RooXXXPdf::CaloTrijet2016_bkg(th1x,p1_CaloTrijet2016,p2_CaloTrijet2016,p3_CaloTrijet2016,p4_CaloTrijet2016,p5_CaloTrijet2016,p6_CaloTrijet2016,sqrts)',
  "EXPR::CaloTrijet2016_bkg_unbin('FUNCTION3',mjj,p0_CaloTrijet2016,p1_CaloTrijet2016,p2_CaloTrijet2016,p3_CaloTrijet2016,p4_CaloTrijet2016,p5_CaloTrijet2016,p6_CaloTrijet2016,sqrts)",
  'SUM::extDijetPdf(Ntot_bkg_CaloTrijet2016*CaloTrijet2016_bkg)']
 
 #270, 296, 325, 354, 386, 
-signal_mjj = BINS
+signal_mjj = [244, 270, 296, 325, 354, 386, 419, 453, 489, 526, 565, 606, 649, 693, 740, 788, 838, 890, 944, 1000]
 #signal_mjj = [1, 3, 6, 10, 16, 23, 31, 40, 50, 61, 74, 88, 103, 119, 137, 156, 176, 197, 220, 244, 270, 296, 325, 354, 386, 419, 453, 489, 526, 565, 606, 649, 693, 740, 788, 838, 890, 944, 1000, 1058, 1118, 1181, 1246, 1313, 1383, 1455, 1530, 1607, 1687, 1770, 1856, 1945, 2037, 2132, 2231, 2332, 2438, 2546, 2659, 2775, 2895, 3019, 3147, 3279, 3416, 3558, 3704, 3854, 4010, 4171, 4337, 4509, 4686, 4869, 5058, 5253, 5455, 5663, 5877, 6099, 6328, 6564, 6808, 7060, 7320, 7589, 7866, 8152, 8447, 8752, 9067, 9391, 9726, 10072, 10430, 10798, 11179, 11571, 11977, 12395, 12827, 13272, 13732, 14000]
 '''
 
@@ -32,9 +19,9 @@ parametersNom = '''
 combine_parameters = [
     'Ntot_bkg_CaloTrijet2016[1e+07]',
     'p0_CaloTrijet2016[1]',
-    'p1_CaloTrijet2016[4.7]', 
-    'p2_CaloTrijet2016[58]',
-    'p3_CaloTrijet2016[-26]',
+    'p1_CaloTrijet2016[5]', 
+    'p2_CaloTrijet2016[65]',
+    'p3_CaloTrijet2016[-20]',
     'p4_CaloTrijet2016[0]',
     'p5_CaloTrijet2016[0]',
     'p6_CaloTrijet2016[0]',
@@ -409,19 +396,6 @@ def updateTxt(txt):
         lines[i] = lines[i].replace("FUNCTION1",function.replace("pars","p"))
         lines[i] = lines[i].replace("FUNCTION2",function)
         lines[i] = lines[i].replace("FUNCTION3",function3(function))
-        lines[i] = lines[i].replace("XMIN",  str(minx))
-        lines[i] = lines[i].replace("XMAX",  str(maxx))
-        histograms = []
-        for isrPt in sorted(histos):
-            if isrPt>=isrPtCut:
-              histograms.append(histos[isrPt])
-        lines[i] = lines[i].replace("HISTOGRAMS", str(histograms))
-        bins = []
-        for bin_ in sorted(signal_mjj):
-            if bin_>=minx and bin_<=maxx:
-              bins.append(bin_)
-        lines[i] = lines[i].replace("BINS", str(bins))
-#        print(histograms)
         if ("p7" in lines[i] and nparams <= 6) or \
         ("p6" in lines[i] and nparams <= 6) or \
         ("p5" in lines[i] and nparams <= 5) or \
@@ -478,61 +452,45 @@ functions = [
 ("exp(log(TMath::Max(1E-9,pars[2] * x/pars[0] - 1)))/pow(x/pars[0],(pars[1] + pars[3]*log(TMath::Max(1E-9,x/pars[0])) + pars[4]*pow(log(TMath::Max(1E-9,x/pars[0])),2))) ","DijetFisherAlt5"),
 ("exp(log(TMath::Max(1E-9,pars[2] * x/pars[0] - 1)))/pow(x/pars[0],(pars[1] + pars[3]*log(TMath::Max(1E-9,x/pars[0])) + pars[4]*pow(log(TMath::Max(1E-9,x/pars[0])),2) + pars[5]*pow(log(TMath::Max(1E-9,x/pars[0])),3))) ","DijetFisherAlt6"),
 ("exp(log(TMath::Max(1E-9,pars[2] * x/pars[0] - 1)))/pow(x/pars[0],(pars[1] + pars[3]*log(TMath::Max(1E-9,x/pars[0])) + pars[4]*pow(log(TMath::Max(1E-9,x/pars[0])),2) + pars[5]*pow(log(TMath::Max(1E-9,x/pars[0])),3) + pars[6]*pow(log(TMath::Max(1E-9,x/pars[0])),4))) ","DijetFisherAlt7"),
-]
+    ]
 
+for function,Tag in functions:
+    nparams = getNparam(function)
+    fileName_h = "Roo"+Tag+"Pdf.h"
+    fileName_cc = "Roo"+Tag+"Pdf.cc"
+    fileName_cfg = "dijet_isr_"+Tag+".config"
+    file_h = open(fileName_h,'w')
+    file_cc = open(fileName_cc,'w')
+    file_cfg = open(fileName_cfg,'w')
 
-from optparse import OptionParser
+    txt_h = updateTxt(txtTempl_h)
+    txt_cc = updateTxt(txtTempl_cc)
+    txt_cfg = updateTxt(txtTempl_cfg)
+    txt_cfg = fixCfg(txt_cfg)
+    if "Nom" in Tag:
+        txt_cfg += parametersNom
+    elif "Alt" in Tag:
+        txt_cfg += parametersAlt
+    
+    file_h.write(txt_h)
+    file_cc.write(txt_cc)
+    file_cfg.write(txt_cfg)
+    print("cp %s $CMSSW_BASE/src/HiggsAnalysis/CombinedLimit/src/%s"%(fileName_cc,fileName_cc))
+    print("cp %s $CMSSW_BASE/src/HiggsAnalysis/CombinedLimit/interface/%s"%(fileName_h,fileName_h))
+    print("cp %s $CMSSW_BASE/src/CMSDIJET/DijetRootTreeAnalyzer/config/%s"%(fileName_cfg,fileName_cfg))
+    
+    file_cc.close()
+    file_h.close()
+    file_cfg.close()
 
-if __name__ == '__main__':
-  parser = OptionParser()
-  parser.add_option('-x', '--minx',  dest="minx",  default=296.,  type="float", help="low edge of fit range")
-  parser.add_option('-a', '--maxx',  dest="maxx",  default=1000., type="float", help="high edge of fit range")
-  parser.add_option('-b', '--isrPtCut', dest="isrPtCut", default=70.,   type="float", help="isr pt cut")
-  (options,args) = parser.parse_args()
-  minx = options.minx
-  maxx = options.maxx
-  isrPtCut = options.isrPtCut
-  print
-  print("fitRange = [%.1f,%.1f]"%( minx, maxx)) 
-  print("isrPtCut = %.1f"%( isrPtCut) ) 
-  print
-  for function,Tag in functions:
-      nparams = getNparam(function)
-      fileName_h = "Roo"+Tag+"Pdf.h"
-      fileName_cc = "Roo"+Tag+"Pdf.cc"
-      fileName_cfg = "dijet_isr_"+Tag+".config"
-      file_h = open(fileName_h,'w')
-      file_cc = open(fileName_cc,'w')
-      file_cfg = open(fileName_cfg,'w')
+print("""
+### Remember to update classes_def.xml and classes.h ###
 
-      txt_h = updateTxt(txtTempl_h)
-      txt_cc = updateTxt(txtTempl_cc)
-      txt_cfg = updateTxt(txtTempl_cfg)
-      txt_cfg = fixCfg(txt_cfg)
-      if "Nom" in Tag:
-          txt_cfg += parametersNom
-      elif "Alt" in Tag:
-          txt_cfg += parametersAlt
-      
-      file_h.write(txt_h)
-      file_cc.write(txt_cc)
-      file_cfg.write(txt_cfg)
-      print("cp %s $CMSSW_BASE/src/HiggsAnalysis/CombinedLimit/src/%s"%(fileName_cc,fileName_cc))
-      print("cp %s $CMSSW_BASE/src/HiggsAnalysis/CombinedLimit/interface/%s"%(fileName_h,fileName_h))
-      print("cp %s $CMSSW_BASE/src/CMSDIJET/DijetRootTreeAnalyzer/config/%s"%(fileName_cfg,fileName_cfg))
-      
-      file_cc.close()
-      file_h.close()
-      file_cfg.close()
+cd $CMSSW_BASE/src/HiggsAnalysis/CombinedLimit/
+scram b -j8
+cd -
+#cd ..
 
-  print("""
-  ### Remember to update classes_def.xml and classes.h ###
+python python/BinnedFit.py -c config/dijet_isr_%s.config -l 971  -b CaloTrijet2016 -d fits_trijet_silvio_2018/ --fit-spectrum inputs/data_blind_eta2.5_jets01.root --signal inputs/ResonanceShapes_qq_13TeV_CaloScouting_2016.root  --model qq --mass 410 --xsec 20
 
-  cd $CMSSW_BASE/src/HiggsAnalysis/CombinedLimit/
-  scram b -j8
-  cd -
-  #cd ..
-
-  python python/BinnedFit.py -c config/dijet_isr_%s.config -l 971  -b CaloTrijet2016 -d fits_trijet_silvio_2018/ --fit-spectrum inputs/data_blind_eta2.5_jets01.root --signal inputs/ResonanceShapes_qq_13TeV_CaloScouting_2016.root  --model qq --mass 410 --xsec 20
-
-  """%(functions[0][1]))
+"""%(functions[0][1]))

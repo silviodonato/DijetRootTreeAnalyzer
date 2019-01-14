@@ -1,27 +1,40 @@
 import ROOT
 
-nbins = 14
+chi2File = "chi2.txt"
+
+def lineToNum(l):
+  return float(l.split(",")[0])
+
+txt = open(chi2File)
+ls = txt.readlines()
 
 chi2 = {}
-chi2[3] = 3927.91068876
-chi2[4] = 16.4987982036
-chi2[5] = 6.32408665554
-chi2[6] = 5.66839047663
-chi2[7] = 5.67070474852
+chi2[3] = lineToNum(ls[0])
+chi2[4] = lineToNum(ls[1])
+chi2[5] = lineToNum(ls[2])
+chi2[6] = lineToNum(ls[3])
+chi2[7] = lineToNum(ls[4])
 
 chi2Alt = {}
-chi2Alt[3] = 3927.91068876
-chi2Alt[4] = 9.96554956639
-chi2Alt[5] = 5.93892583765
-chi2Alt[6] = 6.00571075381
-chi2Alt[7] = 6.25531530996
+chi2Alt[3] = lineToNum(ls[5])
+chi2Alt[4] = lineToNum(ls[6])
+chi2Alt[5] = lineToNum(ls[7])
+chi2Alt[6] = lineToNum(ls[8])
+chi2Alt[7] = lineToNum(ls[9])
+
+print("chi2 = %s"%str(chi2))
+print("chi2Alt = %s"%str(chi2Alt))
+
+nbins = 19
+
 
 ## NB n2>n1 !
-def fisher(n1,n2,chi2):
-  fisher = ((chi2[n1]-chi2[n2])/(n2-n1))/(chi2[n2]/(nbins-n2))
+def fisher(n1,n2,chi2,chi2_n2=0):
+  if chi2_n2==0: chi2_n2 = chi2
+  fisher = ((chi2[n1]-chi2_n2[n2])/(n2-n1))/(chi2_n2[n2]/(nbins-n2))
   return fisher
 
-def CL(fisher, n1):
+def CL(fisher, n2):
   cl = 1.0 - ROOT.TMath.FDistI(fisher, 1.0, nbins - n2)
   return cl
 
@@ -30,28 +43,37 @@ cl_ = {}
 
 print("")
 print("NOMINAL")
-print("Fisher\tCL")
+print("\tChi2")
+for n1 in chi2.keys():
+  print("%d\t%.1f"%(n1, chi2[n1]))
+
+print("")
+print("\tFisher\tCL")
 for n1 in chi2.keys():
   n2 = n1+1
   if not (n2 in chi2.keys()): continue
   fish = fisher(n1,n2,chi2) 
-  cl = CL(fish,n1)
+  cl = CL(fish,n2)
   fish_[n1] = fish
   cl_[n1] = cl
   print("%d vs %d\t%f\t%f"%(n1,n2,fish,cl))
-
 
 fishAlt_ = {}
 clAlt_ = {}
 
 print("")
 print("ALTERNATIVE")
-print("Fisher\tCL")
+print("\tChi2")
+for n1 in chi2Alt.keys():
+  print("%d\t%.1f"%(n1, chi2Alt[n1]))
+
+print("")
+print("\tFisher\tCL")
 for n1 in chi2Alt.keys():
   n2 = n1+1
   if not (n2 in chi2Alt.keys()): continue
   fish = fisher(n1,n2,chi2Alt) 
-  cl = CL(fish,n1)
+  cl = CL(fish,n2)
   fishAlt_[n1] = fish
   clAlt_[n1] = cl
   print("%d vs %d\t%f\t%f"%(n1,n2,fish,cl))

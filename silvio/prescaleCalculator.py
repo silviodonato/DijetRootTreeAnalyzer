@@ -1,15 +1,20 @@
 import ROOT
 
+
+ROOT.gStyle.SetOptFit()
+ROOT.gStyle.SetOptStat()
+
 #ROOT.gROOT.SetBatch(1)
 
-fileName = "/mnt/t3nfs01/data01/shome/dbrzhech/DijetScouting/CMSSW_8_0_30/src/DijetRootTreeAnalyzer/data_L1test.root"
+#fileName = "/mnt/t3nfs01/data01/shome/dbrzhech/DijetScouting/CMSSW_8_0_30/src/DijetRootTreeAnalyzer/data_L1test.root"
+fileName = "/mnt/t3nfs01/data01/shome/dbrzhech/DijetScouting/CMSSW_8_0_30/src/DijetRootTreeAnalyzer/dijet_data_full_woH_jets01_deta1.1.root"
 
 file_ = ROOT.TFile(fileName)
 
 file_.Get("DijetFilter/dijetMassHisto").ls()
-histoAND = file_.Get("DijetFilter/dijetMassHisto/dijetMassHisto_50_L1_HTT240_L1_HTT320")
+histoAND = file_.Get("DijetFilter/dijetMassHisto/dijetMassHisto_70_L1_HTT240_L1_HTT320")
 histoOR = file_.Get("DijetFilter/dijetMassHisto/dijetMassHisto_L1_HTT_240_270_280_300_320_or")
-histo240 = file_.Get("DijetFilter/dijetMassHisto/dijetMassHisto_isrptcut_50")
+histo240 = file_.Get("DijetFilter/dijetMassHisto/dijetMassHisto_isrptcut_70")
 
 histoAND.Rebin(200)
 histoOR.Rebin(200)
@@ -41,6 +46,8 @@ ratio2.Divide(histoAND,histoOR)
 ratio2.GetYaxis().SetRangeUser(0,1.1)
 ratio2.Draw("E")
 ratio2.Fit("pol0","","",1000,1000000)
+c2.SaveAs("prescalePlot.png")
+c2.SaveAs("prescalePlot.pdf")
 
 c3 = ROOT.TCanvas("c3","")
 ratio3.Divide(histoAND,histo240)
