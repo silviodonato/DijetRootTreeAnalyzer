@@ -45,7 +45,7 @@ print("")
 print("NOMINAL")
 print("\tChi2")
 for n1 in chi2.keys():
-  print("%d\t%.1f"%(n1, chi2[n1]))
+  print("%d\t%.2f"%(n1, chi2[n1]))
 
 print("")
 print("\tFisher\tCL")
@@ -65,7 +65,7 @@ print("")
 print("ALTERNATIVE")
 print("\tChi2")
 for n1 in chi2Alt.keys():
-  print("%d\t%.1f"%(n1, chi2Alt[n1]))
+  print("%d\t%.2f"%(n1, chi2Alt[n1]))
 
 print("")
 print("\tFisher\tCL")
@@ -85,6 +85,23 @@ lt_f_CL =    (fish_[3],cl_[3],fish_[4],cl_[4],fish_[5],cl_[5],fish_[6],cl_[6])
 lt_f_CLAlt =    (fishAlt_[3],clAlt_[3],fishAlt_[4],clAlt_[4],fishAlt_[5],clAlt_[5],fishAlt_[6],clAlt_[6]) 
 
 lt_all = lt_chi2 + lt_chi2Alt + lt_f_CL + lt_f_CLAlt
+
+test_alt = 5
+test_nom = 4
+ 
+
+print("Alternative%d vs Nominal %d"%(test_alt,test_nom))
+fish = fisher(test_alt,test_nom,chi2Alt,chi2)
+print("Fisher =  %.2f"%(fish))
+cl = CL(fish,test_nom)
+print("CL =  %.2f"%(cl))
+
+
+print("Nominal%d vs Alternative %d"%(test_nom,test_alt))
+fish = fisher(test_nom,test_alt,chi2,chi2Alt)
+print("Fisher =  %.2f"%(fish))
+cl = CL(fish,test_alt)
+print("CL =  %.2f"%(cl))
 
 print("  ###  LATEX  ###  ")
 print(r""" \begin{table}[th]

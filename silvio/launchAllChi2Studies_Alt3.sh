@@ -2,7 +2,7 @@ mkdir -p trigger_Alt3_studies_deta1p1_full_ten_percent_blind
 
 python python/chisquareTable.py \
 -c config/dijet_isr_DijetFisherAlt3.config \
--l 1000  -b CaloTrijet2016 \
+-l 1536  -b CaloTrijet2016 \
 -d trigger_Alt3_studies_deta1p1_full_ten_percent_blind/ \
 --fit-spectrum data_deta1p1_full_ten_percent_blind.root \
 --signal inputs/ResonanceShapes_qq_13TeV_CaloScouting_2016.root \
@@ -19,7 +19,7 @@ mkdir -p isrPt_Alt3_studies_deta1p1_full_ten_percent_blind
 
 python python/chisquareTable.py \
 -c config/dijet_isr_DijetFisherAlt3.config \
--l 1000  -b CaloTrijet2016 \
+-l 1536  -b CaloTrijet2016 \
 -d isrPt_Alt3_studies_deta1p1_full_ten_percent_blind/ \
 --fit-spectrum data_deta1p1_full_ten_percent_blind.root \
 --signal inputs/ResonanceShapes_qq_13TeV_CaloScouting_2016.root \
@@ -37,7 +37,7 @@ mkdir -p trigger_Alt3_studies_deta1p1_full_ten_percent
 
 python python/chisquareTable.py \
 -c config/dijet_isr_DijetFisherAlt3.config \
--l 1000  -b CaloTrijet2016 \
+-l 1536  -b CaloTrijet2016 \
 -d trigger_Alt3_studies_deta1p1_full_ten_percent/ \
 --fit-spectrum data_deta1p1_full_ten_percent.root \
 --signal inputs/ResonanceShapes_qq_13TeV_CaloScouting_2016.root \
@@ -54,7 +54,7 @@ mkdir -p isrPt_Alt3_studies_deta1p1_full_ten_percent
 
 python python/chisquareTable.py \
 -c config/dijet_isr_DijetFisherAlt3.config \
--l 1000  -b CaloTrijet2016 \
+-l 1536  -b CaloTrijet2016 \
 -d isrPt_Alt3_studies_deta1p1_full_ten_percent/ \
 --fit-spectrum data_deta1p1_full_ten_percent.root \
 --signal inputs/ResonanceShapes_qq_13TeV_CaloScouting_2016.root \
@@ -71,7 +71,7 @@ mkdir -p trigger_Alt3_studies_deta1p1_full_blind
 
 python python/chisquareTable.py \
 -c config/dijet_isr_DijetFisherAlt3.config \
--l 1000  -b CaloTrijet2016 \
+-l 1536  -b CaloTrijet2016 \
 -d trigger_Alt3_studies_deta1p1_full_blind/ \
 --fit-spectrum data_deta1p1_full_blind.root \
 --signal inputs/ResonanceShapes_qq_13TeV_CaloScouting_2016.root \
@@ -88,7 +88,7 @@ mkdir -p isrPt_Alt3_studies_deta1p1_full_blind
 
 python python/chisquareTable.py \
 -c config/dijet_isr_DijetFisherAlt3.config \
--l 1000  -b CaloTrijet2016 \
+-l 1536  -b CaloTrijet2016 \
 -d isrPt_Alt3_studies_deta1p1_full_blind/ \
 --fit-spectrum data_deta1p1_full_blind.root \
 --signal inputs/ResonanceShapes_qq_13TeV_CaloScouting_2016.root \

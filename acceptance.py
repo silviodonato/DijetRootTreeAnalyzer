@@ -23,7 +23,8 @@ parser.add_option("-s", "--step", action="store", type="string", dest="step", de
 parser.add_option("-b", "--batch", action="store", type="string", dest="batch", default="True")
 parser.add_option("", "--matching", action="store", type="string", dest="matching", default="")
 (options, args) = parser.parse_args()
-selection    = "isr_pt > 70 && jet2_pt>70 && jet1_pt>70 && abs(jet1_eta)<2.5 && abs(jet2_eta)<2.5 && abs(isr_eta)<2.5 && abs(dijet_deta) < 1.1 && dijet_mass > 296 && dijet_mass < 1000"
+selection    = "isr_pt > 70 && jet2_pt>70 && jet1_pt>70 && abs(jet1_eta)<2.5 && abs(jet2_eta)<2.5 && abs(isr_eta)<2.5 && abs(dijet_deta) < 1.1 && dijet_mass > 270 && dijet_mass < 1000"
+#selection    = "jet2_pt>70 && jet1_pt>70 && abs(jet1_eta)<2.5 && abs(jet2_eta)<2.5 && abs(isr_eta)<2.5 && abs(dijet_deta) < 1.1 && dijet_mass > 270 && dijet_mass < 1000"
 preselection = "abs(jet1MC_eta)<2.5 && abs(jet2MC_eta)<2.5 && abs(dijetMC_deta) < 1.1"
 #selection    += " && "+preselection
 #if options.matching == "jets01":
@@ -55,14 +56,21 @@ def prob_mass(rootTree, var, val_key, isPrintAcc=False):
         mass_array.append(float(m))
     mass_array.sort()
     acc = array('f')
+    acc_reco = array('f')
+    acc_gen = array('f')
     acc_errs = array('f')
     for i,m in enumerate(mass_array):
         mass = m
         tree = rootTree[str(int(m))]
-        accptnc = float(tree.Draw(var, selection))/float(tree.Draw(var,preselection))
+        reco = float(tree.Draw(var, selection))
+        gen = float(tree.Draw(var,preselection))
+        den = float(tree.Draw(var,""))
+        accptnc = reco/gen
         print "M = %s: %s/%s"%(m, tree.Draw(var, selection),tree.Draw(var,preselection))
-        accptnc_err = math.sqrt(accptnc/float(tree.Draw(var,preselection))*(1+accptnc))
+        accptnc_err = math.sqrt(accptnc/gen*(1+accptnc))
         acc.append(accptnc)
+        acc_reco.append(reco/den)
+        acc_gen.append(gen/den)
         acc_errs.append(accptnc_err)
         if(isPrintAcc): print "acceptance(%s) = %s +- %s"%(mass, accptnc, accptnc_err)
         #for entry in tree:
@@ -75,7 +83,10 @@ def prob_mass(rootTree, var, val_key, isPrintAcc=False):
 
            # if isr_pt > 50 and jet2_pt>45  and abs(dijet_deta)<1.2 and jet1_pt>90:
     return {"acceptance": acc,
-            "errors": acc_errs}[val_key]
+            "errors": acc_errs,
+            "acceptance_reco": acc_reco,
+            "acceptance_gen": acc_gen,
+            }[val_key]
 
 errs = lambda Ni, N: sqrt(Ni)/N*sqrt(1+Ni/N)
 
@@ -126,6 +137,8 @@ def mass_shapes(directory, mass, var, outputFileName, matching):
                 rootTree[m].Add(directory+"/"+file)
                 fileName = file
     acc = prob_mass(rootTree, var, "acceptance")
+    acc_gen = prob_mass(rootTree, var, "acceptance_gen")
+    acc_reco = prob_mass(rootTree, var, "acceptance_reco")
     acc_errs = prob_mass(rootTree, var, "errors", True)
     outFile=TFile(outputFileName, "RECREATE")
     c1=TCanvas("c","c",0,0,800,800)
@@ -144,6 +157,18 @@ def mass_shapes(directory, mass, var, outputFileName, matching):
     # raw_input("press enter...")
     #gr.Write()
     gr_imp.Write()
+
+    gr_imp, acc_dict_reco = interpol(massArr, step, acc_reco, array('f',[0.0]*len(acc_reco)), matching)
+    gr_imp.SetMarkerColor(kRed)
+    gr_imp.SetMarkerStyle(8)
+    gr_imp.Draw("AP")
+    c1.SaveAs(outputFileName.split(".")[0]+"_reco.png")
+
+    gr_imp, acc_dict_gen  = interpol(massArr, step, acc_gen, array('f',[0.0]*len(acc_gen)), matching)
+    gr_imp.SetMarkerColor(kRed)
+    gr_imp.SetMarkerStyle(8)
+    gr_imp.Draw("AP")
+    c1.SaveAs(outputFileName.split(".")[0]+"_gen.png")
     return acc_dict
 
 if options.matching == "all":

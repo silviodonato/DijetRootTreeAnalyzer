@@ -3,24 +3,39 @@ import copy
 
 ROOT.gROOT.SetBatch(1)
 
-mass = 600
+#mass = 600
 
 wj = 1.1
 
 #wjs = [round(x/10.,1) for x in range(4,19,1)]
 
-detas = [round(x/10.,1) for x in range(4,28,1)]
+'''
+varName = "isrPtCut"
+varTex = "third jet p_{T} [GeV]"
+values = [round(x/1.,1) for x in range(40,100,5)]
+#values = [round(x/1.,1) for x in range(40,160,5)]
+selection = "isr_pt>%f && HLT_CaloScoutingHT250 && abs(dijet_deta)<1.1 && abs(jet1_eta)<2.5 && abs(jet2_eta)<2.5 && abs(isr_eta)<2.5 && HLT_CaloScoutingHT250" #&& 
 
+'''
+
+varName = "deta"
+varTex = "Delta#eta (jj)"
+values = [round(x/10.,1) for x in range(4,28,1)]
+selection = "isr_pt>70 && HLT_CaloScoutingHT250 && abs(dijet_deta)<%f  && abs(jet1_eta)<2.5 && abs(jet2_eta)<2.5 && abs(isr_eta)<2.5 && HLT_CaloScoutingHT250 "
+#'''
+
+varPlot = "dijet_mass"
+
+varTexNoUnits = varTex.replace("[GeV]","")
+ 
 masses = [
-    200, 300, 400, 500, 600, 800
+    300, 400, 500, 600
 ]
 
 #masses = [
 #    mass
 #]
 
-selection = "isr_pt>50 && HLT_CaloScoutingHT250 && abs(dijet_deta)<%f "
-variable = "dijet_mass"
 binning = "(200,0,1000)"
 
 dataFileName = "/mnt/t3nfs01/data01/shome/dbrzhech/DijetScouting/CMSSW_8_0_30/src/DijetRootTreeAnalyzer/data_wj_studies/data_wj_studies_%sdata.root"
@@ -72,8 +87,8 @@ ROOT.kBlue -9,
 def getHisto(fileName, sel = selection):
     file_ = ROOT.TFile.Open(fileName)
     tree = file_.Get("rootTupleTree/tree")
-    tree.Draw(variable + ">> histo"+binning, sel%deta)
-    print(sel%deta)
+    tree.Draw(varPlot + ">> histo"+binning, sel%value)
+    print(sel%value)
     histo = file_.Get("histo").Clone(fileName.replace("/",""))
     histo.SetLineWidth(2)
     return copy.copy(histo)
@@ -108,23 +123,23 @@ def getSsqrtB(dat,sig, mass):
 data = {}
 signal = {}
 signalGoodMatch = {}
-for deta in detas:
-    data[deta] = getHisto(dataFileName%wj)
+for value in values:
+    data[value] = getHisto(dataFileName%wj)
     for mass in masses:
-        signal[(deta,mass)] = getHisto(signalFileName%(mass,wj))
-        signalGoodMatch[(deta,mass)] = getHisto(signalFileName%(mass,wj), selection + " && (sqrt(TVector2::Phi_mpi_pi(jet1_phi-jet1MC_phi)**2 + (jet1_eta-jet1MC_eta)**2)<0.4 && sqrt(TVector2::Phi_mpi_pi(jet2_phi-jet2MC_phi)**2 + (jet2_eta-jet2MC_eta)**2)<0.4) ")
-    print(data[deta])
+        signal[(value,mass)] = getHisto(signalFileName%(mass,wj))
+        signalGoodMatch[(value,mass)] = getHisto(signalFileName%(mass,wj), selection + " && (sqrt(TVector2::Phi_mpi_pi(jet1_phi-jet1MC_phi)**2 + (jet1_eta-jet1MC_eta)**2)<0.4 && sqrt(TVector2::Phi_mpi_pi(jet2_phi-jet2MC_phi)**2 + (jet2_eta-jet2MC_eta)**2)<0.4) ")
+    print(data[value])
 
 print(data)
 print(signal)
 
 ## rescale to show plots nicer
 for mass in masses:
-    bin_ = data[deta].FindBin(mass)
-    scale = 10. * data[deta].GetBinContent(bin_) / signal[(0.4,mass)].GetBinContent(bin_)
-    for deta in detas:
-        signal[(deta,mass)].Scale(scale)
-        signalGoodMatch[(deta,mass)].Scale(scale)
+    bin_ = data[value].FindBin(mass)
+    scale = 10. * data[value].GetBinContent(bin_) / signal[(values[0],mass)].GetBinContent(bin_)
+    for value in values:
+        signal[(value,mass)].Scale(scale)
+        signalGoodMatch[(value,mass)].Scale(scale)
 
 
 signif = {}
@@ -140,34 +155,34 @@ for matching in [True,False]:
         leg.SetHeader("")
         print("M(jj) = %s GeV. Matching %s"%(mass,matching))
         signif_max[(mass,matching)] = 0
-        for i,deta in enumerate(detas):
-            data[deta].SetLineColor(colors[i])
-            signals[(deta,mass)].SetLineColor(colors[i])
+        for i,value in enumerate(values):
+            data[value].SetLineColor(colors[i])
+            signals[(value,mass)].SetLineColor(colors[i])
             if i==0:
-                signals[(deta,mass)].SetTitle("M(X) = %s GeV"%mass)
-                signals[(deta,mass)].GetYaxis().SetTitle("Events")
-                signals[(deta,mass)].GetXaxis().SetTitle("m_{jj} [GeV]")
-                signals[(deta,mass)].GetYaxis().SetRangeUser(1E1,1E4)
-                signals[(deta,mass)].Draw("")
+                signals[(value,mass)].SetTitle("M(X) = %s GeV"%mass)
+                signals[(value,mass)].GetYaxis().SetTitle("Events")
+                signals[(value,mass)].GetXaxis().SetTitle("m_{jj} [GeV]")
+                signals[(value,mass)].GetYaxis().SetRangeUser(1E1,1E4)
+                signals[(value,mass)].Draw("")
             else:
-                signals[(deta,mass)].Draw("same")
+                signals[(value,mass)].Draw("same")
                 
-            data[deta].Draw("same")
-            leg.AddEntry(data[deta],"#Delta #eta (jj) = %s"%deta)
+            data[value].Draw("same")
+            leg.AddEntry(data[value],"%s = %s"%(varTexNoUnits, value))
         #    SsqrtB,minBin,maxBin = getBestSsqrtB(data[wj],signalGoodMatch[(wj,mass)])
         #    print("wide jet R=%s, S/sqrt(B)=%s, in mjj=[%s,%s]"%(wj,SsqrtB,minBin,maxBin))
-            SsqrtB,minBin,maxBin = getSsqrtB(data[deta],signals[(deta,mass)],mass)
-            print("wide jet R=%s, S/sqrt(B)=%s, in mjj=[%s,%s]"%(deta,SsqrtB,minBin,maxBin))
-            signif[(deta,mass,matching)] = SsqrtB
+            SsqrtB,minBin,maxBin = getSsqrtB(data[value],signals[(value,mass)],mass)
+            print("wide jet R=%s, S/sqrt(B)=%s, in mjj=[%s,%s]"%(value,SsqrtB,minBin,maxBin))
+            signif[(value,mass,matching)] = SsqrtB
             signif_max[(mass,matching)] = max(signif_max[(mass,matching)], SsqrtB)
         leg.Draw()
 
         c1.Update()
         c1.Modified()
         if matching:
-            c1.SaveAs("plots_deta_%s_matching.png"%mass)
+            c1.SaveAs("plots_%s_%s_matching.png"%(varName,mass))
         else:
-            c1.SaveAs("plots_deta_%s.png"%mass)
+            c1.SaveAs("plots_%s_%s.png"%(varName,mass))
 
 #data[wj].Scale(1./data[wj].Integral())
 #signal[(wj,mass)].Scale(1./signal[(wj,mass)].Integral())
@@ -178,42 +193,46 @@ for matching in [True,False]:
 #signalGoodMatch[(wj,mass)].Draw("same")
 
 
-#sig = signalGoodMatch[(deta,mass)]
-#dat = data[deta]
+#sig = signalGoodMatch[(value,mass)]
+#dat = data[value]
 
 c1.SetLogy(0)
 
 grs = {}
 for matching in [True,False]:
     for mass in sorted(masses):
-        grs[mass] = ROOT.TGraphErrors()
-        grs[mass].SetLineWidth(2)
-        grs[mass].SetLineColor(colors[masses.index(mass)])
-        grs[mass].SetMarkerColor(colors[masses.index(mass)])
-        grs[mass].SetMarkerSize(0)
-        grs[mass].SetMarkerStyle(21)
-        for i,deta in enumerate(detas):
-            grs[mass].SetPoint(i,deta, signif[(deta,mass,matching)]/ signif_max[(mass,matching)])
-            grs[mass].SetPointError(i,0,0)
+        grs[(mass,matching)] = ROOT.TGraphErrors()
+        grs[(mass,matching)].SetLineWidth(2)
+        grs[(mass,matching)].SetLineColor(colors[masses.index(mass)])
+        grs[(mass,matching)].SetMarkerColor(colors[masses.index(mass)])
+        grs[(mass,matching)].SetMarkerSize(0)
+        grs[(mass,matching)].SetMarkerStyle(21)
+        grs[(mass,matching)].SetMinimum(0)
+        grs[(mass,matching)].SetMaximum(1.1)
+        for i,value in enumerate(values):
+            grs[(mass,matching)].SetPoint(i,value, signif[(value,mass,matching)]/ signif_max[(mass,matching)])
+            grs[(mass,matching)].SetPointError(i,0,0)
 
 
 for matching in [True,False]:
     leg = ROOT.TLegend(0.78,0.58,0.98,0.98)
     for mass in sorted(masses):
-        grs[mass].GetXaxis().SetTitle(" #Delta#eta (jj)")
-        grs[mass].GetYaxis().SetTitle("Normalized S/sqrt(B)")
-        grs[mass].SetTitle("Significance vs #Delta #eta (jj) cut")
-        ax = grs[mass].GetXaxis()
+        grs[(mass,matching)].GetXaxis().SetTitle(" %s"%varTex)
+        grs[(mass,matching)].GetYaxis().SetTitle("Normalized S/sqrt(B)")
+        grs[(mass,matching)].SetTitle("Significance vs %s cut"%varTexNoUnits)
+        ax = grs[(mass,matching)].GetXaxis()
         ax.SetLimits(ax.GetXmin(),ax.GetXmin() + (ax.GetXmax()-ax.GetXmin())*1.2 )
-        leg.AddEntry(grs[mass],"%s GeV"%mass,"lep")
+        leg.AddEntry(grs[(mass,matching)],"M = %s GeV"%mass,"lep")
         if masses.index(mass)==0:
-            grs[mass].Draw("ALP")
+            grs[(mass,matching)].Draw("ALP")
         else:
-            grs[mass].Draw("LP")
+            grs[(mass,matching)].Draw("LP")
     leg.Draw()
     c1.Update()
     c1.Modified()
     if matching:
-        c1.SaveAs("plots_deta_sig_matching.png")
+        c1.SaveAs("plots_%s_sig_matching.png"%varName)
+        c1.SaveAs("plots_%s_sig_matching.pdf"%varName)
     else:
-        c1.SaveAs("plots_deta_sig.png")
+        c1.SaveAs("plots_%s_sig.png"%varName)
+        c1.SaveAs("plots_%s_sig.pdf"%varName)

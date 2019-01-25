@@ -74,7 +74,7 @@ title = "Di-jet mass plot"
 varX = "dijet_mass"
 #varX_nbins,   varX_min,  varX_max = 200,100,1100
 #varX_nbins,   varX_min,  varX_max = 50,0,1000
-varX_nbins,   varX_min,  varX_max = 50,0,1000
+varX_nbins,   varX_min,  varX_max = 40,100,500
 #varX_nbins,   varX_min,  varX_max = 1000,60,1050
 varX_title = "m_{jj}"
 
@@ -115,25 +115,33 @@ for i in range(len(bins)-1):
     preselect = denTrigger + "&& abs(dijet_deta)>%f && abs(dijet_deta)<%f"%(bins[i],bins[i+1]) #
     tree.Draw("%s >> histo(%f,%f,%f)"%(varX,varX_nbins,varX_min,varX_max),"%s"%(preselect) ,"")
     histo = ROOT.gDirectory.Get("histo")
-    histos.append(histo.Clone("[%s,%s]"%((round(bins[i],2)),round(bins[i+1],2))))
+    histos.append(histo.Clone("%s < #Delta#eta < %s"%((round(bins[i],2)),round(bins[i+1],2))))
 
 
 leg = ROOT.TLegend(0.52,0.7,0.9,0.9)
 #leg.SetHeader("")
 
 for i,histo in enumerate(histos):
+    histo.SetTitle("")
+    histo.GetXaxis().SetTitle("m(jj)")
+    histo.GetYaxis().SetTitle("AU")
     histo.Sumw2()
     histo.Scale(1./histo.Integral(histo.FindBin(500),varX_nbins))
     leg.AddEntry(histo,histo.GetName(),"l") 
     histo.SetLineColor(colors[i])
     histo.SetLineWidth(2)
+    histo.SetMinimum(3E-2)
     if i==0:
         histo.Draw("ERR")
+        histo.Draw("HIST,C,same")
     else:
         histo.Draw("ERR,same")
+        histo.Draw("HIST,C,same")
+
 
 
 c2.SetLogy()
 leg.Draw()
 c2.SaveAs("detaplot.png")
+c2.SaveAs("detaplot.pdf")
 #g.Draw("LEGO")c2.SaveAs("plotDeta.png")

@@ -30,7 +30,8 @@ def print_chi2_profile(fileIn):
 #            val = min(val,100)
 #            val = max(val,0.1)
             chi2_profile.SetBinContent(i,j,val)
-            if "isrPt" in fileIn:
+            if True:
+#            if "isrPt" in fileIn:
                 lx = ax.GetBinLabel(i)
                 lx = lx.replace(" ","")
                 ly = ay.GetBinLabel(j)
@@ -48,7 +49,8 @@ def print_chi2_profile(fileIn):
 
     chi2_profile.SetMinimum(-1E-9)
     chi2_profile.SetMaximum(10)
-    if "isrPt" in fileIn: chi2_profile.SetMaximum(0.5)
+    chi2_profile.SetMaximum(0.5)
+#    if "isrPt" in fileIn: chi2_profile.SetMaximum(0.5)
     chi2_profile.Draw("COLZ,TEXT")
     chi2_profile
     c1.SaveAs(fileIn.replace(".root",".pdf"))
