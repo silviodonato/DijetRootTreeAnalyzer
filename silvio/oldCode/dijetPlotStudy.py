@@ -95,21 +95,30 @@ canv.SetGridx()
 canv.SetGridy()
 
 folder = "../ntupleSignal/"
+folder = "../jetPairing3MC/"
 fileNames = [
 #    "../output/test_reduced_skim_new.root",
-   folder + "VectorDiJet1Jet_25_13TeV.root",
-   folder + "VectorDiJet1Jet_50_13TeV.root",
-   folder + "VectorDiJet1Jet_75_13TeV.root",
-   folder + "VectorDiJet1Jet_100_13TeV.root",
-   folder + "VectorDiJet1Jet_125_13TeV.root",
-   folder + "VectorDiJet1Jet_150_13TeV.root",
-   folder + "VectorDiJet1Jet_200_13TeV.root",
-   folder + "VectorDiJet1Jet_300_13TeV.root",
-   folder + "VectorDiJet1Jet_400_13TeV.root",
-   folder + "VectorDiJet1Jet_500_13TeV.root",
-   folder + "VectorDiJet1Jet_600_13TeV.root",
-   folder + "VectorDiJet1Jet_800_13TeV.root",
-   folder + "VectorDiJet1Jet_1000_13TeV.root",
+#   folder + "VectorDiJet1Jet_25_13TeV.root",
+#   folder + "VectorDiJet1Jet_50_13TeV.root",
+#   folder + "VectorDiJet1Jet_75_13TeV.root",
+#   folder + "VectorDiJet1Jet_100_13TeV.root",
+#   folder + "VectorDiJet1Jet_125_13TeV.root",
+#   folder + "VectorDiJet1Jet_150_13TeV.root",
+#   folder + "VectorDiJet1Jet_200_13TeV.root",
+#   folder + "VectorDiJet1Jet_300_13TeV.root",
+#   folder + "VectorDiJet1Jet_400_13TeV.root",
+#   folder + "VectorDiJet1Jet_500_13TeV.root",
+#   folder + "VectorDiJet1Jet_600_13TeV.root",
+#   folder + "VectorDiJet1Jet_800_13TeV.root",
+#   folder + "VectorDiJet1Jet_1000_13TeV.root",
+
+   folder + "signal_jets01_200.root",
+   folder + "signal_jets01_300.root",
+   folder + "signal_jets01_400.root",
+   folder + "signal_jets01_500.root",
+   folder + "signal_jets01_600.root",
+   folder + "signal_jets01_800.root",
+   folder + "signal_jets01_1000.root",
 ]
 
 

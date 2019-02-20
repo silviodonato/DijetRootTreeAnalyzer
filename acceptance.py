@@ -163,12 +163,14 @@ def mass_shapes(directory, mass, var, outputFileName, matching):
     gr_imp.SetMarkerStyle(8)
     gr_imp.Draw("AP")
     c1.SaveAs(outputFileName.split(".")[0]+"_reco.png")
+    c1.SaveAs(outputFileName.split(".")[0]+"_reco.pdf")
 
     gr_imp, acc_dict_gen  = interpol(massArr, step, acc_gen, array('f',[0.0]*len(acc_gen)), matching)
     gr_imp.SetMarkerColor(kRed)
     gr_imp.SetMarkerStyle(8)
     gr_imp.Draw("AP")
     c1.SaveAs(outputFileName.split(".")[0]+"_gen.png")
+    c1.SaveAs(outputFileName.split(".")[0]+"_gen.pdf")
     return acc_dict
 
 if options.matching == "all":

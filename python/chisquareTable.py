@@ -4,6 +4,7 @@ import BinnedFitMod
 import ROOT
 signal_mjj_binning = [1, 3, 6, 10, 16, 23, 31, 40, 50, 61, 74, 88, 103, 119, 137, 156, 176, 197, 220, 244, 270, 296, 325, 354, 386, 419, 453, 489, 526, 565, 606, 649, 693, 740, 788, 838, 890, 944, 1000, 1058, 1118, 1181, 1246, 1313, 1383, 1455, 1530, 1607, 1687, 1770, 1856, 1945, 2037, 2132, 2231, 2332, 2438, 2546, 2659, 2775, 2895, 3019, 3147, 3279, 3416, 3558, 3704, 3854, 4010, 4171, 4337, 4509, 4686, 4869, 5058, 5253, 5455, 5663, 5877, 6099, 6328, 6564, 6808, 7060, 7320, 7589, 7866, 8152, 8447, 8752, 9067, 9391, 9726, 10072, 10430, 10798, 11179, 11571, 11977, 12395, 12827, 13272, 13732, 14000]
 isrPtCutBinning = [40,50,60,70,80,90,100,150,200,300]
+#isrPtCutBinning = [40,50,60,70,80,90]
 
 def findLines(lines, findString, box):
 
@@ -37,8 +38,37 @@ def signal_mjj_function(minBin, maxBin):
 
     return signal_mjj
 
+def histoNamesIsrPtCut(isrPtCut):
+#    isrPtCut = int(isrPtCut)
+    print("isrPtCut = ",isrPtCut)
+    output='['
+    if int(isrPtCut) < 300:
+        output += "'DijetFilter/dijetMassHisto/dijetMassHisto_isrptcut_%s_%s'"%(int(isrPtCut), isrPtCutBinning[isrPtCutBinning.index(int(isrPtCut))+1])
+        for isrBinLeftEdge in isrPtCutBinning[isrPtCutBinning.index(int(isrPtCut))+1:-1]:
+            output += ", 'DijetFilter/dijetMassHisto/dijetMassHisto_isrptcut_%s_%s'"%(isrBinLeftEdge, isrPtCutBinning[isrPtCutBinning.index(isrBinLeftEdge)+1])
+        output += ", "
+    output += "'DijetFilter/dijetMassHisto/dijetMassHisto_isrptcut_300']"
+    return output
 
-def writeConfigFile(configFileTemplateName,box,isrPtCut,fitRanges,variables_range):
+trigger_histo_map = {
+"L1_HTT240": "'DijetFilter/dijetMassHisto/dijetMassHisto_isrptcut_70'",
+"L1_HTT240 && HT270": "'DijetFilter/dijetMassHisto/dijetMassHisto_isrptcut_70_HT_270'",
+"L1_HTT240 && L1_HTT270": "'DijetFilter/dijetMassHisto/dijetMassHisto_isrptcut_70_L1_HTT240_L1_HTT270'",
+"L1_HTT240 && L1_HTT320":"'DijetFilter/dijetMassHisto/dijetMassHisto_70_L1_HTT240_L1_HTT320'",
+"L1_HTT_240..270_or":"'DijetFilter/dijetMassHisto/dijetMassHisto_L1_HTT_240_270_or'",
+"L1_HTT_240..280_or":"'DijetFilter/dijetMassHisto/dijetMassHisto_L1_HTT_240_270_280_or'",
+"L1_HTT_240..300_or":"'DijetFilter/dijetMassHisto/dijetMassHisto_L1_HTT_240_270_280_300_or'",
+"L1_HTT_240..320_or":"'DijetFilter/dijetMassHisto/dijetMassHisto_L1_HTT_240_270_280_300_320_or'",
+}
+
+def histoNameFunc(keyType, keyValue):
+    if keyType == "isrPtCut":
+        output = histoNamesIsrPtCut(keyValue)
+    elif keyType == "trigger":
+        output = trigger_histo_map[keyValue]
+    return output
+
+def writeConfigFile(configFileTemplateName,box,inpuHistoNameDict,fitRanges,variables_range):
     output_string = {}
     keys = []
     keys.append('box')
@@ -52,14 +82,10 @@ def writeConfigFile(configFileTemplateName,box,isrPtCut,fitRanges,variables_rang
 
     keys.append('histoName')
     # output_string['histoName'] ='histoName = "dijetMassHisto_isrptcut_%s"'%(int(isrPtCut))
-    output_string['histoName'] ='histoName = ['
-    if isrPtCut < 300:
-        output_string['histoName'] += "'DijetFilter/dijetMassHisto/dijetMassHisto_isrptcut_%s_%s'"%(int(isrPtCut), isrPtCutBinning[isrPtCutBinning.index(isrPtCut)+1])
-        for isrBinLeftEdge in isrPtCutBinning[isrPtCutBinning.index(isrPtCut)+1:-1]:
-            output_string['histoName'] += ", 'DijetFilter/dijetMassHisto/dijetMassHisto_isrptcut_%s_%s'"%(isrBinLeftEdge, isrPtCutBinning[isrPtCutBinning.index(isrBinLeftEdge)+1])
-        output_string['histoName'] += ", "
-    output_string['histoName'] += "'DijetFilter/dijetMassHisto/dijetMassHisto_isrptcut_300'"
-    output_string['histoName'] += "]"
+    histoNameOutput = histoNameFunc(inpuHistoNameDict["keyType"], inpuHistoNameDict["keyValue"])
+    output_string['histoName'] ="histoName = %s"%(histoNameOutput)
+
+    # output_string['histoName'] += "]"
 
     keys.append('variables_range')
     output_string['variables_range'] = "variables_range = ['mjj_Low[%s.,%s.]', 'mjj_Blind[%s.,%s.]', 'mjj_High[%s.,%s.]']"%(mjjLowLeft,mjjLowRight,mjjBlindLeft,mjjBlindRight,mjjHighLeft,mjjHighRight)
@@ -87,18 +113,21 @@ def createConfigFile(configPath, configFileName, text):
     configFile.write(text)
     print "Config file %s/%s was created!"%(configPath, configFileName)
 
-def writeLaTeXTable(outputFileName, chiSquare_dict, isrPtCutArray, minBinArr, maxBin):
+def writeLaTeXTable(outputFileName, chiSquare_dict, xCutArray, minBinArr, maxBin):
     outFile = open(outputFileName,"w")
-    output = "\\begin{table}[h]\n \\begin{tabular}{|l||"+"c|"*(len(isrPtCutArray)+1)+"}\n"
-    output+="\\textbf{Fit range / isr pT cut}"
-    for i,isrPtCut in enumerate(isrPtCutArray):
-        output+= " & $p_{T,ISR} > %s $"%(isrPtCut)
+    output = "\\begin{table}[h]\n \\begin{tabular}{|l||"+"c|"*(len(minBinArr)+1)+"}\n"
+    # output+="\\textbf{Fit range / isr pT cut}"
+    output+="\\textbf{Trigger/ fit range}"
+    for i,minBin in enumerate(minBinArr):
+        # output+= " & $p_{T,ISR} > %s $"%(cut)
+        output+=" & $%s < m_{jj} < %s$"%(minBin, maxBin)
     output+=" \\\\\n"
     output+="\\hline\n \\hline\n"
-    for j,minBin in enumerate(minBinArr):
-        output+=" $%s < m_{jj} < %s$"%(minBin, maxBin)
-        for i,isrPtCut in enumerate(isrPtCutArray):
-            output+=" & %s"%(chiSquare_dict[int(isrPtCut)][int(minBin)])
+    print("chiSquare_dict:",chiSquare_dict)
+    for j,cut in enumerate(xCutArray):
+        output+= " \\verb|%s|"%(cut)
+        for i,minBin in enumerate(minBinArr):
+            output+=" & %4.2f"%(chiSquare_dict[str(cut)][int(minBin)])
         output+=" \\\\\n \\hline\n"
 
     output+= " \\end{tabular}"
@@ -109,41 +138,68 @@ def writeLaTeXTable(outputFileName, chiSquare_dict, isrPtCutArray, minBinArr, ma
 def main(options,args):
     configFileTemplateName = options.config
     box = options.box
-    isrPtCutArray   = [50.,60.,70.,80.,90.,100.]
-    minBinArr = [244., 270., 296., 325.]
-
+    isCreateConfigFile = options.isCreateConfigFile
+    isCreateChi2Table = options.isCreateChi2Table
+    isrPtCutArray   = [40,50,60,70,80,90]
+#    isrPtCutArray   = [70]
+    triggerArray = ["L1_HTT240", "L1_HTT240 && HT270", "L1_HTT240 && L1_HTT270", "L1_HTT240 && L1_HTT320", "L1_HTT_240..270_or", "L1_HTT_240..280_or", "L1_HTT_240..300_or", "L1_HTT_240..320_or"]
+    minBinArr = [220, 244, 270, 296, 325]
+    cutDict = {"trigger":  triggerArray,
+               "isrPtCut": isrPtCutArray}
+    keyType = options.cutType
     # isrPtCutArray   = [70.]
     # minBinArr = [296.]
-    chiSquareHisto = ROOT.TH2F("chi2_profile", "Chi2 profile", len(isrPtCutArray), isrPtCutArray[0], isrPtCutArray[-1]+10., len(minBinArr), minBinArr[0], signal_mjj_binning[signal_mjj_binning.index(minBinArr[-1])+1])
-    chiSquareHisto.GetXaxis().SetTitle("ISR pT cut")
-    chiSquareHisto.GetYaxis().SetTitle("Fit Range")
-    c1 = ROOT.TCanvas("chi2_profile","#Chi^{2}/ndof", 0,0,1600,1600)
+    chiSquareHisto = ROOT.TH2F("chi2_profile", "Chi2 profile", len(cutDict[keyType]), 0.5, len(cutDict)+0.5, len(minBinArr), minBinArr[0], signal_mjj_binning[signal_mjj_binning.index(minBinArr[-1])+1])
+    #chiSquareHisto.GetYaxis().Set
+    c1 = ROOT.TCanvas("chi2_profile","chi2/ndof", 0,0,2000,900)
     chiSquare_dict = {}
-    for i,isrPtCut in enumerate(isrPtCutArray):
-        chiSquare_dict[int(isrPtCut)] = {}
-        chiSquareHisto.GetXaxis().SetBinLabel(i+1, "p_{T,ISR} > " + str(isrPtCut))
+    # for i,isrPtCut in enumerate(isrPtCutArray):
+    if keyType == "isrPtCut":
+        chiSquareHisto.GetXaxis().SetTitle("ISR pT cut")
+    elif keyType == "trigger":
+        chiSquareHisto.GetXaxis().SetTitle("Trigger")
+    chiSquareHisto.GetYaxis().SetTitle("Fit Range")
+    for i,keyValue in enumerate(cutDict[keyType]):
+        # chiSquare_dict[int(isrPtCut)] = {}
+        if keyType == "isrPtCut":
+            keyValue = str(int(keyValue))
+            chiSquareHisto.GetXaxis().SetBinLabel(i+1, "p_{T,ISR} > " + keyValue)
+        elif keyType == "trigger":
+            chiSquareHisto.GetXaxis().SetBinLabel(i+1, keyValue)
+
+        chiSquare_dict[keyValue] = {}
+
         for j,minBin in enumerate(minBinArr):
-            isrPtCut = isrPtCut
+            # isrPtCut = isrPtCut
             fitRanges = minBin,minBin,1000.
             variables_range = minBin,1000,minBin,1000,minBin,1000
-            configText = writeConfigFile(configFileTemplateName,box,isrPtCut,fitRanges,variables_range)
-            configPath = "/mnt/t3nfs01/data01/shome/dbrzhech/DijetScouting/CMSSW_7_4_14/src/CMSDIJET/DijetRootTreeAnalyzer/config/"
-            configFileName = "dijet_isr_DijetFisherAlt4_isrpt_%s_minBin_%s.config"%(int(isrPtCut),int(minBin))
-            createConfigFile(configPath, configFileName, configText)
-            chiSquare = BinnedFitMod.BinnedFitMod(options, args, configPath+configFileName,str(int(isrPtCut)), str(int(minBin)))
-            chiSquare_dict[int(isrPtCut)][int(minBin)] = chiSquare
-            chiSquareHisto.GetYaxis().SetBinLabel(j+1, str(minBin) + " < m_{jj} < " + str(fitRanges[2]))
-            chiSquareHisto.Fill(isrPtCut,minBin,chiSquare)
+            configText = writeConfigFile(configFileTemplateName,box,{"keyType": keyType, "keyValue": keyValue},fitRanges,variables_range)
+            configPath = os.getcwd()+'/'
+            configFileName = "%s_isrpt_%s_minBin_%s.config"%(options.config.split(".")[0], keyValue.replace(' ', '_').replace('&&','and'),int(minBin))
+            if isCreateConfigFile:
+                createConfigFile(configPath, configFileName, configText)
+            if isCreateChi2Table:
+                print("BinnedFitMod.BinnedFitMod(%s, %s, %s, %s, %s)"%(str(options),str(args),str(configPath+configFileName),str(keyValue.replace(' ', '_').replace('&&','and')),str(int(minBin))))
+                chiSquare = BinnedFitMod.BinnedFitMod(options, args, configPath+configFileName, keyValue.replace(' ', '_').replace('&&','and'), str(int(minBin)))
+                print("chiSquare = %s"%chiSquare)
+                chiSquare_dict[keyValue][int(minBin)] = chiSquare
+                chiSquareHisto.GetYaxis().SetBinLabel(j+1, str(int(minBin)) + " < m_{jj} < " + str(int(fitRanges[2])))
+                chiSquareHisto.SetBinContent(i+1,j+1,chiSquare)
 
-    latexText = writeLaTeXTable("chi2_table.tex", chiSquare_dict, isrPtCutArray, minBinArr, 1000)
+    if isCreateChi2Table:
+        #latexText = writeLaTeXTable("chi2_table_blind_deta1.3.tex", chiSquare_dict, isrPtCutArray, minBinArr, 1000)
+        latexText = writeLaTeXTable(options.latexOut, chiSquare_dict, cutDict[keyType], minBinArr, 1000)
     # print latexText
     # exit()
-    outputFile = ROOT.TFile.Open("chi2_profile.root","RECREATE")
-
-    chiSquareHisto.Draw("COLZ")
-    c1.Write()
+    if isCreateChi2Table:
+        #outputFile = ROOT.TFile.Open("chi2_profile_blind_deta1.3.root","RECREATE")
+        outputFile = ROOT.TFile.Open(options.rootOut,"RECREATE")
+        chiSquareHisto.SetMaximum(10)
+        chiSquareHisto.Draw("COLZ TEXT")
+        chiSquareHisto.Write()
+    # c1.Write()
     # print chiSquare_dict
-    raw_input("Press enter...")
+    # raw_input("Press enter...")
 
 
 
@@ -152,6 +208,16 @@ if __name__ == '__main__':
     parser = OptionParser()
     parser.add_option('-c','--config',dest="config",type="string",default="config/run2.config",
                   help="Name of the config file to use")
+    parser.add_option('','--cut-type',dest="cutType",type="string",default="isrPtCut",
+                  help="Cut variable for x-axis")
+    parser.add_option('','--latex-out',dest="latexOut",type="string",default="output_chi2.tex",
+                  help="Name of the output file with chi square table")
+    parser.add_option('','--root-out',dest="rootOut",type="string",default="output_chi2.root",
+                  help="Name of the output root file with chi square histogram")
+    parser.add_option('','--config-create',dest="isCreateConfigFile",type="string",
+                  help="Create config file")
+    parser.add_option('','--chi2table-create',dest="isCreateChi2Table",type="string",
+                  help="Create chi2 table results")
     parser.add_option('-d','--dir',dest="outDir",default="./",type="string",
                   help="Output directory to store cards")
     parser.add_option('-l','--lumi',dest="lumi", default=1.,type="float",

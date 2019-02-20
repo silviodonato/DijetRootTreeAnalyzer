@@ -6,7 +6,17 @@ from array import *
 from optparse import OptionParser
 from inputAcceptance import acc_dict
 
-g_qsim = 0.25
+
+q_qsim_withDM = 0.25
+def g_qsim(Mres):
+    C_M = 0
+    for mq in [2.2E-3, 4.7E-3, 95E-3, 1.275, 4.18, 173.0]:
+        if Mres>2*mq:
+            C_M += (1 - 4*(mq/Mres)**2 )**0.5 * (1 + 2*(mq/Mres)**2 )
+    g_qsim = q_qsim_withDM * (1./(1.+1./(3*C_M*q_qsim_withDM**2)))**0.5
+    return g_qsim
+
+
 #acceptance from 300 to 1000 GeV with 50 GeV step
 # def acceptance_func(matching):
 #     acceptance_arr={
@@ -157,7 +167,7 @@ def getHybridCLsArrays(directory, model, Box, bayes):
         xsec_table = table_xsec['DM1GeV'][int(xsecTree.mass)]
 
         if isCouplingLimit:
-            gqULObs = rt.TMath.Sqrt(xsecULObs/acceptance/xsec_table)*g_qsim
+            gqULObs = rt.TMath.Sqrt(xsecULObs/acceptance/xsec_table)*g_qsim(int(xsecTree.mass))
             observedLimit.append(gqULObs)
         else:
             observedLimit.append(xsecULObs)#*crossSections[i])
@@ -165,7 +175,7 @@ def getHybridCLsArrays(directory, model, Box, bayes):
         observedLimit_er.append(0.0)#*crossSections[i])
 
         if isCouplingLimit:
-            gqULExp = rt.TMath.Sqrt(xsecULExp/acceptance/xsec_table)*g_qsim
+            gqULExp = rt.TMath.Sqrt(xsecULExp/acceptance/xsec_table)*g_qsim(int(xsecTree.mass))
             expectedLimit.append(gqULExp)
         else:
             expectedLimit.append(xsecULExp)#*crossSections[i])
@@ -178,10 +188,10 @@ def getHybridCLsArrays(directory, model, Box, bayes):
         xsecULExpMinus2 = min(xsecULExpMinus2,xsecULExpMinus)
 
         if isCouplingLimit:
-            gqULExpPlus = rt.TMath.Sqrt(max(xsecULExpPlus,xsecULExp)/acceptance/xsec_table)*g_qsim
-            gqULExpMinus = rt.TMath.Sqrt(min(xsecULExpMinus,xsecULExp)/acceptance/xsec_table)*g_qsim
-            gqULExpPlus2 = rt.TMath.Sqrt(max(xsecULExpPlus2,xsecULExpPlus)/acceptance/xsec_table)*g_qsim
-            gqULExpMinus2 = rt.TMath.Sqrt(min(xsecULExpMinus2,xsecULExpMinus)/acceptance/xsec_table)*g_qsim
+            gqULExpPlus = rt.TMath.Sqrt(max(xsecULExpPlus,xsecULExp)/acceptance/xsec_table)*g_qsim(int(xsecTree.mass))
+            gqULExpMinus = rt.TMath.Sqrt(min(xsecULExpMinus,xsecULExp)/acceptance/xsec_table)*g_qsim(int(xsecTree.mass))
+            gqULExpPlus2 = rt.TMath.Sqrt(max(xsecULExpPlus2,xsecULExpPlus)/acceptance/xsec_table)*g_qsim(int(xsecTree.mass))
+            gqULExpMinus2 = rt.TMath.Sqrt(min(xsecULExpMinus2,xsecULExpMinus)/acceptance/xsec_table)*g_qsim(int(xsecTree.mass))
             expectedLimit_minus1sigma.append(gqULExp - gqULExpMinus)
             expectedLimit_plus1sigma.append(gqULExpPlus - gqULExp)
             expectedLimit_minus2sigma.append(gqULExp - gqULExpMinus2)
@@ -502,6 +512,7 @@ if __name__ == '__main__':
     box = Box.lower()
     isCouplingLimit = options.isCouplingLimit
     matching = options.isCouplingLimit
+    if matching == False: matching = "jets01"
     # acc_dict = acceptance_func(matching)
 
     thyXsecDict = getThyXsecDict()
@@ -617,10 +628,10 @@ if __name__ == '__main__':
         for mg in sorted(thyXsecDict[thyModel].keys()):
             if not isCouplingLimit:
                 mass_xsec[thyModel].append(mg)
-                sig_xsec[thyModel].append(thyXsecDict[thyModel][mg])
+                sig_xsec[thyModel].append(thyXsecDict[thyModel][mg] * acc_dict[matching][int(mg)] )
             else:
                 mass_xsec[thyModel].append(mg)
-                thyXsecDict[thyModel][mg] = g_qsim
+                thyXsecDict[thyModel][mg] = g_qsim(mg)
                 sig_xsec[thyModel].append(thyXsecDict[thyModel][mg])
 
         N_g_xsec[thyModel] = len(mass_xsec[thyModel])
@@ -633,7 +644,8 @@ if __name__ == '__main__':
     setstyle()
     rt.gStyle.SetOptStat(0)
     c = rt.TCanvas("c","c",800,800)
-    if options.doSignificance:
+    if options.doSignificance or options.isCouplingLimit:
+#    if options.doSignificance:
         c.SetLogy(0)
     else:
         c.SetLogy()

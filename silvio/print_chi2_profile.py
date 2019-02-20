@@ -57,6 +57,7 @@ def print_chi2_profile(fileIn):
     c1.SaveAs(fileIn.replace(".root",".png"))
     f1.Close()
 
+'''
 print_chi2_profile("/mnt/t3nfs01/data01/shome/sdonato/scoutingAnalysis/CMSSW_7_4_14/src/CMSDIJET/DijetRootTreeAnalyzer/trigger_Alt4_studies_deta1p1_full_ten_percent_blind.root")
 print_chi2_profile("/mnt/t3nfs01/data01/shome/sdonato/scoutingAnalysis/CMSSW_7_4_14/src/CMSDIJET/DijetRootTreeAnalyzer/trigger_Alt4_studies_deta1p1_full_ten_percent.root")
 print_chi2_profile("/mnt/t3nfs01/data01/shome/sdonato/scoutingAnalysis/CMSSW_7_4_14/src/CMSDIJET/DijetRootTreeAnalyzer/trigger_Alt4_studies_deta1p1_full_blind.root")
@@ -100,3 +101,6 @@ print_chi2_profile("/mnt/t3nfs01/data01/shome/sdonato/scoutingAnalysis/CMSSW_7_4
 print_chi2_profile("/mnt/t3nfs01/data01/shome/sdonato/scoutingAnalysis/CMSSW_7_4_14/src/CMSDIJET/DijetRootTreeAnalyzer/isrPt_Nom5_studies_deta1p1_full_ten_percent_blind.root")
 print_chi2_profile("/mnt/t3nfs01/data01/shome/sdonato/scoutingAnalysis/CMSSW_7_4_14/src/CMSDIJET/DijetRootTreeAnalyzer/isrPt_Nom5_studies_deta1p1_full_ten_percent.root")
 print_chi2_profile("/mnt/t3nfs01/data01/shome/sdonato/scoutingAnalysis/CMSSW_7_4_14/src/CMSDIJET/DijetRootTreeAnalyzer/isrPt_Nom5_studies_deta1p1_full_blind.root")
+'''
+print_chi2_profile("/mnt/t3nfs01/data01/shome/sdonato/scoutingAnalysis/CMSSW_7_4_14/src/CMSDIJET/DijetRootTreeAnalyzer/trigger_Alt5_studies_deta1p1_full_blind.root")
+

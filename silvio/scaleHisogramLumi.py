@@ -1,11 +1,11 @@
 import ROOT
 import os
 
-lumiIn     = 1.654
-lumiOut    = 18.321
+lumiIn     = 1.992
+lumiOut    = 21.190
 
-fileIn   = "input_jets01_fakeFullLumi/full.root"
-fileOut  = "input_jets01_fakeFullLumi/full_extFullData.root"
+fileIn   = "data_wRunH_deta1p1_full_ten_percent.root"
+fileOut  = "data_wRunH_deta1p1_ext.root"
 
 print("scale(%s,%s)"%(fileIn,fileOut))
 f1 = ROOT.TFile.Open(fileIn)

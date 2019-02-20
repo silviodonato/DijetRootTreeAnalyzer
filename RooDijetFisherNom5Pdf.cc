@@ -42,8 +42,8 @@ RooDijetFisherNom5Pdf::RooDijetFisherNom5Pdf(const char *name, const char *title
   xBins(0),
   xMax(0),
   xMin(0),
-  relTol(2E-32),
-  absTol(2E-32)
+  relTol(1E-12),
+  absTol(1E-12)
 {
   memset(&xArray, 0, sizeof(xArray));
 }

@@ -14,6 +14,9 @@ import math
 densityCorr = False
 
 def binnedFit(pdf, data, fitRange='Full',useWeight=False):
+    print("######################### HELLO ###############")
+    pdf.Print()
+    data.Print()
     if useWeight:
         fr = pdf.fitTo(data,rt.RooFit.Range(fitRange),rt.RooFit.Extended(True),rt.RooFit.SumW2Error(True),rt.RooFit.Save(),rt.RooFit.Minimizer('Minuit2','migrad'),rt.RooFit.Strategy(2))
         migrad_status = fr.status()
@@ -439,6 +442,14 @@ if __name__ == '__main__':
     dataHist = rt.RooDataHist("data_obs","data_obs",rt.RooArgList(th1x), rt.RooFit.Import(myRealTH1))
     dataHist.Print('v')
 
+    print("paramNames=",paramNames)
+    for parNTot in paramNames:
+        if "Ntot" in parNTot:
+            break
+    parNTot_ = w.var(parNTot)
+    print("%s = %d"%(parNTot,parNTot_.getVal()))
+    parNTot_.setVal(dataHist.sum(rt.kFALSE))
+    print("%s = %d"%(parNTot,parNTot_.getVal()))
 
     rootTools.Utils.importToWS(w,dataHist)
 
@@ -703,7 +714,7 @@ if __name__ == '__main__':
         l.SetTextFont(42)
         l.SetNDC()
         #l.DrawLatex(0.7,0.96,"%i pb^{-1} (%i TeV)"%(lumi,w.var('sqrts').getVal()/1000.))
-        l.DrawLatex(0.73,0.96,"%d fb^{-1} (%i TeV)"%(lumi/1000.,w.var('sqrts').getVal()/1000.))
+        l.DrawLatex(0.73,0.96,"%.1f fb^{-1} (%i TeV)"%(lumi/1000.,w.var('sqrts').getVal()/1000.))
         # PAS
         #l.SetTextSize(0.055)
         #l.DrawLatex(0.175,0.96,"CMS")
@@ -975,7 +986,7 @@ if __name__ == '__main__':
     l.SetTextFont(42)
     l.SetNDC()
     #l.DrawLatex(0.7,0.96,"%i pb^{-1} (%i TeV)"%(lumi,w.var('sqrts').getVal()/1000.))
-    l.DrawLatex(0.7,0.94,"%d fb^{-1} (%i TeV)"%(lumi/1000.,w.var('sqrts').getVal()/1000.))
+    l.DrawLatex(0.7,0.94,"%.1f fb^{-1} (%i TeV)"%(lumi/1000.,w.var('sqrts').getVal()/1000.))
     # PAS
     #l.SetTextFont(62)
     #l.SetTextSize(0.055)
@@ -1042,7 +1053,7 @@ if __name__ == '__main__':
         pave_sel.AddText("Wide PF-jets")
         #pave_sel.AddText("%.1f < m_{jj} < %.1f TeV"%(w.var('mjj').getMin('Low')/1000.,w.var('mjj').getMax('High')/1000.))
         pave_sel.AddText("m_{jj} > %.2f TeV"%(w.var('mjj').getMin('Low')/1000.))
-    pave_sel.AddText("|#eta| < 2.5, |#Delta#eta| < 1.3")
+    pave_sel.AddText("|#eta| < 2.5, |#Delta#eta| < 1.1")
     pave_sel.Draw("SAME")
 
     list_parameter = [p0_b, p0_b*(w.var('Ntot_bkg_%s'%box).getErrorHi() - w.var('Ntot_bkg_%s'%box).getErrorLo())/(2.0*w.var('Ntot_bkg_%s'%box).getVal()),

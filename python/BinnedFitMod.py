@@ -22,8 +22,8 @@ def binnedFit(pdf, data, fitRange='Full',useWeight=False):
         nll = pdf.createNLL(data,rt.RooFit.Range(fitRange),rt.RooFit.Extended(True),rt.RooFit.Offset(True))
         m2 = rt.RooMinimizer(nll)
         m2.setStrategy(2)
-        m2.setMaxFunctionCalls(100000 * 10000)
-        m2.setMaxIterations(100000 * 10000)
+        m2.setMaxFunctionCalls(10000 )
+        m2.setMaxIterations(10000 )
         migrad_status = m2.minimize('Minuit2','migrad')
         improve_status = m2.minimize('Minuit2','improve')
         hesse_status = m2.minimize('Minuit2','hesse')
@@ -37,8 +37,8 @@ def effFit(pdf, data, conditionalObs):
     nll = pdf.createNLL(data,rt.RooFit.Range('Eff'),rt.RooFit.Offset(True),rt.RooFit.ConditionalObservables(conditionalObs))
     m2 = rt.RooMinimizer(nll)
     m2.setStrategy(2)
-    m2.setMaxFunctionCalls(100000  * 10000)
-    m2.setMaxIterations(100000  * 10000)
+    m2.setMaxFunctionCalls(10000  )
+    m2.setMaxIterations(10000  )
     migrad_status = m2.minimize('Minuit2','migrad')
     improve_status = m2.minimize('Minuit2','improve')
     hesse_status = m2.minimize('Minuit2','hesse')
@@ -58,8 +58,9 @@ def simFit(pdf, data, fitRange, effPdf, effData, conditionalObs):
 
     m2 = rt.RooMinimizer(simNll)
     m2.setStrategy(2)
-    m2.setMaxFunctionCalls(100000  * 10000)
-    m2.setMaxIterations(100000  * 10000)
+    m2.setMaxFunctionCalls(10000 )
+    m2.setMaxIterations(10000  )
+
     migrad_status = m2.minimize('Minuit2','migrad')
     improve_status = m2.minimize('Minuit2','improve')
     hesse_status = m2.minimize('Minuit2','hesse')
@@ -212,7 +213,7 @@ def calculateChi2AndFillResiduals(data_obs_TGraph_,background_hist_,hist_fit_res
 
     return [chi2_FullRangeAll, ndf_FullRangeAll, chi2_PlotRangeAll, ndf_PlotRangeAll, chi2_PlotRangeNonZero, ndf_PlotRangeNonZero, chi2_PlotRangeMinNumEvents, ndf_PlotRangeMinNumEvents]
 
-def BinnedFitMod(options,args,configFile,isrPtCut,minRange):
+def BinnedFitMod(options,args,configFile,cutValueDir,minRange):
 
     rt.RooMsgService.instance().setGlobalKillBelow(rt.RooFit.FATAL)
     rt.gStyle.SetPaintTextFormat('+.2f')
@@ -225,7 +226,7 @@ def BinnedFitMod(options,args,configFile,isrPtCut,minRange):
     fitRegion = options.fitRegion
     plotRegion = options.plotRegion
     histoName = cfg.getVariables(box, "histoName")
-    optionsOutdir = options.outDir+'/fit_results_'+box+'_isrpt_'+isrPtCut+'_minrange_'+minRange
+    optionsOutdir = options.outDir+'/fit_results_'+box+'_isrpt_'+cutValueDir+'_minrange_'+minRange
     if not os.path.exists(optionsOutdir):
         os.mkdir(optionsOutdir)
 
@@ -397,6 +398,14 @@ def BinnedFitMod(options,args,configFile,isrPtCut,minRange):
     dataHist = rt.RooDataHist("data_obs","data_obs",rt.RooArgList(th1x), rt.RooFit.Import(myRealTH1))
     dataHist.Print('v')
 
+    print("paramNames=",paramNames)
+    for parNTot in paramNames:
+        if "Ntot" in parNTot:
+            break
+    parNTot_ = w.var(parNTot)
+    print("BEFORE ----> %s = %d"%(parNTot,parNTot_.getVal()))
+    parNTot_.setVal(dataHist.sum(rt.kFALSE))
+    print("AFTER ----> %s = %d"%(parNTot,parNTot_.getVal()))
 
     rootTools.Utils.importToWS(w,dataHist)
 
@@ -663,7 +672,7 @@ def BinnedFitMod(options,args,configFile,isrPtCut,minRange):
         l.SetTextFont(42)
         l.SetNDC()
         #l.DrawLatex(0.7,0.96,"%i pb^{-1} (%i TeV)"%(lumi,w.var('sqrts').getVal()/1000.))
-        l.DrawLatex(0.73,0.96,"%d fb^{-1} (%i TeV)"%(lumi/1000.,w.var('sqrts').getVal()/1000.))
+        l.DrawLatex(0.73,0.96,"%.1f fb^{-1} (%i TeV)"%(lumi/1000.,w.var('sqrts').getVal()/1000.))
         # PAS
         #l.SetTextSize(0.055)
         #l.DrawLatex(0.175,0.96,"CMS")
@@ -935,7 +944,7 @@ def BinnedFitMod(options,args,configFile,isrPtCut,minRange):
     l.SetTextFont(42)
     l.SetNDC()
     #l.DrawLatex(0.7,0.96,"%i pb^{-1} (%i TeV)"%(lumi,w.var('sqrts').getVal()/1000.))
-    l.DrawLatex(0.7,0.94,"%d fb^{-1} (%i TeV)"%(lumi/1000.,w.var('sqrts').getVal()/1000.))
+    l.DrawLatex(0.7,0.94,"%.1f fb^{-1} (%i TeV)"%(lumi/1000.,w.var('sqrts').getVal()/1000.))
     # PAS
     #l.SetTextFont(62)
     #l.SetTextSize(0.055)
@@ -1001,7 +1010,7 @@ def BinnedFitMod(options,args,configFile,isrPtCut,minRange):
         pave_sel.AddText("Wide PF-jets")
         #pave_sel.AddText("%.1f < m_{jj} < %.1f TeV"%(w.var('mjj').getMin('Low')/1000.,w.var('mjj').getMax('High')/1000.))
         pave_sel.AddText("m_{jj} > %.2f TeV"%(w.var('mjj').getMin('Low')/1000.))
-    pave_sel.AddText("|#eta| < 2.5, |#Delta#eta| < 1.3")
+    pave_sel.AddText("|#eta| < 2.5, |#Delta#eta| < 1.1")
     pave_sel.Draw("SAME")
 
     list_parameter = [p0_b, p0_b*(w.var('Ntot_bkg_%s'%box).getErrorHi() - w.var('Ntot_bkg_%s'%box).getErrorLo())/(2.0*w.var('Ntot_bkg_%s'%box).getVal()),
