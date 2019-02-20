@@ -63,8 +63,6 @@ python python/GetCombine.py -d cards_qq_freq/ -m qq --mass range\(300,1001,50\) 
 python python/Plot1DLimit_silvio.py -d cards_qq_freq/ -m qq -b CaloTrijet2016 -l 1.654 --massMin 100 --massMax 1200  --xsecMin 1 --xsecMax 10000 &&
 python python/Plot1DLimit_silvio.py -d cards_qq_freq/ -m qq -b CaloTrijet2016 -l 1.654 --massMin 100 --massMax 1200  --xsecMin 0.0 --xsecMax 0.45 --coupling jets01
 
-rm -rf cards_qq_freq_jets01_ten_percent_Nom5 && mv cards_qq_freq cards_qq_freq_jets01_ten_percent_Nom5 && ln -s cards_qq_freq_jets01_ten_percent_Nom5 cards_qq_freq
-
 mkdir -p cards_qq_freq_jets01_ten_percent_Alt5
 rm -rf cards_qq_freq
 ln -s cards_qq_freq_jets01_ten_percent_Alt5 cards_qq_freq
@@ -95,8 +93,6 @@ done
 python python/GetCombine.py -d cards_qq_freq/ -m qq --mass range\(300,1001,50\) -b CaloTrijet2016 --xsec 1 -l 1.654 && \
 python python/Plot1DLimit_silvio.py -d cards_qq_freq/ -m qq -b CaloTrijet2016 -l 1.654 --massMin 100 --massMax 1200  --xsecMin 1 --xsecMax 10000 &&
 python python/Plot1DLimit_silvio.py -d cards_qq_freq/ -m qq -b CaloTrijet2016 -l 1.654 --massMin 100 --massMax 1200  --xsecMin 0.0 --xsecMax 0.45 --coupling jets01
-
-rm -rf cards_qq_freq_jets01_ten_percent_Alt5 && mv cards_qq_freq cards_qq_freq_jets01_ten_percent_Alt5 && ln -s cards_qq_freq_jets01_ten_percent_Alt5 cards_qq_freq
 
 mkdir -p cards_qq_freq_jets01_ten_percent_Alt4
 rm -rf cards_qq_freq
@@ -129,8 +125,6 @@ python python/GetCombine.py -d cards_qq_freq/ -m qq --mass range\(300,1001,50\) 
 python python/Plot1DLimit_silvio.py -d cards_qq_freq/ -m qq -b CaloTrijet2016 -l 1.654 --massMin 100 --massMax 1200  --xsecMin 1 --xsecMax 10000 &&
 python python/Plot1DLimit_silvio.py -d cards_qq_freq/ -m qq -b CaloTrijet2016 -l 1.654 --massMin 100 --massMax 1200  --xsecMin 0.0 --xsecMax 0.45 --coupling jets01
 
-rm -rf cards_qq_freq_jets01_ten_percent_Alt4 && mv cards_qq_freq cards_qq_freq_jets01_ten_percent_Alt4 && ln -s cards_qq_freq_jets01_ten_percent_Alt4 cards_qq_freq
-
 mkdir -p cards_qq_freq_jets01_ten_percent_Alt3
 rm -rf cards_qq_freq
 ln -s cards_qq_freq_jets01_ten_percent_Alt3 cards_qq_freq
@@ -162,6 +156,5 @@ python python/GetCombine.py -d cards_qq_freq/ -m qq --mass range\(300,1001,50\) 
 python python/Plot1DLimit_silvio.py -d cards_qq_freq/ -m qq -b CaloTrijet2016 -l 1.654 --massMin 100 --massMax 1200  --xsecMin 1 --xsecMax 10000 &&
 python python/Plot1DLimit_silvio.py -d cards_qq_freq/ -m qq -b CaloTrijet2016 -l 1.654 --massMin 100 --massMax 1200  --xsecMin 0.0 --xsecMax 0.45 --coupling jets01
 
-rm -rf cards_qq_freq_jets01_ten_percent_Alt3 && mv cards_qq_freq cards_qq_freq_jets01_ten_percent_Alt3 && ln -s cards_qq_freq_jets01_ten_percent_Alt3 cards_qq_freq
 
 
