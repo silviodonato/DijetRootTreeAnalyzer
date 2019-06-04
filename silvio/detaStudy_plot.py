@@ -1,182 +1,140 @@
 import ROOT
-import copy
+import array
 
-ROOT.gROOT.SetBatch(1)
+redoPlot = True
 
-mass = 600
+'''
+ROOT.gROOT.SetBatch(0)
+canv2 = ROOT.TCanvas()
+'''
+colors = [
+ROOT.kBlack,
 
-wj = 1.1
+ROOT.kYellow+1,
+ROOT.kRed,
+ROOT.kMagenta,
+ROOT.kBlue,
+ROOT.kCyan+1,
+ROOT.kGreen+1,
 
-#wjs = [round(x/10.,1) for x in range(4,19,1)]
+ROOT.kOrange,
+ROOT.kPink,
+ROOT.kViolet,
+ROOT.kAzure,
+ROOT.kTeal,
+ROOT.kSpring,
 
-#detas = [round(x/10.,1) for x in range(4,19,1)]
+ROOT.kGray,
+] 
 
-masses = [
-    200, 300, 400, 500, 600, 800
+bins = [
+    0.0,
+    0.3,
+    0.6,
+    0.9,
+    1.2,
+    1.5,
+    1.8,
+    2.1,
+    2.4,
 ]
 
-#masses = [
-#    mass
-#]
-
-selection = "isr_pt>50 && HLT_CaloScoutingHT250 "
-variable = "abs(dijet_deta)"
-binning = "(60,0,3)"
-
-dataFileName = "/mnt/t3nfs01/data01/shome/dbrzhech/DijetScouting/CMSSW_8_0_30/src/DijetRootTreeAnalyzer/data_wj_studies/data_wj_studies_%sdata.root"
-signalFileName = "/mnt/t3nfs01/data01/shome/sdonato/scoutingNew/copy/CMSSW_7_4_14/src/CMSDIJET/DijetRootTreeAnalyzer/wideJetMC/signal_%s_wj%s.root"
-
-###################################
+bins = [
+    0.0,
+    0.9,
+    1.1,
+]
 
 ROOT.gStyle.SetOptStat(0)
 
-c1 = ROOT.TCanvas("c1","",1280,720)
-#c1.SetLogy()
-c1.SetGridx()
-c1.SetGridy()
-
-colors = [
-ROOT.kRed +3,
-ROOT.kRed +1,
-ROOT.kRed -4,
-ROOT.kRed -7,
-ROOT.kRed -9,
-ROOT.kGreen +3,
-ROOT.kGreen +1,
-ROOT.kGreen -4,
-ROOT.kGreen -7,
-ROOT.kGreen -9,
-ROOT.kBlue +3,
-ROOT.kBlue +1,
-ROOT.kBlue -4,
-ROOT.kBlue -7,
-ROOT.kBlue -9,
-ROOT.kRed +3,
-ROOT.kRed +1,
-ROOT.kRed -4,
-ROOT.kRed -7,
-ROOT.kRed -9,
-ROOT.kGreen +3,
-ROOT.kGreen +1,
-ROOT.kGreen -4,
-ROOT.kGreen -7,
-ROOT.kGreen -9,
-ROOT.kBlue +3,
-ROOT.kBlue +1,
-ROOT.kBlue -4,
-ROOT.kBlue -7,
-ROOT.kBlue -9,
-]
+fileName = "/mnt/t3nfs01/data01/shome/dbrzhech/DijetScouting/CMSSW_8_0_30/src/DijetRootTreeAnalyzer/data_wj_studies/data_wj_studies_1.3data.root"
 
 
-def getHisto(fileName, sel = selection):
-    file_ = ROOT.TFile.Open(fileName)
+#fileName = "../ntupleSignal/VectorDiJet1Jet_150_13TeV.root"
+denTrigger = "isr_pt>=70 && HLT_CaloScoutingHT250"
+
+#fileName = "../CaloScoutingHT250.root"
+#denTrigger = "HLT_CaloScoutingHT250"
+#denTrigger = "1"
+
+#fileName = "../ntupleTrigger/CaloJet40Skim.root"
+#denTrigger = "1"
+
+
+preselect = denTrigger + "&& 1" #
+title = "Di-jet mass plot"
+
+varX = "dijet_mass"
+#varX_nbins,   varX_min,  varX_max = 200,100,1100
+#varX_nbins,   varX_min,  varX_max = 50,0,1000
+varX_nbins,   varX_min,  varX_max = 40,100,500
+#varX_nbins,   varX_min,  varX_max = 1000,60,1050
+varX_title = "m_{jj}"
+
+fit_min = 320
+
+#######################################################
+
+N = 4
+dijet_eta_max = 3
+#canv.SetTitle(title)
+preselect += "&& (%s < %d)"%(varX,varX_max)
+
+file_ = ROOT.TFile(fileName)
+tree = file_.Get("tree")
+if not type(tree)==ROOT.TTree:
     tree = file_.Get("rootTupleTree/tree")
-    tree.Draw(variable + ">> histo"+binning, sel + "&& dijet_mass>%f && dijet_mass<%f"%(mass*0.9,mass*1.1))
-    print(sel + "&& dijet_mass>%f && dijet_mass<%f"%(mass*0.9,mass*1.1))
-    histo = file_.Get("histo").Clone(fileName.replace("/",""))
+tree.Draw("dijet_eta >> deta(100,0,%f)"%dijet_eta_max,"%s && dijet_mass>300"%(preselect) ,"")
+deta = ROOT.gDirectory.Get("deta")
+deta.Draw("HIST")
+
+x = array.array('d',[i*1./N for i in range(N)])
+y = array.array('d',[0 for i in range(N)])
+deta.GetQuantiles(N,y,x)
+#bins = list(y)
+#funct = ROOT.TF1("funct","pol4",0,3)
+#deta.Fit(funct)
+#funct.Draw("same")
+
+#canv.SaveAs("histoMjj.root")
+
+c2 = ROOT.TCanvas("c2","")
+#c2.SetLogz()
+
+g = ROOT.TGraph2D()
+chi2 = {}
+histos=[]
+for i in range(len(bins)-1):
+    preselect = denTrigger + "&& abs(dijet_deta)>%f && abs(dijet_deta)<%f"%(bins[i],bins[i+1]) #
+    tree.Draw("%s >> histo(%f,%f,%f)"%(varX,varX_nbins,varX_min,varX_max),"%s"%(preselect) ,"")
+    histo = ROOT.gDirectory.Get("histo")
+    histos.append(histo.Clone("%s < #Delta#eta < %s"%((round(bins[i],2)),round(bins[i+1],2))))
+
+
+leg = ROOT.TLegend(0.52,0.7,0.9,0.9)
+#leg.SetHeader("")
+
+for i,histo in enumerate(histos):
+    histo.SetTitle("")
+    histo.GetXaxis().SetTitle("m(jj)")
+    histo.GetYaxis().SetTitle("AU")
+    histo.Sumw2()
+    histo.Scale(1./histo.Integral(histo.FindBin(500),varX_nbins))
+    leg.AddEntry(histo,histo.GetName(),"l") 
+    histo.SetLineColor(colors[i])
     histo.SetLineWidth(2)
-    return copy.copy(histo)
-
-def getBestSsqrtB(dat,sig):
-    s_sqrtB_max = 0
-    for i in range(mass-100,mass,10):
-        bin_min = sig.FindBin(i)
-        for j in range(mass,mass+300,10):
-            bin_max = sig.FindBin(j)
-            s = 1.*sig.Integral(bin_min, bin_max)
-            b = 1.*dat.Integral(bin_min, bin_max)
-            s_sqrtB = s/(b**0.5)
-            if s_sqrtB>s_sqrtB_max:
-                s_sqrtB_max = s_sqrtB
-                minBin = dat.GetBinLowEdge(bin_min)
-                maxBin = dat.GetBinLowEdge(bin_max+1)
-    #            print(i,j,s,b,s_sqrtB_max)
-    return s_sqrtB_max,minBin,maxBin
-
-def getSsqrtB(dat,sig, mass):
-    bin_min = sig.FindBin(mass*0.98)
-    bin_max = sig.FindBin(mass*1.02)
-    s = 1.*sig.Integral(bin_min, bin_max)
-    b = 1.*dat.Integral(bin_min, bin_max)
-    s_sqrtB_max = s/(b**0.5+1E-9)
-    minBin = dat.GetBinLowEdge(bin_min)
-    maxBin = dat.GetBinLowEdge(bin_max+1)
-    return s_sqrtB_max,minBin,maxBin
-
-
-data = {}
-signal = {}
-signalGoodMatch = {}
-data = getHisto(dataFileName%wj)
-for mass in masses:
-    signal[(mass)] = getHisto(signalFileName%(mass,wj))
-    signalGoodMatch[(mass)] = getHisto(signalFileName%(mass,wj), selection + " && (sqrt(TVector2::Phi_mpi_pi(jet1_phi-jet1MC_phi)**2 + (jet1_eta-jet1MC_eta)**2)<0.4 && sqrt(TVector2::Phi_mpi_pi(jet2_phi-jet2MC_phi)**2 + (jet2_eta-jet2MC_eta)**2)<0.4) ")
-print(data)
-
-print(data)
-print(signal)
-
-'''
-## rescale to show plots nicer
-for mass in masses:
-    bin_ = data.FindBin(mass)
-    scale = 10. * data.GetBinContent(bin_) / signal[(0.4,mass)].GetBinContent(bin_)
-    for deta in detas:
-        signal[(mass)].Scale(scale)
-        signalGoodMatch[(mass)].Scale(scale)
-'''
-
-
-
-for matching in [True,False]:
-    if matching:
-        signals = signal
+    histo.SetMinimum(3E-2)
+    if i==0:
+        histo.Draw("ERR")
+        histo.Draw("HIST,C,same")
     else:
-        signals = signalGoodMatch
-    for mass in masses:
-        leg = ROOT.TLegend(0.78,0.83,0.98,0.98)
-#        leg.SetHeader("")
-        print("M(jj) = %s GeV. Matching %s"%(mass,matching))
-        data.SetLineColor(ROOT.kBlack)
-        data.Scale(1./data.Integral())
-        signals[(mass)].Scale(1./signals[(mass)].Integral())
-        signals[(mass)].SetLineColor(ROOT.kRed)
-        signals[(mass)].SetTitle("#Delta#eta (%d GeV)"%mass)
-        signals[(mass)].GetYaxis().SetTitle("Events")
-        signals[(mass)].GetXaxis().SetTitle("#Delta#eta")
-#        signals[(mass)].GetYaxis().SetRangeUser(1E1,1E4)
-        signals[(mass)].SetMaximum(1.2*max(signals[(mass)].GetMaximum(),data.GetMaximum()))
-        signals[(mass)].SetMinimum(0)
-        signals[(mass)].Draw("")
-                
-        data.Draw("same")
-        leg.AddEntry(data,"data")
-        leg.AddEntry(signals[(mass)],"signal")
-    #    SsqrtB,minBin,maxBin = getBestSsqrtB(data[wj],signalGoodMatch[(wj,mass)])
-    #    print("wide jet R=%s, S/sqrt(B)=%s, in mjj=[%s,%s]"%(wj,SsqrtB,minBin,maxBin))
-        SsqrtB,minBin,maxBin = getSsqrtB(data,signals[(mass)],mass)
-        print("wide jet S/sqrt(B)=%s, in mjj=[%s,%s]"%(SsqrtB,minBin,maxBin))
-        leg.Draw()
-
-        c1.Update()
-        c1.Modified()
-        if matching:
-            c1.SaveAs("deta_%s_matching.png"%mass)
-            c1.SaveAs("deta_%s_matching.pdf"%mass)
-        else:
-            c1.SaveAs("deta_%s.png"%mass)
-            c1.SaveAs("deta_%s.pdf"%mass)
-
-#data[wj].Scale(1./data[wj].Integral())
-#signal[(wj,mass)].Scale(1./signal[(wj,mass)].Integral())
-#signalGoodMatch[(wj,mass)].Scale(1./signalGoodMatch[(wj,mass)].Integral())
-
-#data[wj].Draw()
-#signal[(wj,mass)].Draw("same")
-#signalGoodMatch[(wj,mass)].Draw("same")
+        histo.Draw("ERR,same")
+        histo.Draw("HIST,C,same")
 
 
-sig = signalGoodMatch[(mass)]
-dat = data
 
+c2.SetLogy()
+leg.Draw()
+c2.SaveAs("detaplot.png")
+c2.SaveAs("detaplot.pdf")
+#g.Draw("LEGO")c2.SaveAs("plotDeta.png")

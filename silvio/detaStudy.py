@@ -12,7 +12,7 @@ wj = 1.1
 detas = [round(x/10.,1) for x in range(4,28,1)]
 
 masses = [
-    200, 300, 400, 500, 600, 800
+    300, 400, 500, 600
 ]
 
 #masses = [
@@ -23,8 +23,11 @@ selection = "isr_pt>50 && HLT_CaloScoutingHT250 && abs(dijet_deta)<%f "
 variable = "dijet_mass"
 binning = "(200,0,1000)"
 
-dataFileName = "/mnt/t3nfs01/data01/shome/dbrzhech/DijetScouting/CMSSW_8_0_30/src/DijetRootTreeAnalyzer/data_wj_studies/data_wj_studies_%sdata.root"
-signalFileName = "/mnt/t3nfs01/data01/shome/sdonato/scoutingNew/copy/CMSSW_7_4_14/src/CMSDIJET/DijetRootTreeAnalyzer/wideJetMC/signal_%s_wj%s.root"
+dataFileName = "../data_ntuple_CR_nocut.root"
+signalFileName = "mc_signal_%d.root"
+
+#dataFileName = "/mnt/t3nfs01/data01/shome/dbrzhech/DijetScouting/CMSSW_8_0_30/src/DijetRootTreeAnalyzer/data_wj_studies/data_wj_studies_%sdata.root"
+#signalFileName = "/mnt/t3nfs01/data01/shome/sdonato/scoutingNew/copy/CMSSW_7_4_14/src/CMSDIJET/DijetRootTreeAnalyzer/wideJetMC/signal_%s_wj%s.root"
 
 ###################################
 
@@ -71,7 +74,9 @@ ROOT.kBlue -9,
 
 def getHisto(fileName, sel = selection):
     file_ = ROOT.TFile.Open(fileName)
-    tree = file_.Get("rootTupleTree/tree")
+    tree = file_.Get("tree")
+    if not type(tree)==ROOT.TTree:
+        tree = file_.Get("rootTupleTree/tree")
     tree.Draw(variable + ">> histo"+binning, sel%deta)
     print(sel%deta)
     histo = file_.Get("histo").Clone(fileName.replace("/",""))
@@ -109,10 +114,10 @@ data = {}
 signal = {}
 signalGoodMatch = {}
 for deta in detas:
-    data[deta] = getHisto(dataFileName%wj)
+    data[deta] = getHisto(dataFileName)
     for mass in masses:
-        signal[(deta,mass)] = getHisto(signalFileName%(mass,wj))
-        signalGoodMatch[(deta,mass)] = getHisto(signalFileName%(mass,wj), selection + " && (sqrt(TVector2::Phi_mpi_pi(jet1_phi-jet1MC_phi)**2 + (jet1_eta-jet1MC_eta)**2)<0.4 && sqrt(TVector2::Phi_mpi_pi(jet2_phi-jet2MC_phi)**2 + (jet2_eta-jet2MC_eta)**2)<0.4) ")
+        signal[(deta,mass)] = getHisto(signalFileName%(mass))
+        signalGoodMatch[(deta,mass)] = getHisto(signalFileName%(mass), selection + " && (sqrt(TVector2::Phi_mpi_pi(jet1_phi-jet1MC_phi)**2 + (jet1_eta-jet1MC_eta)**2)<0.4 && sqrt(TVector2::Phi_mpi_pi(jet2_phi-jet2MC_phi)**2 + (jet2_eta-jet2MC_eta)**2)<0.4) ")
     print(data[deta])
 
 print(data)

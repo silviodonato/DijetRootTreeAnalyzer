@@ -1,5 +1,6 @@
 signal_mjj = [1, 3, 6, 10, 16, 23, 31, 40, 50, 61, 74, 88, 103, 119, 137, 156, 176, 197, 220, 244, 270, 296, 325, 354, 386, 419, 453, 489, 526, 565, 606, 649, 693, 740, 788, 838, 890, 944, 1000, 1058, 1118, 1181, 1246, 1313, 1383, 1455, 1530, 1607, 1687, 1770, 1856, 1945, 2037, 2132, 2231, 2332, 2438, 2546, 2659, 2775, 2895, 3019, 3147, 3279, 3416, 3558, 3704, 3854, 4010, 4171, 4337, 4509, 4686, 4869, 5058, 5253, 5455, 5663, 5877, 6099, 6328, 6564, 6808, 7060, 7320, 7589, 7866, 8152, 8447, 8752, 9067, 9391, 9726, 10072, 10430, 10798, 11179, 11571, 11977, 12395, 12827, 13272, 13732, 14000]
 
+
 histos = {
   50:'DijetFilter/dijetMassHisto/dijetMassHisto_isrptcut_50_60', 
   60:'DijetFilter/dijetMassHisto/dijetMassHisto_isrptcut_60_70', 
@@ -411,14 +412,16 @@ def updateTxt(txt):
         lines[i] = lines[i].replace("FUNCTION3",function3(function))
         lines[i] = lines[i].replace("XMIN",  str(minx))
         lines[i] = lines[i].replace("XMAX",  str(maxx))
-        histograms = []
-        for isrPt in sorted(histos):
-            if isrPt>=isrPtCut:
-              histograms.append(histos[isrPt])
+        histograms = ['dijetMassHisto_isrptcut_%d'%isrPtCut]
+        ### Old histograms ###
+#        for isrPt in sorted(histos):
+#            if isrPt>=isrPtCut:
+#              histograms.append(histos[isrPt])
         lines[i] = lines[i].replace("HISTOGRAMS", str(histograms))
         bins = []
+        bins.append(minx)
         for bin_ in sorted(signal_mjj):
-            if bin_>=minx and bin_<=maxx:
+            if bin_>minx and bin_<=maxx:
               bins.append(bin_)
         lines[i] = lines[i].replace("BINS", str(bins))
 #        print(histograms)
@@ -467,7 +470,7 @@ def updateTxt(txt):
 '''
 
 functions = [
-("pow(x/pars[0],-pars[1])","DijetFisherNom2"),
+#("pow(x/pars[0],-pars[1])","DijetFisherNom2"),
 ("exp(log(TMath::Max(1E-9,pars[2] * x/pars[0] - 1)))/pow(x/pars[0],pars[1])","DijetFisherNom3"),
 ("exp(log(TMath::Max(1E-9,pars[2] * x/pars[0] - 1)) + pars[3]*x/pars[0])/pow(x/pars[0],pars[1])","DijetFisherNom4"),
 ("exp(log(TMath::Max(1E-9,pars[2] * x/pars[0] - 1)) + pars[3]*x/pars[0] + pars[4]*pow(x/pars[0],2))/pow(x/pars[0],pars[1])","DijetFisherNom5"),
@@ -485,7 +488,7 @@ from optparse import OptionParser
 
 if __name__ == '__main__':
   parser = OptionParser()
-  parser.add_option('-x', '--minx',  dest="minx",  default=296.,  type="float", help="low edge of fit range")
+  parser.add_option('-x', '--minx',  dest="minx",  default=270.,  type="float", help="low edge of fit range")
   parser.add_option('-a', '--maxx',  dest="maxx",  default=1000., type="float", help="high edge of fit range")
   parser.add_option('-b', '--isrPtCut', dest="isrPtCut", default=70.,   type="float", help="isr pt cut")
   (options,args) = parser.parse_args()
@@ -533,6 +536,36 @@ if __name__ == '__main__':
   cd -
   #cd ..
 
-  python python/BinnedFit.py -c config/dijet_isr_%s.config -l 971  -b CaloTrijet2016 -d fits_trijet_silvio_2018/ --fit-spectrum inputs/data_blind_eta2.5_jets01.root --signal inputs/ResonanceShapes_qq_13TeV_CaloScouting_2016.root  --model qq --mass 410 --xsec 20
+######################
 
-  """%(functions[0][1]))
+  python python/BinnedFit.py -c config/dijet_isr_%s.config -l 971  -b CaloTrijet2016 -d fits_trijet_silvio_2018/ --fit-spectrum inputs_Danyyl/data_th1f_full_newmethod_cr_0.root --signal inputs/ResonanceShapes_qq_13TeV_CaloScouting_2016.root  --model qq --mass 410 --xsec 20
+
+######################
+
+  """%(functions[2][1]))
+  
+  print("#########################")
+  print("Created runFisherTest.sh")
+  print("#########################")
+  f = file("runFisherTest.sh",'w')
+  f.write("mkdir -p \\")
+  for function in functions:
+    f.write("Fish_%s \\"%function[1])
+  f.write("\n")
+    
+  for function in functions:
+    f.write('''
+    python python/BinnedFit.py -c config/dijet_isr_%s.config -l 1992  -b CaloTrijet2016 -d Fish_%s/ --fit-spectrum inputs_Danyyl/data_th1f_full_newmethod_cr_4.root --signal inputs/ResonanceShapes_qq_13TeV_CaloScouting_2016.root  --model qq --mass 410 --xsec 20 >& log%s & '''%(function[1],function[1],function[1]))
+    
+  f.write("\n##########################################\n")
+  
+  f.write("mkdir -p \\")
+  for function in functions:
+    f.write("FishFullData_%s \\"%function[1])
+  f.write("\n")
+    
+  for function in functions:
+    f.write('''
+    python python/BinnedFit.py -c config/dijet_isr_%s.config -l 21190  -b CaloTrijet2016 -d FishFullData_%s/ --fit-spectrum inputs_Danyyl/data_th1f_full_flipped_eta.root --signal inputs/ResonanceShapes_qq_13TeV_CaloScouting_2016.root  --model qq --mass 410 --xsec 20 >& logFullData%s & '''%(function[1],function[1],function[1]))
+  f.write('\n\n')
+  f.close()

@@ -423,6 +423,7 @@ if __name__ == '__main__':
     histoName = cfg.getVariables(box, "histoName")
 
     myTH1 = None
+    print("args:",args)
     for f in args:
         if f.lower().endswith('.root'):
             if f.lower().find('resonanceshapes')!=-1:
@@ -430,14 +431,15 @@ if __name__ == '__main__':
             else:
                 rootFile = rt.TFile(f)
                 names = [k.GetName() for k in rootFile.GetListOfKeys()]
-		if type(histoName) == list:
-			myTH1 = rootFile.Get(histoName[0])
-			for histoN in histoName[1:]: myTH1.Add(rootFile.Get(histoN))
-                try:
-                    myTH1 = rootFile.Get(histoName)
-                    myTH1.Print('v')
-                except:
-                    print("%s not found in %s"%(histoName,f))
+                if type(histoName) == list:
+                    myTH1 = rootFile.Get(histoName[0])
+                    for histoN in histoName[1:]: myTH1.Add(rootFile.Get(histoN))
+                else:
+                    try:
+                        myTH1 = rootFile.Get(histoName)
+                        myTH1.Print('v')
+                    except:
+                        print("%s not found in %s"%(histoName,f))
     print("signalFileName ",signalFileName)
     print("myTH1 ",myTH1)
     print("rootFile ",f)
@@ -706,3 +708,4 @@ if __name__ == '__main__':
     w.Write()
     w.Print('v')
     os.system("cat %s"%options.outDir+"/"+outFile.replace(".root",".txt"))
+    del w

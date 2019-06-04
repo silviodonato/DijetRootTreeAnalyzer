@@ -1,6 +1,7 @@
 import ROOT
 
 chi2File = "chi2.txt"
+#chi2File = "chi2FullData.txt"
 
 def lineToNum(l):
   return float(l.split(",")[0])
@@ -8,19 +9,19 @@ def lineToNum(l):
 txt = open(chi2File)
 ls = txt.readlines()
 
-chi2 = {}
-chi2[3] = lineToNum(ls[0])
-chi2[4] = lineToNum(ls[1])
-chi2[5] = lineToNum(ls[2])
-chi2[6] = lineToNum(ls[3])
-chi2[7] = lineToNum(ls[4])
-
 chi2Alt = {}
-chi2Alt[3] = lineToNum(ls[5])
-chi2Alt[4] = lineToNum(ls[6])
-chi2Alt[5] = lineToNum(ls[7])
-chi2Alt[6] = lineToNum(ls[8])
-chi2Alt[7] = lineToNum(ls[9])
+chi2Alt[3] = lineToNum(ls[0])
+chi2Alt[4] = lineToNum(ls[1])
+chi2Alt[5] = lineToNum(ls[2])
+chi2Alt[6] = lineToNum(ls[3])
+chi2Alt[7] = lineToNum(ls[4])
+
+chi2 = {}
+chi2[3] = lineToNum(ls[5])
+chi2[4] = lineToNum(ls[6])
+chi2[5] = lineToNum(ls[7])
+chi2[6] = lineToNum(ls[8])
+chi2[7] = lineToNum(ls[9])
 
 print("chi2 = %s"%str(chi2))
 print("chi2Alt = %s"%str(chi2Alt))
@@ -151,7 +152,7 @@ print(r""" \begin{table}[th]
      3Par-4Par & %.0f & %.3f \\ 
      4Par-5Par & %.1f & %.3f \\ 
      5Par-6Par & %.2f & %.3f \\ 
-     5Par-6Par & %.2f & %.3f \\ 
+     5Par-7Par & %.2f & %.3f \\ 
      \hline
    \end{tabular}
    \caption{Fisher test results are reported for each family.}

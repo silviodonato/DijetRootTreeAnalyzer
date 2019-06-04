@@ -27,38 +27,18 @@ ROOT.kSpring,
 ROOT.kGray,
 ] 
 
-bins = [
-    0.0,
-    0.3,
-    0.6,
-    0.9,
-    1.2,
-    1.5,
-    1.8,
-    2.1,
-    2.4,
-]
-
-bins = [
-    0.0,
-    0.9,
-    1.1,
-]
+bins = range(50,101,5)
 
 ROOT.gStyle.SetOptStat(0)
-#fileName = "/eos/cms/store/group/phys_exotica/dijet/Dijet13TeVScouting/rootTrees_reduced/ScoutingCaloCommissioning_2017-01-18/CommissioningG/rootfile_CaloScoutingCommissioning2016G_JEC_CaloHLT_plus_V10p2_20170119_001201_reduced_skim.root"
-#fileName = "rootFile_reduced_skim.root"
 
-#fileName = "ntupleTrigger/L1HTTSkim.root"
-#fileName = "/mnt/t3nfs01/data01/shome/dbrzhech/DijetScouting/CMSSW_8_0_30/src/DijetRootTreeAnalyzer/rootfile_list_ScoutingCaloCommissioning_Run2016.root"
-#fileName = "/mnt/t3nfs01/data01/shome/dbrzhech/DijetScouting/CMSSW_8_0_30/src/DijetRootTreeAnalyzer/data_trig_eff_wo_runH_eta2.5.root"
-#fileName = "/mnt/t3nfs01/data01/shome/dbrzhech/DijetScouting/CMSSW_8_0_30/src/DijetRootTreeAnalyzer/data_strat_unblind.root"
-#fileName = "/mnt/t3nfs01/data01/shome/sdonato/scoutingNew/copy/CMSSW_7_4_14/src/CMSDIJET/DijetRootTreeAnalyzer/silvio/tmp.root"
-fileName = "/mnt/t3nfs01/data01/shome/dbrzhech/DijetScouting/CMSSW_8_0_30/src/DijetRootTreeAnalyzer/data_wj_studies/data_wj_studies_1.3data.root"
+#fileName = "../inputs_Silvio/data_RunH_ntuple_long.root"
+#fileName = "../inputs_Silvio/test_ntuple.root"
+#fileName = "../data_ntuple_full_study_10perc.root"
+fileName = "../data_ntuple_full_study.root"
 
 
 #fileName = "../ntupleSignal/VectorDiJet1Jet_150_13TeV.root"
-denTrigger = "isr_pt>=70 && HLT_CaloScoutingHT250"
+denTrigger = "abs(dijet_deta)<=1.1 && HLT_CaloScoutingHT250 && L1_HTT240"
 
 #fileName = "../CaloScoutingHT250.root"
 #denTrigger = "HLT_CaloScoutingHT250"
@@ -74,7 +54,7 @@ title = "Di-jet mass plot"
 varX = "dijet_mass"
 #varX_nbins,   varX_min,  varX_max = 200,100,1100
 #varX_nbins,   varX_min,  varX_max = 50,0,1000
-varX_nbins,   varX_min,  varX_max = 50,0,1000
+varX_nbins,   varX_min,  varX_max = 160,100,500
 #varX_nbins,   varX_min,  varX_max = 1000,60,1050
 varX_title = "m_{jj}"
 
@@ -91,16 +71,16 @@ file_ = ROOT.TFile(fileName)
 tree = file_.Get("tree")
 if not type(tree)==ROOT.TTree:
     tree = file_.Get("rootTupleTree/tree")
-tree.Draw("dijet_eta >> deta(100,0,%f)"%dijet_eta_max,"%s && dijet_mass>300"%(preselect) ,"")
-deta = ROOT.gDirectory.Get("deta")
-deta.Draw("HIST")
+tree.Draw("dijet_eta >> isrpt(100,0,%f)"%dijet_eta_max,"%s && dijet_mass>300"%(preselect) ,"")
+isrpt = ROOT.gDirectory.Get("isrpt")
+isrpt.Draw("HIST")
 
 x = array.array('d',[i*1./N for i in range(N)])
 y = array.array('d',[0 for i in range(N)])
-deta.GetQuantiles(N,y,x)
+isrpt.GetQuantiles(N,y,x)
 #bins = list(y)
 #funct = ROOT.TF1("funct","pol4",0,3)
-#deta.Fit(funct)
+#isrpt.Fit(funct)
 #funct.Draw("same")
 
 #canv.SaveAs("histoMjj.root")
@@ -110,30 +90,43 @@ c2 = ROOT.TCanvas("c2","")
 
 g = ROOT.TGraph2D()
 chi2 = {}
+max_ = 0
 histos=[]
 for i in range(len(bins)-1):
-    preselect = denTrigger + "&& abs(dijet_deta)>%f && abs(dijet_deta)<%f"%(bins[i],bins[i+1]) #
+    preselect = denTrigger + "&& isr_pt>%f && isr_pt<%f"%(bins[i],bins[i+1]) #
     tree.Draw("%s >> histo(%f,%f,%f)"%(varX,varX_nbins,varX_min,varX_max),"%s"%(preselect) ,"")
     histo = ROOT.gDirectory.Get("histo")
-    histos.append(histo.Clone("[%s,%s]"%((round(bins[i],2)),round(bins[i+1],2))))
+    histos.append(histo.Clone("%s < p_{T,3} < %s"%((round(bins[i],2)),round(bins[i+1],2))))
+    max_ = max(max_, histo.GetMaximum())
 
 
-leg = ROOT.TLegend(0.52,0.7,0.9,0.9)
+leg = ROOT.TLegend(0.52,0.4,0.9,0.9)
 #leg.SetHeader("")
 
 for i,histo in enumerate(histos):
+    histo.SetTitle("")
+    histo.GetXaxis().SetTitle("m(jj)")
+    histo.GetYaxis().SetTitle("AU")
     histo.Sumw2()
-    histo.Scale(1./histo.Integral(histo.FindBin(500),varX_nbins))
+    histo.Scale(1./histo.Integral(histo.FindBin(300),varX_nbins))
     leg.AddEntry(histo,histo.GetName(),"l") 
     histo.SetLineColor(colors[i])
     histo.SetLineWidth(2)
+    histo.SetMinimum(0)
+    histo.SetMaximum(0.1)
     if i==0:
         histo.Draw("ERR")
+        histo.Draw("HIST,C,same")
     else:
         histo.Draw("ERR,same")
+        histo.Draw("HIST,C,same")
 
 
-c2.SetLogy()
+
+c2.SetGridx(1)
+c2.SetGridy(1)
+c2.SetLogy(0)
 leg.Draw()
-c2.SaveAs("detaplot.png")
-#g.Draw("LEGO")c2.SaveAs("plotDeta.png")
+c2.SaveAs("isrptplot.png")
+c2.SaveAs("isrptplot.pdf")
+#g.Draw("LEGO")c2.SaveAs("plotisrpt.png")

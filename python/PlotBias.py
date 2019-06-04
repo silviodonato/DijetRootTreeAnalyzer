@@ -40,7 +40,10 @@ def getBiasHistos(varName,toyTree):
     ## except:
     ##     pass
 
-    toyTree.Project('h_bias','%s'%(varName),'(muHiErr+mu)<19&&(mu-muLoErr)>-19')
+    ## SD MOD
+#    toyTree.Project('h_bias','%s'%(varName),'(muHiErr+mu)<19&&(mu-muLoErr)>-19')
+#    toyTree.Project('h_bias','%s'%(varName),'(muHiErr+mu)<9.9&&(mu-muLoErr)>-9.9 && muErr>0 && muLoErr>0 && muHiErr>0')
+    toyTree.Project('h_bias','%s'%(varName),'(muHiErr+mu)<99&&(mu-muLoErr)>-99 && muErr>0 && muLoErr>0 && muHiErr>0')
 
     return h
 
@@ -65,7 +68,8 @@ def getBiasDivRHistos(varName,toyTree):
     ## except:
     ##     pass
 
-    toyTree.Project('h_bias','%s'%(varName),'(muHiErr+mu)<19&&(mu-muLoErr)>-19')
+#    toyTree.Project('h_bias','%s'%(varName),'(muHiErr+mu)<19&&(mu-muLoErr)>-19')
+    toyTree.Project('h_bias','%s'%(varName),'(muHiErr+mu)<99&&(mu-muLoErr)>-99 && muErr>0 && muLoErr>0 && muHiErr>0')
 
     return h
 
@@ -120,8 +124,21 @@ def print1DBias(c,rootFile,h,func,printName,xTitle,yTitle,lumiLabel="",boxLabel=
     tLeg.SetLineColor(rt.kWhite)
     tLeg.SetLineWidth(0)
     tLeg.SetFillStyle(0)
-    tLeg.AddEntry(h,"#splitline{Pseudodata}{%s (%s GeV) #mu=%1.3f}"%(options.model, massPoint,rDict[int(massPoint)]),"lep")
-    tLeg.AddEntry(func,"#splitline{Gaussian fit}{mean = %+1.2f, s.d. = %1.2f}"%(func.GetParameter(1),func.GetParameter(2)),"l")
+    integ    = h.Integral(h.FindBin(-100),h.FindBin(1000))
+    bin_l = h.FindBin(h.GetMean()-2.+0.5*h.GetBinWidth(1))
+    bin_h = h.FindBin(h.GetMean()+2.-0.5*h.GetBinWidth(1))
+    integ_2s = h.Integral(bin_l, bin_h)
+    if integ>0:
+       fract_2s = integ_2s/integ
+       fract_2s_err = (fract_2s * (1. - fract_2s)/ integ)**0.5
+    else:
+       fract_2s = 0
+       fract_2s_err = 0    
+
+#    tLeg.AddEntry(h,"#splitline{Pseudodata}{%s (%s GeV) #mu=%1.3f }"%(options.model, massPoint,rDict[int(massPoint)]),"lep")
+    tLeg.AddEntry(h,"#splitline{Pseudodata %s (%s GeV) #mu=%1.3f }{mean = %1.2f, RMS = %1.2f}"%(options.model, massPoint,rDict[int(massPoint)],h.GetMean(),h.GetRMS()),"lep")
+    tLeg.AddEntry(func,"#splitline{Gaussian fit}{#mu = %+1.2f #pm %1.2f, #sigma = %1.2f #pm %1.2f}"%(func.GetParameter(1),func.GetParError(1),func.GetParameter(2),func.GetParError(2)),"l")
+    tLeg.AddEntry(func,"#splitline{%1.2f<#mu<%1.2f: %d / %d}{%1.1f %% #pm %1.1f %%}"%(h.GetBinLowEdge(bin_l),h.GetBinLowEdge(bin_h+1),integ_2s, integ , fract_2s*100, fract_2s_err*100),"")
 
     tLeg.Draw("same")
 
@@ -161,6 +178,8 @@ def print1DBias(c,rootFile,h,func,printName,xTitle,yTitle,lumiLabel="",boxLabel=
                 }
     l.DrawLatex(0.15,0.82,'gen. pdf = %s'%pdf_dict[options.genPdf])
     l.DrawLatex(0.15,0.77,'fit pdf = %s'%pdf_dict[options.fitPdf])
+    l.DrawLatex(0.15,0.72,'%i toys'%h.GetEntries())
+
 
     c.cd()
 
@@ -275,7 +294,7 @@ if __name__ == '__main__':
         #gaus_func.SetParameter(0,100)
         gaus_func_divr.SetParameter(0,5)
         gaus_func_divr.SetParameter(1,0)
-        gaus_func_divr.SetParameter(2,0.5)
+        gaus_func_divr.SetParameter(2,0.2)
         print1DBias(c,tdirectory,h_bias_divr,gaus_func_divr,options.outDir+"/bias_divr_%s_%s_lumi-%s_r-%s_%s_%s_%s.pdf"%(options.model,massPoint,('%.3f'%(options.lumi/1000.)).replace('.','p'),('%.3f'%rDict[int(massPoint)]).replace('.','p'),box,options.genPdf,options.fitPdf),"Bias (#hat{#mu} - #mu)/#mu",eventsLabel,lumiLabel,boxLabel,'',None)
 
         graph_divr.SetPoint(i, int(massPoint), 100.*gaus_func_divr.GetParameter(1))

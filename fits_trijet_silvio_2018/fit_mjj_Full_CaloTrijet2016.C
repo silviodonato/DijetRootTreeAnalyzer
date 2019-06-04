@@ -1,7 +1,7 @@
 void fit_mjj_Full_CaloTrijet2016()
 {
 //=========Macro generated from canvas: c/c
-//=========  (Mon Jan 21 10:36:53 2019) by ROOT version6.02/05
+//=========  (Mon May 13 14:21:43 2019) by ROOT version6.02/05
    TCanvas *c = new TCanvas("c", "c",0,0,600,700);
    gStyle->SetOptStat(0);
    gStyle->SetOptTitle(0);
@@ -18,7 +18,7 @@ void fit_mjj_Full_CaloTrijet2016()
    TPad *c_1 = new TPad("c_1", "c_1",0.01,0.37,0.99,0.98);
    c_1->Draw();
    c_1->cd();
-   c_1->Range(105.1613,-4.69897,1047.097,4.978449);
+   c_1->Range(117.4194,-4.69897,1046.452,4.978449);
    c_1->SetFillColor(0);
    c_1->SetBorderMode(0);
    c_1->SetBorderSize(2);
@@ -33,12 +33,12 @@ void fit_mjj_Full_CaloTrijet2016()
    c_1->SetFrameBorderMode(0);
    c_1->SetFrameFillStyle(0);
    c_1->SetFrameBorderMode(0);
-   Double_t xAxis1[19] = {270, 296, 325, 354, 386, 419, 453, 489, 526, 565, 606, 649, 693, 740, 788, 838, 890, 944, 1000}; 
+   Double_t xAxis1[19] = {280, 296, 325, 354, 386, 419, 453, 489, 526, 565, 606, 649, 693, 740, 788, 838, 890, 944, 1000}; 
    
-   TH1F *data_obs_density1 = new TH1F("data_obs_density1","Dijet Mass",18, xAxis1);
+   TH1D *data_obs_density1 = new TH1D("data_obs_density1","Dijet Mass",18, xAxis1);
    data_obs_density1->SetMinimum(2e-05);
    data_obs_density1->SetMaximum(20000);
-   data_obs_density1->SetEntries(1.237625e+08);
+   data_obs_density1->SetEntries(5018);
    data_obs_density1->SetLineColor(0);
    data_obs_density1->SetLineWidth(0);
    data_obs_density1->SetMarkerColor(0);
@@ -59,114 +59,114 @@ void fit_mjj_Full_CaloTrijet2016()
    data_obs_density1->GetZaxis()->SetTitleFont(42);
    data_obs_density1->Draw("axis");
    
-   TF1 *CaloTrijet2016_bkg_unbin1 = new TF1("*CaloTrijet2016_bkg_unbin",270,1000,1);
+   TF1 *CaloTrijet2016_bkg_unbin1 = new TF1("*CaloTrijet2016_bkg_unbin",280,1000,1);
     //The original function :  had originally been created by:
-    //TF1 *CaloTrijet2016_bkg_unbin = new TF1("CaloTrijet2016_bkg_unbin",,270,1000,1);
-   CaloTrijet2016_bkg_unbin1->SetRange(270,1000);
+    //TF1 *CaloTrijet2016_bkg_unbin = new TF1("CaloTrijet2016_bkg_unbin",,280,1000,1);
+   CaloTrijet2016_bkg_unbin1->SetRange(280,1000);
    CaloTrijet2016_bkg_unbin1->SetName("CaloTrijet2016_bkg_unbin");
    CaloTrijet2016_bkg_unbin1->SetTitle("");
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(0,617.0933);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(1,597.0345);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(2,573.0606);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(3,546.7559);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(4,519.2674);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(5,491.4185);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(6,463.7927);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(7,436.7962);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(8,410.7035);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(9,385.6924);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(10,361.8694);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(11,339.289);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(12,317.968);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(13,297.8964);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(14,279.0454);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(15,261.3733);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(16,244.8301);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(17,229.3608);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(18,214.9079);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(19,201.4128);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(20,188.8176);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(21,177.0658);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(22,166.1025);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(23,155.8754);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(24,146.3349);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(25,137.434);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(26,129.1283);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(27,121.3765);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(28,114.1396);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(29,107.3815);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(30,101.0685);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(31,95.16913);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(32,89.65424);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(33,84.49677);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(34,79.67159);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(35,75.15541);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(36,70.92664);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(37,66.96527);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(38,63.25277);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(39,59.77195);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(40,56.5069);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(41,53.44288);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(42,50.56621);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(43,47.86424);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(44,45.32523);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(45,42.93827);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(46,40.69327);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(47,38.58086);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(48,36.59234);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(49,34.71963);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(50,32.95522);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(51,31.29215);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(52,29.72392);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(53,28.24453);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(54,26.84835);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(55,25.53016);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(56,24.28511);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(57,23.10867);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(58,21.99662);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(59,20.94502);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(60,19.95021);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(61,19.00876);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(62,18.11748);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(63,17.27337);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(64,16.47365);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(65,15.71572);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(66,14.99713);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(67,14.3156);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(68,13.669);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(69,13.05532);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(70,12.4727);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(71,11.91938);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(72,11.3937);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(73,10.89414);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(74,10.41924);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(75,9.967638);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(76,9.538062);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(77,9.129311);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(78,8.740258);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(79,8.369843);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(80,8.017071);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(81,7.681002);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(82,7.360755);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(83,7.055499);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(84,6.764451);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(85,6.486874);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(86,6.222072);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(87,5.969389);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(88,5.728208);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(89,5.497946);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(90,5.27805);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(91,5.068002);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(92,4.867311);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(93,4.675511);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(94,4.492165);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(95,4.316858);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(96,4.149198);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(97,3.988813);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(98,3.835352);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(99,3.688484);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(100,3.547892);
-   CaloTrijet2016_bkg_unbin1->SetSavedPoint(101,270);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(0,171.4057);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(1,160.6031);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(2,150.1472);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(3,140.1422);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(4,130.6492);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(5,121.6985);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(6,113.299);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(7,105.4453);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(8,98.12185);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(9,91.30706);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(10,84.9754);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(11,79.0993);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(12,73.65042);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(13,68.60047);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(14,63.92184);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(15,59.58794);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(16,55.57348);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(17,51.8546);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(18,48.40891);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(19,45.21553);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(20,42.25504);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(21,39.50944);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(22,36.96209);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(23,34.59761);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(24,32.40186);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(25,30.36179);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(26,28.46539);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(27,26.70164);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(28,25.06037);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(29,23.53227);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(30,22.10877);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(31,20.78198);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(32,19.54466);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(33,18.39015);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(34,17.31233);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(35,16.30557);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(36,15.36467);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(37,14.48486);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(38,13.66175);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(39,12.89129);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(40,12.16973);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(41,11.49364);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(42,10.85983);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(43,10.26536);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(44,9.707529);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(45,9.183822);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(46,8.691921);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(47,8.229682);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(48,7.795117);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(49,7.386386);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(50,7.001783);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(51,6.639727);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(52,6.29875);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(53,5.977489);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(54,5.67468);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(55,5.389145);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(56,5.119792);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(57,4.865603);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(58,4.625631);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(59,4.398995);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(60,4.184872);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(61,3.982498);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(62,3.791158);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(63,3.610185);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(64,3.438957);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(65,3.276893);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(66,3.123451);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(67,2.978122);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(68,2.840431);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(69,2.709936);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(70,2.586219);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(71,2.468892);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(72,2.357589);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(73,2.251969);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(74,2.151711);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(75,2.056514);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(76,1.966097);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(77,1.880193);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(78,1.798554);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(79,1.720947);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(80,1.647151);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(81,1.57696);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(82,1.51018);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(83,1.446627);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(84,1.38613);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(85,1.328526);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(86,1.273663);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(87,1.221397);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(88,1.171593);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(89,1.124121);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(90,1.078863);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(91,1.035704);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(92,0.9945365);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(93,0.9552595);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(94,0.9177773);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(95,0.8819993);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(96,0.8478401);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(97,0.815219);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(98,0.7840596);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(99,0.7542897);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(100,0.7258409);
+   CaloTrijet2016_bkg_unbin1->SetSavedPoint(101,280);
    CaloTrijet2016_bkg_unbin1->SetSavedPoint(102,1000);
    CaloTrijet2016_bkg_unbin1->SetFillColor(19);
    CaloTrijet2016_bkg_unbin1->SetFillStyle(0);
@@ -180,11 +180,11 @@ void fit_mjj_Full_CaloTrijet2016()
    CaloTrijet2016_bkg_unbin1->GetYaxis()->SetLabelSize(0.035);
    CaloTrijet2016_bkg_unbin1->GetYaxis()->SetTitleSize(0.035);
    CaloTrijet2016_bkg_unbin1->GetYaxis()->SetTitleFont(42);
-   CaloTrijet2016_bkg_unbin1->SetParameter(0,9.326059e-06);
+   CaloTrijet2016_bkg_unbin1->SetParameter(0,6.366135e-08);
    CaloTrijet2016_bkg_unbin1->SetParError(0,0);
    CaloTrijet2016_bkg_unbin1->SetParLimits(0,0,0);
    CaloTrijet2016_bkg_unbin1->Draw("csame");
-   TLatex *   tex = new TLatex(0.7,0.94,"0 fb^{-1} (13 TeV)");
+   TLatex *   tex = new TLatex(0.7,0.94,"2.0 fb^{-1} (13 TeV)");
 tex->SetNDC();
    tex->SetTextFont(42);
    tex->SetTextSize(0.055);
@@ -228,120 +228,120 @@ tex->SetNDC();
    pt->SetTextAlign(11);
    pt->SetTextFont(42);
    pt->SetTextSize(0.045);
-   AText = pt->AddText("#chi^{2} / NDF = 27.3 / 14 = 1.9");
+   AText = pt->AddText("#chi^{2} / NDF = 13.3 / 14 = 1.0");
    AText = pt->AddText("Wide Calo-jets");
-   AText = pt->AddText("0.27 < m_{jj} < 1.00 TeV");
+   AText = pt->AddText("0.28 < m_{jj} < 1.00 TeV");
    AText = pt->AddText("|#eta| < 2.5, |#Delta#eta| < 1.1");
    pt->Draw();
    
-   TF1 *CaloTrijet2016_bkg_unbin2 = new TF1("*CaloTrijet2016_bkg_unbin",270,1000,1);
+   TF1 *CaloTrijet2016_bkg_unbin2 = new TF1("*CaloTrijet2016_bkg_unbin",280,1000,1);
     //The original function :  had originally been created by:
-    //TF1 *CaloTrijet2016_bkg_unbin = new TF1("CaloTrijet2016_bkg_unbin",,270,1000,1);
-   CaloTrijet2016_bkg_unbin2->SetRange(270,1000);
+    //TF1 *CaloTrijet2016_bkg_unbin = new TF1("CaloTrijet2016_bkg_unbin",,280,1000,1);
+   CaloTrijet2016_bkg_unbin2->SetRange(280,1000);
    CaloTrijet2016_bkg_unbin2->SetName("CaloTrijet2016_bkg_unbin");
    CaloTrijet2016_bkg_unbin2->SetTitle("");
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(0,617.0933);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(1,597.0345);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(2,573.0606);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(3,546.7559);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(4,519.2674);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(5,491.4185);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(6,463.7927);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(7,436.7962);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(8,410.7035);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(9,385.6924);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(10,361.8694);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(11,339.289);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(12,317.968);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(13,297.8964);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(14,279.0454);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(15,261.3733);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(16,244.8301);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(17,229.3608);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(18,214.9079);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(19,201.4128);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(20,188.8176);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(21,177.0658);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(22,166.1025);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(23,155.8754);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(24,146.3349);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(25,137.434);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(26,129.1283);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(27,121.3765);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(28,114.1396);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(29,107.3815);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(30,101.0685);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(31,95.16913);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(32,89.65424);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(33,84.49677);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(34,79.67159);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(35,75.15541);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(36,70.92664);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(37,66.96527);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(38,63.25277);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(39,59.77195);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(40,56.5069);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(41,53.44288);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(42,50.56621);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(43,47.86424);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(44,45.32523);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(45,42.93827);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(46,40.69327);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(47,38.58086);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(48,36.59234);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(49,34.71963);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(50,32.95522);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(51,31.29215);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(52,29.72392);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(53,28.24453);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(54,26.84835);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(55,25.53016);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(56,24.28511);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(57,23.10867);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(58,21.99662);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(59,20.94502);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(60,19.95021);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(61,19.00876);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(62,18.11748);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(63,17.27337);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(64,16.47365);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(65,15.71572);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(66,14.99713);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(67,14.3156);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(68,13.669);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(69,13.05532);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(70,12.4727);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(71,11.91938);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(72,11.3937);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(73,10.89414);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(74,10.41924);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(75,9.967638);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(76,9.538062);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(77,9.129311);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(78,8.740258);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(79,8.369843);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(80,8.017071);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(81,7.681002);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(82,7.360755);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(83,7.055499);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(84,6.764451);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(85,6.486874);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(86,6.222072);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(87,5.969389);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(88,5.728208);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(89,5.497946);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(90,5.27805);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(91,5.068002);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(92,4.867311);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(93,4.675511);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(94,4.492165);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(95,4.316858);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(96,4.149198);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(97,3.988813);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(98,3.835352);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(99,3.688484);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(100,3.547892);
-   CaloTrijet2016_bkg_unbin2->SetSavedPoint(101,270);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(0,171.4057);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(1,160.6031);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(2,150.1472);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(3,140.1422);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(4,130.6492);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(5,121.6985);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(6,113.299);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(7,105.4453);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(8,98.12185);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(9,91.30706);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(10,84.9754);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(11,79.0993);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(12,73.65042);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(13,68.60047);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(14,63.92184);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(15,59.58794);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(16,55.57348);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(17,51.8546);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(18,48.40891);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(19,45.21553);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(20,42.25504);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(21,39.50944);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(22,36.96209);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(23,34.59761);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(24,32.40186);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(25,30.36179);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(26,28.46539);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(27,26.70164);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(28,25.06037);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(29,23.53227);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(30,22.10877);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(31,20.78198);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(32,19.54466);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(33,18.39015);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(34,17.31233);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(35,16.30557);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(36,15.36467);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(37,14.48486);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(38,13.66175);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(39,12.89129);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(40,12.16973);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(41,11.49364);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(42,10.85983);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(43,10.26536);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(44,9.707529);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(45,9.183822);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(46,8.691921);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(47,8.229682);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(48,7.795117);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(49,7.386386);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(50,7.001783);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(51,6.639727);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(52,6.29875);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(53,5.977489);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(54,5.67468);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(55,5.389145);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(56,5.119792);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(57,4.865603);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(58,4.625631);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(59,4.398995);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(60,4.184872);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(61,3.982498);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(62,3.791158);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(63,3.610185);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(64,3.438957);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(65,3.276893);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(66,3.123451);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(67,2.978122);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(68,2.840431);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(69,2.709936);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(70,2.586219);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(71,2.468892);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(72,2.357589);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(73,2.251969);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(74,2.151711);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(75,2.056514);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(76,1.966097);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(77,1.880193);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(78,1.798554);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(79,1.720947);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(80,1.647151);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(81,1.57696);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(82,1.51018);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(83,1.446627);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(84,1.38613);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(85,1.328526);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(86,1.273663);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(87,1.221397);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(88,1.171593);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(89,1.124121);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(90,1.078863);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(91,1.035704);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(92,0.9945365);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(93,0.9552595);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(94,0.9177773);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(95,0.8819993);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(96,0.8478401);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(97,0.815219);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(98,0.7840596);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(99,0.7542897);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(100,0.7258409);
+   CaloTrijet2016_bkg_unbin2->SetSavedPoint(101,280);
    CaloTrijet2016_bkg_unbin2->SetSavedPoint(102,1000);
    CaloTrijet2016_bkg_unbin2->SetFillColor(19);
    CaloTrijet2016_bkg_unbin2->SetFillStyle(0);
@@ -355,13 +355,13 @@ tex->SetNDC();
    CaloTrijet2016_bkg_unbin2->GetYaxis()->SetLabelSize(0.035);
    CaloTrijet2016_bkg_unbin2->GetYaxis()->SetTitleSize(0.035);
    CaloTrijet2016_bkg_unbin2->GetYaxis()->SetTitleFont(42);
-   CaloTrijet2016_bkg_unbin2->SetParameter(0,9.326059e-06);
+   CaloTrijet2016_bkg_unbin2->SetParameter(0,6.366135e-08);
    CaloTrijet2016_bkg_unbin2->SetParError(0,0);
    CaloTrijet2016_bkg_unbin2->SetParLimits(0,0,0);
    CaloTrijet2016_bkg_unbin2->Draw("csame");
    
    Double_t g_data_clone_fx3001[18] = {
-   283,
+   288,
    310.5,
    339.5,
    370,
@@ -380,26 +380,26 @@ tex->SetNDC();
    917,
    972};
    Double_t g_data_clone_fy3001[18] = {
-   577.0381,
-   476.8166,
-   373.8143,
-   285.4472,
-   213.5628,
-   159.1555,
-   117.9024,
-   87.28998,
-   64.53556,
-   47.49125,
-   34.96103,
-   25.72205,
-   18.8925,
-   13.94982,
-   10.26437,
-   7.597441,
-   5.620666,
-   4.140356};
+   159.4485,
+   128.924,
+   96.57798,
+   71.35509,
+   52.06788,
+   37.97243,
+   27.65325,
+   20.12864,
+   14.66093,
+   10.64939,
+   7.731589,
+   5.606631,
+   4.067782,
+   2.957674,
+   2.163665,
+   1.582725,
+   1.154042,
+   0.845767};
    Double_t g_data_clone_felx3001[18] = {
-   13,
+   8,
    14.5,
    14.5,
    16,
@@ -418,26 +418,26 @@ tex->SetNDC();
    27,
    28};
    Double_t g_data_clone_fely3001[18] = {
-   0.1511873,
-   0.1301297,
-   0.1152202,
-   0.09584902,
-   0.0816405,
-   0.06943385,
-   0.05807775,
-   0.04929253,
-   0.0412826,
-   0.03453939,
-   0.02893728,
-   0.02453727,
-   0.02034677,
-   0.01730069,
-   0.01454055,
-   0.01226681,
-   0.01035372,
-   0.008726183};
+   0.07073184,
+   0.04724247,
+   0.04088884,
+   0.03345817,
+   0.02814445,
+   0.02367879,
+   0.01963752,
+   0.01652612,
+   0.01373767,
+   0.01141919,
+   0.009500901,
+   0.007998145,
+   0.006591655,
+   0.005561847,
+   0.004660949,
+   0.003908997,
+   0.003275504,
+   0.002753565};
    Double_t g_data_clone_fehx3001[18] = {
-   13,
+   8,
    14.5,
    14.5,
    16,
@@ -456,33 +456,33 @@ tex->SetNDC();
    27,
    28};
    Double_t g_data_clone_fehy3001[18] = {
-   0.1512269,
-   0.1301652,
-   0.1152558,
-   0.09588121,
-   0.08167171,
-   0.06946414,
-   0.05810637,
-   0.04932037,
-   0.04130901,
-   0.03456452,
-   0.02896124,
-   0.02456069,
-   0.0203687,
-   0.01732215,
-   0.01456116,
-   0.01228663,
-   0.01037281,
-   0.008744593};
+   0.07076322,
+   0.04725979,
+   0.04090616,
+   0.03347387,
+   0.02815966,
+   0.02369356,
+   0.01965147,
+   0.0165397,
+   0.01375055,
+   0.01143144,
+   0.009512583,
+   0.008009562,
+   0.006602345,
+   0.005572316,
+   0.004671001,
+   0.003918664,
+   0.003284814,
+   0.002762544};
    TGraphAsymmErrors *grae = new TGraphAsymmErrors(18,g_data_clone_fx3001,g_data_clone_fy3001,g_data_clone_felx3001,g_data_clone_fehx3001,g_data_clone_fely3001,g_data_clone_fehy3001);
    grae->SetName("g_data_clone");
    grae->SetTitle("Dijet Mass");
    grae->SetMarkerStyle(20);
    grae->SetMarkerSize(0);
    
-   TH1F *Graph_g_data_clone3001 = new TH1F("Graph_g_data_clone3001","Dijet Mass",100,197,1073);
-   Graph_g_data_clone3001->SetMinimum(3.718467);
-   Graph_g_data_clone3001->SetMaximum(634.4951);
+   TH1F *Graph_g_data_clone3001 = new TH1F("Graph_g_data_clone3001","Dijet Mass",100,208,1072);
+   Graph_g_data_clone3001->SetMinimum(0.7587121);
+   Graph_g_data_clone3001->SetMaximum(175.3869);
    Graph_g_data_clone3001->SetDirectory(0);
    Graph_g_data_clone3001->SetStats(0);
 
@@ -507,7 +507,7 @@ tex->SetNDC();
    grae->Draw("zp");
    
    Double_t Graph_from_data_obs_rebin_fx3002[18] = {
-   283,
+   288,
    310.5,
    339.5,
    370,
@@ -526,26 +526,26 @@ tex->SetNDC();
    917,
    972};
    Double_t Graph_from_data_obs_rebin_fy3002[18] = {
-   577.0381,
-   476.8166,
-   373.8143,
-   285.4472,
-   213.5628,
-   159.1555,
-   117.9024,
-   87.28998,
-   64.53556,
-   47.49125,
-   34.96103,
-   25.72205,
-   18.8925,
-   13.94982,
-   10.26437,
-   7.597441,
-   5.620666,
-   4.140356};
+   159.4485,
+   128.924,
+   96.57798,
+   71.35509,
+   52.06788,
+   37.97243,
+   27.65325,
+   20.12864,
+   14.66093,
+   10.64939,
+   7.731589,
+   5.606631,
+   4.067782,
+   2.957674,
+   2.163665,
+   1.582725,
+   1.154042,
+   0.845767};
    Double_t Graph_from_data_obs_rebin_felx3002[18] = {
-   13,
+   8,
    14.5,
    14.5,
    16,
@@ -564,26 +564,26 @@ tex->SetNDC();
    27,
    28};
    Double_t Graph_from_data_obs_rebin_fely3002[18] = {
-   0.1511873,
-   0.1301297,
-   0.1152202,
-   0.09584902,
-   0.0816405,
-   0.06943385,
-   0.05807775,
-   0.04929253,
-   0.0412826,
-   0.03453939,
-   0.02893728,
-   0.02453727,
-   0.02034677,
-   0.01730069,
-   0.01454055,
-   0.01226681,
-   0.01035372,
-   0.008726183};
+   0.07073184,
+   0.04724247,
+   0.04088884,
+   0.03345817,
+   0.02814445,
+   0.02367879,
+   0.01963752,
+   0.01652612,
+   0.01373767,
+   0.01141919,
+   0.009500901,
+   0.007998145,
+   0.006591655,
+   0.005561847,
+   0.004660949,
+   0.003908997,
+   0.003275504,
+   0.002753565};
    Double_t Graph_from_data_obs_rebin_fehx3002[18] = {
-   13,
+   8,
    14.5,
    14.5,
    16,
@@ -602,33 +602,33 @@ tex->SetNDC();
    27,
    28};
    Double_t Graph_from_data_obs_rebin_fehy3002[18] = {
-   0.1512269,
-   0.1301652,
-   0.1152558,
-   0.09588121,
-   0.08167171,
-   0.06946414,
-   0.05810637,
-   0.04932037,
-   0.04130901,
-   0.03456452,
-   0.02896124,
-   0.02456069,
-   0.0203687,
-   0.01732215,
-   0.01456116,
-   0.01228663,
-   0.01037281,
-   0.008744593};
+   0.07076322,
+   0.04725979,
+   0.04090616,
+   0.03347387,
+   0.02815966,
+   0.02369356,
+   0.01965147,
+   0.0165397,
+   0.01375055,
+   0.01143144,
+   0.009512583,
+   0.008009562,
+   0.006602345,
+   0.005572316,
+   0.004671001,
+   0.003918664,
+   0.003284814,
+   0.002762544};
    grae = new TGraphAsymmErrors(18,Graph_from_data_obs_rebin_fx3002,Graph_from_data_obs_rebin_fy3002,Graph_from_data_obs_rebin_felx3002,Graph_from_data_obs_rebin_fehx3002,Graph_from_data_obs_rebin_fely3002,Graph_from_data_obs_rebin_fehy3002);
    grae->SetName("Graph_from_data_obs_rebin");
    grae->SetTitle("Dijet Mass");
    grae->SetMarkerStyle(20);
    grae->SetMarkerSize(0.9);
    
-   TH1F *Graph_Graph_from_data_obs_rebin3002 = new TH1F("Graph_Graph_from_data_obs_rebin3002","Dijet Mass",100,197,1073);
-   Graph_Graph_from_data_obs_rebin3002->SetMinimum(3.718467);
-   Graph_Graph_from_data_obs_rebin3002->SetMaximum(634.4951);
+   TH1F *Graph_Graph_from_data_obs_rebin3002 = new TH1F("Graph_Graph_from_data_obs_rebin3002","Dijet Mass",100,208,1072);
+   Graph_Graph_from_data_obs_rebin3002->SetMinimum(0.7587121);
+   Graph_Graph_from_data_obs_rebin3002->SetMaximum(175.3869);
    Graph_Graph_from_data_obs_rebin3002->SetDirectory(0);
    Graph_Graph_from_data_obs_rebin3002->SetStats(0);
 
@@ -649,42 +649,47 @@ tex->SetNDC();
    grae->SetHistogram(Graph_Graph_from_data_obs_rebin3002);
    
    grae->Draw("zp");
-      tex = new TLatex(290,1000,"10^{6}");
+      tex = new TLatex(275.5733,10000,"10^{7}");
    tex->SetTextAlign(32);
    tex->SetTextFont(42);
    tex->SetLineWidth(2);
    tex->Draw();
-      tex = new TLatex(290,100,"10^{5}");
+      tex = new TLatex(275.5733,1000,"10^{6}");
    tex->SetTextAlign(32);
    tex->SetTextFont(42);
    tex->SetLineWidth(2);
    tex->Draw();
-      tex = new TLatex(290,10,"10^{4}");
+      tex = new TLatex(275.5733,100,"10^{5}");
    tex->SetTextAlign(32);
    tex->SetTextFont(42);
    tex->SetLineWidth(2);
    tex->Draw();
-      tex = new TLatex(290,1,"10^{3}");
+      tex = new TLatex(275.5733,10,"10^{4}");
    tex->SetTextAlign(32);
    tex->SetTextFont(42);
    tex->SetLineWidth(2);
    tex->Draw();
-      tex = new TLatex(290,0.1,"10^{2}");
+      tex = new TLatex(275.5733,1,"10^{3}");
    tex->SetTextAlign(32);
    tex->SetTextFont(42);
    tex->SetLineWidth(2);
    tex->Draw();
-      tex = new TLatex(290,0.01,"10");
+      tex = new TLatex(275.5733,0.1,"10^{2}");
    tex->SetTextAlign(32);
    tex->SetTextFont(42);
    tex->SetLineWidth(2);
    tex->Draw();
-      tex = new TLatex(290,0.001,"1");
+      tex = new TLatex(275.5733,0.01,"10");
    tex->SetTextAlign(32);
    tex->SetTextFont(42);
    tex->SetLineWidth(2);
    tex->Draw();
-      tex = new TLatex(290,0.0001,"10^{#minus1}");
+      tex = new TLatex(275.5733,0.001,"1");
+   tex->SetTextAlign(32);
+   tex->SetTextFont(42);
+   tex->SetLineWidth(2);
+   tex->Draw();
+      tex = new TLatex(275.5733,0.0001,"10^{#minus1}");
    tex->SetTextAlign(32);
    tex->SetTextFont(42);
    tex->SetLineWidth(2);
@@ -696,7 +701,7 @@ tex->SetNDC();
    TPad *c_2 = new TPad("c_2", "c_2",0.01,0.02,0.99,0.36);
    c_2->Draw();
    c_2->cd();
-   c_2->Range(105.1613,-7.269231,1047.097,3.5);
+   c_2->Range(117.4194,-7.269231,1046.452,3.5);
    c_2->SetFillColor(0);
    c_2->SetBorderMode(0);
    c_2->SetBorderSize(2);
@@ -708,27 +713,27 @@ tex->SetNDC();
    c_2->SetBottomMargin(0.35);
    c_2->SetFrameBorderMode(0);
    c_2->SetFrameBorderMode(0);
-   Double_t xAxis2[19] = {270, 296, 325, 354, 386, 419, 453, 489, 526, 565, 606, 649, 693, 740, 788, 838, 890, 944, 1000}; 
+   Double_t xAxis2[19] = {280, 296, 325, 354, 386, 419, 453, 489, 526, 565, 606, 649, 693, 740, 788, 838, 890, 944, 1000}; 
    
    TH1D *h_fit_residual_vs_mass2 = new TH1D("h_fit_residual_vs_mass2","h_fit_residual_vs_mass",18, xAxis2);
-   h_fit_residual_vs_mass2->SetBinContent(1,-0.7412418);
-   h_fit_residual_vs_mass2->SetBinContent(2,2.294092);
-   h_fit_residual_vs_mass2->SetBinContent(3,-1.080883);
-   h_fit_residual_vs_mass2->SetBinContent(4,-1.113561);
-   h_fit_residual_vs_mass2->SetBinContent(5,-0.7336093);
-   h_fit_residual_vs_mass2->SetBinContent(6,0.7759479);
-   h_fit_residual_vs_mass2->SetBinContent(7,-0.8369579);
-   h_fit_residual_vs_mass2->SetBinContent(8,1.328524);
-   h_fit_residual_vs_mass2->SetBinContent(9,1.414175);
-   h_fit_residual_vs_mass2->SetBinContent(10,-0.4118419);
-   h_fit_residual_vs_mass2->SetBinContent(11,1.190146);
-   h_fit_residual_vs_mass2->SetBinContent(12,-0.3009625);
-   h_fit_residual_vs_mass2->SetBinContent(13,-2.568305);
-   h_fit_residual_vs_mass2->SetBinContent(14,0.6579019);
-   h_fit_residual_vs_mass2->SetBinContent(15,-1.622321);
-   h_fit_residual_vs_mass2->SetBinContent(16,0.3128685);
-   h_fit_residual_vs_mass2->SetBinContent(17,1.415403);
-   h_fit_residual_vs_mass2->SetBinContent(18,0.03287753);
+   h_fit_residual_vs_mass2->SetBinContent(1,-0.676937);
+   h_fit_residual_vs_mass2->SetBinContent(2,1.485145);
+   h_fit_residual_vs_mass2->SetBinContent(3,-0.8873656);
+   h_fit_residual_vs_mass2->SetBinContent(4,-1.172049);
+   h_fit_residual_vs_mass2->SetBinContent(5,0.8477082);
+   h_fit_residual_vs_mass2->SetBinContent(6,0.317057);
+   h_fit_residual_vs_mass2->SetBinContent(7,0.09752896);
+   h_fit_residual_vs_mass2->SetBinContent(8,0.10803);
+   h_fit_residual_vs_mass2->SetBinContent(9,-0.05864891);
+   h_fit_residual_vs_mass2->SetBinContent(10,-0.1284022);
+   h_fit_residual_vs_mass2->SetBinContent(11,0.9464905);
+   h_fit_residual_vs_mass2->SetBinContent(12,-0.676359);
+   h_fit_residual_vs_mass2->SetBinContent(13,-1.419426);
+   h_fit_residual_vs_mass2->SetBinContent(14,-0.5725187);
+   h_fit_residual_vs_mass2->SetBinContent(15,0.9636846);
+   h_fit_residual_vs_mass2->SetBinContent(16,1.526958);
+   h_fit_residual_vs_mass2->SetBinContent(17,-0.05911124);
+   h_fit_residual_vs_mass2->SetBinContent(18,-0.8095156);
    h_fit_residual_vs_mass2->SetBinError(1,1);
    h_fit_residual_vs_mass2->SetBinError(2,1);
    h_fit_residual_vs_mass2->SetBinError(3,1);
@@ -773,7 +778,7 @@ tex->SetNDC();
    h_fit_residual_vs_mass2->GetZaxis()->SetTitleSize(0.035);
    h_fit_residual_vs_mass2->GetZaxis()->SetTitleFont(42);
    h_fit_residual_vs_mass2->Draw("hist");
-   TLine *line = new TLine(270,0,1000,0);
+   TLine *line = new TLine(280,0,1000,0);
    line->Draw();
       tex = new TLatex(400,-4,"0.4");
    tex->SetTextAlign(22);

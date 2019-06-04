@@ -23,7 +23,7 @@ parser.add_option("-s", "--step", action="store", type="string", dest="step", de
 parser.add_option("-b", "--batch", action="store", type="string", dest="batch", default="True")
 parser.add_option("", "--matching", action="store", type="string", dest="matching", default="")
 (options, args) = parser.parse_args()
-selection    = "isr_pt > 70 && jet2_pt>70 && jet1_pt>70 && abs(jet1_eta)<2.5 && abs(jet2_eta)<2.5 && abs(isr_eta)<2.5 && abs(dijet_deta) < 1.1 && dijet_mass > 270 && dijet_mass < 1000"
+selection    = "isr_pt > 70 && jet2_pt>70 && jet1_pt>70 && abs(jet1_eta)<2.5 && abs(jet2_eta)<2.5 && abs(isr_eta)<2.5 && abs(dijet_deta) < 1.1 && dijet_mass > 255 && dijet_mass < 1000"
 #selection    = "jet2_pt>70 && jet1_pt>70 && abs(jet1_eta)<2.5 && abs(jet2_eta)<2.5 && abs(isr_eta)<2.5 && abs(dijet_deta) < 1.1 && dijet_mass > 270 && dijet_mass < 1000"
 preselection = "abs(jet1MC_eta)<2.5 && abs(jet2MC_eta)<2.5 && abs(dijetMC_deta) < 1.1"
 #selection    += " && "+preselection
@@ -182,9 +182,16 @@ else:
 # dir_array = options.dir.split(",")
 
 if not options.dir:
-    dir_array = ["/mnt/t3nfs01/data01/shome/dbrzhech/DijetScouting/CMSSW_8_0_30/src/DijetRootTreeAnalyzer/output_jets01_mc_eta2.5_acc_20181114_151035",
-                 "/mnt/t3nfs01/data01/shome/dbrzhech/DijetScouting/CMSSW_8_0_30/src/DijetRootTreeAnalyzer/output_jets02_mc_eta2.5_acc_20181114_152551",
-                 "/mnt/t3nfs01/data01/shome/dbrzhech/DijetScouting/CMSSW_8_0_30/src/DijetRootTreeAnalyzer/output_jets12_mc_eta2.5_acc_20181114_155058",]
+    dir_array = ["/mnt/t3nfs01/data01/shome/dbrzhech/DijetScouting/CMSSW_8_0_30/src/DijetRootTreeAnalyzer/output_jets01_mc_eta2.5_acc_20181114_151035/",
+                 "/mnt/t3nfs01/data01/shome/dbrzhech/DijetScouting/CMSSW_8_0_30/src/DijetRootTreeAnalyzer/output_jets01_mc_eta2.5_acc_20181114_151035/",
+                 "/mnt/t3nfs01/data01/shome/dbrzhech/DijetScouting/CMSSW_8_0_30/src/DijetRootTreeAnalyzer/output_jets01_mc_eta2.5_acc_20181114_151035/",]
+#    dir_array = ["/mnt/t3nfs01/data01/shome/dbrzhech/DijetScouting/CMSSW_8_0_30/src/DijetRootTreeAnalyzer/output_jets01_mc_eta2.5_acc_20181114_151035",
+#                 "/mnt/t3nfs01/data01/shome/dbrzhech/DijetScouting/CMSSW_8_0_30/src/DijetRootTreeAnalyzer/output_jets02_mc_eta2.5_acc_20181114_152551",
+#                 "/mnt/t3nfs01/data01/shome/dbrzhech/DijetScouting/CMSSW_8_0_30/src/DijetRootTreeAnalyzer/output_jets12_mc_eta2.5_acc_20181114_155058",]
+
+#/work/dbrzhech/DijetScouting/CMSSW_8_0_30/src/DijetRootTreeAnalyzer/output_20190513_131719
+
+                 
 
 acc_dict = {}
 iter_dir = 0

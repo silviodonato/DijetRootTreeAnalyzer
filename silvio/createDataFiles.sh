@@ -18,3 +18,13 @@ hadd -f data_wRunH_deta1p1_full_ten_percent.root data_deta1p1_full_ten_percent.r
 
 
 # run silvio/MakeBlindFiles.sh
+
+######################################
+
+#hadd -f data_3D_deta1p1_full.root /work/dbrzhech/DijetScouting/CMSSW_8_0_30/src/DijetRootTreeAnalyzer/output_dataMC_batch/output_data_th3f_10percent_rightone_20190301_182327/rootfile_list_ScoutingCaloHT_Run2016*_*_reduced_skim.root &
+
+#hadd -f data_3D_deta1p1_full_ten_percent.root /work/dbrzhech/DijetScouting/CMSSW_8_0_30/src/DijetRootTreeAnalyzer/output_dataMC_batch/output_data_th3f_10percent_rightone_20190301_182327/rootfile_list_ScoutingCaloHT_Run2016*_*9_reduced_skim.root &
+
+################################################
+
+hadd -f data_3D_deta1p1_full_ten_percent.root /work/dbrzhech/DijetScouting/CMSSW_8_0_30/src/DijetRootTreeAnalyzer/output_dataMC_batch/output_data_th3f_10percent_rightone_20190301_182327/rootfile_list_ScoutingCaloHT_Run2016*_*_reduced_skim.root &

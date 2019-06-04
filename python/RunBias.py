@@ -39,9 +39,9 @@ eval `scramv1 runtime -sh`
 %s
 """%(pwd,commandMass))
         txt.close()
-#        exec_me("qsub -o %s/submit_bias_study/log -e %s/submit_bias_study/log -q %s.q %s"%(pwd,pwd,options.queue.replace(".q",""),fileName),options.dryRun)
+        exec_me("qsub -o %s/submit_bias_study/log -e %s/submit_bias_study/log -q %s.q %s"%(pwd,pwd,options.queue.replace(".q",""),fileName),options.dryRun)
 # use /dev/null to avoid seg fault for mysterious reason...
-        exec_me("qsub -e %s/submit_bias_study/log -o /dev/null -q %s.q %s"%(pwd,options.queue.replace(".q",""),fileName),options.dryRun)
+#        exec_me("qsub -e %s/submit_bias_study/log -o /dev/null -q %s.q %s"%(pwd,options.queue.replace(".q",""),fileName),options.dryRun)
 
 
 def exec_me(command,dryRun=True):
@@ -59,15 +59,16 @@ def main(options,args):
 
 
     signalSys = ''
-    if box=='CaloDijet2016':
-        signalSys  = '--jesUp inputs/ResonanceShapes_%s_13TeV_CaloScouting_Spring16_JESUP.root --jesDown inputs/ResonanceShapes_%s_13TeV_CaloScouting_Spring16_JESDOWN.root'%(model,model)
-        signalSys += ' --jerUp inputs/ResonanceShapes_%s_13TeV_CaloScouting_Spring16_JERUP.root --jerDown inputs/ResonanceShapes_%s_13TeV_CaloScouting_Spring16_JERDOWN.root'%(model,model)
-    elif box=='PFDijet2016':
-        signalSys  =   '--jesUp inputs/ResonanceShapes_%s_13TeV_Spring16_JESUP.root --jesDown inputs/ResonanceShapes_%s_13TeV_Spring16_JESDOWN.root'%(model,model)
-        signalSys += ' --jerUp inputs/ResonanceShapes_%s_13TeV_Spring16_JERUP.root'%(model)
-    elif box=='CaloTrijet2016':
-        signalSys  = ' --jesUp inputs/ResonanceShapes_%s_13TeV_CaloScouting_2016_JESUP.root --jesDown inputs/ResonanceShapes_%s_13TeV_CaloScouting_2016_JESDOWN.root'%(model,model)
-        signalSys += ' --jerUp inputs/ResonanceShapes_%s_13TeV_CaloScouting_2016_JERUP.root --jerDown inputs/ResonanceShapes_%s_13TeV_CaloScouting_2016_JERDOWN.root'%(model,model)
+    if not(options.noSignalSys):
+        if box=='CaloDijet2016':
+            signalSys  = '--jesUp inputs/ResonanceShapes_%s_13TeV_CaloScouting_Spring16_JESUP.root --jesDown inputs/ResonanceShapes_%s_13TeV_CaloScouting_Spring16_JESDOWN.root'%(model,model)
+            signalSys += ' --jerUp inputs/ResonanceShapes_%s_13TeV_CaloScouting_Spring16_JERUP.root --jerDown inputs/ResonanceShapes_%s_13TeV_CaloScouting_Spring16_JERDOWN.root'%(model,model)
+        elif box=='PFDijet2016':
+            signalSys  =   '--jesUp inputs/ResonanceShapes_%s_13TeV_Spring16_JESUP.root --jesDown inputs/ResonanceShapes_%s_13TeV_Spring16_JESDOWN.root'%(model,model)
+            signalSys += ' --jerUp inputs/ResonanceShapes_%s_13TeV_Spring16_JERUP.root'%(model)
+        elif box=='CaloTrijet2016':
+            signalSys  = ' --jesUp inputs/ResonanceShapes_%s_13TeV_CaloScouting_2016_JESUP.root --jesDown inputs/ResonanceShapes_%s_13TeV_CaloScouting_2016_JESDOWN.root'%(model,model)
+            signalSys += ' --jerUp inputs/ResonanceShapes_%s_13TeV_CaloScouting_2016_JERUP.root --jerDown inputs/ResonanceShapes_%s_13TeV_CaloScouting_2016_JERDOWN.root'%(model,model)
 
 
     xsecTree = None
@@ -90,48 +91,49 @@ def main(options,args):
     print rDict
 
     xsecString = '--xsec %f'%options.xsec
-    rRangeString =  '--setPhysicsModelParameterRanges r=%s,%s'%(options.rMin,options.rMax)
+    rRangeString =  '--rMin %s --rMax %s'%(options.rMin,options.rMax)
+#    rRangeString =  '--setPhysicsModelParameterRanges r=%s,%s'%(options.rMin,options.rMax)
 
     fixStringGen = '--setPhysicsModelParameters pdf_index=%i'%(pdfIndexMap[options.genPdf])
     freezeStringGen = '--freezeNuisances pdf_index'
-    if options.genPdf != 'fiveparam':
-        freezeStringGen += ',p51_CaloTrijet2016,p52_CaloTrijet2016,p53_CaloTrijet2016,p54_CaloTrijet2016'
-    if options.genPdf != 'modexp':
-        freezeStringGen += ',pm1_CaloTrijet2016,pm2_CaloTrijet2016,pm3_CaloTrijet2016,pm4_CaloTrijet2016'
-    if options.genPdf != 'atlas':
-        freezeStringGen += ',pa1_CaloTrijet2016,pa2_CaloTrijet2016,pa3_CaloTrijet2016,pa4_CaloTrijet2016'
-    if options.genPdf != 'atlas6':
-        freezeStringGen += ',pa61_CaloTrijet2016,pa62_CaloTrijet2016,pa63_CaloTrijet2016,pa64_CaloTrijet2016,pa65_CaloTrijet2016'
-#    if options.genPdf != 'fourparam':
-#        freezeStringGen += ',p1_CaloTrijet2016,p2_CaloTrijet2016,p3_CaloTrijet2016'
-    if options.fitPdf != 'silvio4':
-        freezeStringGen += ',p1s4_CaloTrijet2016,p2s4_CaloTrijet2016,p3s4_CaloTrijet2016'
-    if options.fitPdf != 'silvio5':
-        freezeStringGen += ',p1s5_CaloTrijet2016,p2s5_CaloTrijet2016,p3s5_CaloTrijet2016,p4s5_CaloTrijet2016'
-    if options.fitPdf != 'silvio6':
-        freezeStringGen += ',p1s6_CaloTrijet2016,p2s6_CaloTrijet2016,p3s6_CaloTrijet2016,p4s6_CaloTrijet2016,p5s6_CaloTrijet2016'
-#    if options.fitPdf != 'silviobias4':
-#        freezeStringGen += ',p1sb4_CaloTrijet2016,p2sb4_CaloTrijet2016,p3sb4_CaloTrijet2016'
-    if options.fitPdf != 'nom7':
-        freezeStringGen += ',p7nom1_CaloTrijet2016,p7nom2_CaloTrijet2016,p7nom3_CaloTrijet2016,p7nom4_CaloTrijet2016,p7nom5_CaloTrijet2016,p7nom6_CaloTrijet2016'
-    if options.fitPdf != 'nom6':
-        freezeStringGen += ',p6nom1_CaloTrijet2016,p6nom2_CaloTrijet2016,p6nom3_CaloTrijet2016,p6nom4_CaloTrijet2016,p6nom5_CaloTrijet2016'
-    if options.fitPdf != 'nom5':
-        freezeStringGen += ',p5nom1_CaloTrijet2016,p5nom2_CaloTrijet2016,p5nom3_CaloTrijet2016,p5nom4_CaloTrijet2016'
-    if options.fitPdf != 'nom4':
-        freezeStringGen += ',p4nom1_CaloTrijet2016,p4nom2_CaloTrijet2016,p4nom3_CaloTrijet2016'
-    if options.fitPdf != 'nom3':
-        freezeStringGen += ',p3nom1_CaloTrijet2016,p3nom2_CaloTrijet2016'
-    if options.fitPdf != 'alt7':
-        freezeStringGen += ',p7alt1_CaloTrijet2016,p7alt2_CaloTrijet2016,p7alt3_CaloTrijet2016,p7alt4_CaloTrijet2016,p7alt5_CaloTrijet2016,p7alt6_CaloTrijet2016'
-    if options.fitPdf != 'alt6':
-        freezeStringGen += ',p6alt1_CaloTrijet2016,p6alt2_CaloTrijet2016,p6alt3_CaloTrijet2016,p6alt4_CaloTrijet2016,p6alt5_CaloTrijet2016'
-    if options.fitPdf != 'alt5':
-        freezeStringGen += ',p5alt1_CaloTrijet2016,p5alt2_CaloTrijet2016,p5alt3_CaloTrijet2016,p5alt4_CaloTrijet2016'
-    if options.fitPdf != 'alt4':
-        freezeStringGen += ',p4alt1_CaloTrijet2016,p4alt2_CaloTrijet2016,p4alt3_CaloTrijet2016'
-    if options.fitPdf != 'alt3':
-        freezeStringGen += ',p3alt1_CaloTrijet2016,p3alt2_CaloTrijet2016'
+#    if options.genPdf != 'fiveparam':
+#        freezeStringGen += ',p51_CaloTrijet2016,p52_CaloTrijet2016,p53_CaloTrijet2016,p54_CaloTrijet2016'
+#    if options.genPdf != 'modexp':
+#        freezeStringGen += ',pm1_CaloTrijet2016,pm2_CaloTrijet2016,pm3_CaloTrijet2016,pm4_CaloTrijet2016'
+#    if options.genPdf != 'atlas':
+#        freezeStringGen += ',pa1_CaloTrijet2016,pa2_CaloTrijet2016,pa3_CaloTrijet2016,pa4_CaloTrijet2016'
+#    if options.genPdf != 'atlas6':
+#        freezeStringGen += ',pa61_CaloTrijet2016,pa62_CaloTrijet2016,pa63_CaloTrijet2016,pa64_CaloTrijet2016,pa65_CaloTrijet2016'
+##    if options.genPdf != 'fourparam':
+##        freezeStringGen += ',p1_CaloTrijet2016,p2_CaloTrijet2016,p3_CaloTrijet2016'
+#    if options.fitPdf != 'silvio4':
+#        freezeStringGen += ',p1s4_CaloTrijet2016,p2s4_CaloTrijet2016,p3s4_CaloTrijet2016'
+#    if options.fitPdf != 'silvio5':
+#        freezeStringGen += ',p1s5_CaloTrijet2016,p2s5_CaloTrijet2016,p3s5_CaloTrijet2016,p4s5_CaloTrijet2016'
+#    if options.fitPdf != 'silvio6':
+#        freezeStringGen += ',p1s6_CaloTrijet2016,p2s6_CaloTrijet2016,p3s6_CaloTrijet2016,p4s6_CaloTrijet2016,p5s6_CaloTrijet2016'
+##    if options.fitPdf != 'silviobias4':
+##        freezeStringGen += ',p1sb4_CaloTrijet2016,p2sb4_CaloTrijet2016,p3sb4_CaloTrijet2016'
+#    if options.fitPdf != 'nom7':
+#        freezeStringGen += ',p7nom1_CaloTrijet2016,p7nom2_CaloTrijet2016,p7nom3_CaloTrijet2016,p7nom4_CaloTrijet2016,p7nom5_CaloTrijet2016,p7nom6_CaloTrijet2016'
+#    if options.fitPdf != 'nom6':
+#        freezeStringGen += ',p6nom1_CaloTrijet2016,p6nom2_CaloTrijet2016,p6nom3_CaloTrijet2016,p6nom4_CaloTrijet2016,p6nom5_CaloTrijet2016'
+#    if options.fitPdf != 'nom5':
+#        freezeStringGen += ',p5nom1_CaloTrijet2016,p5nom2_CaloTrijet2016,p5nom3_CaloTrijet2016,p5nom4_CaloTrijet2016'
+#    if options.fitPdf != 'nom4':
+#        freezeStringGen += ',p4nom1_CaloTrijet2016,p4nom2_CaloTrijet2016,p4nom3_CaloTrijet2016'
+#    if options.fitPdf != 'nom3':
+#        freezeStringGen += ',p3nom1_CaloTrijet2016,p3nom2_CaloTrijet2016'
+#    if options.fitPdf != 'alt7':
+#        freezeStringGen += ',p7alt1_CaloTrijet2016,p7alt2_CaloTrijet2016,p7alt3_CaloTrijet2016,p7alt4_CaloTrijet2016,p7alt5_CaloTrijet2016,p7alt6_CaloTrijet2016'
+#    if options.fitPdf != 'alt6':
+#        freezeStringGen += ',p6alt1_CaloTrijet2016,p6alt2_CaloTrijet2016,p6alt3_CaloTrijet2016,p6alt4_CaloTrijet2016,p6alt5_CaloTrijet2016'
+#    if options.fitPdf != 'alt5':
+#        freezeStringGen += ',p5alt1_CaloTrijet2016,p5alt2_CaloTrijet2016,p5alt3_CaloTrijet2016,p5alt4_CaloTrijet2016'
+#    if options.fitPdf != 'alt4':
+#        freezeStringGen += ',p4alt1_CaloTrijet2016,p4alt2_CaloTrijet2016,p4alt3_CaloTrijet2016'
+#    if options.fitPdf != 'alt3':
+#        freezeStringGen += ',p3alt1_CaloTrijet2016,p3alt2_CaloTrijet2016'
 
 
     fixStringFit = '--setPhysicsModelParameters pdf_index=%i'%(pdfIndexMap[options.fitPdf])
@@ -184,8 +186,16 @@ def main(options,args):
 #        exec_me('mv mlfit%s_%s_lumi-%.3f_r-%.3f_%s_%s_%s.root %s/'%(model,massPoint,lumi,rDict[int(massPoint)],box,options.genPdf,options.fitPdf,options.outDir),options.dryRun)
         exec_me('python python/WriteDataCard.py -m %s --mass %s -i %s -l %f -c %s -b %s -d %s %s %s %s %s --multi'%(model, massPoint, options.inputFitFile,1000*lumi,options.config,box,".",signalDsName,backgroundDsName[box],xsecString,signalSys),options.dryRun)
         exec_me('mv dijet_combine_%s_%s_lumi-%.3f_%s.* %s'%(model,massPoint,lumi,box,options.outDir),options.dryRun)
-        exec_me('cd %s && combine -M GenerateOnly dijet_combine_%s_%s_lumi-%.3f_%s.txt -n %s_%s_lumi-%.3f_r-%.3f_%s_%s_%s %s %s %s --toysFrequentist --saveToys --expectSignal %.3f -t %i'%(options.outDir,model,massPoint,lumi,box,model,massPoint,lumi,rDict[int(massPoint)],box,options.genPdf,options.fitPdf,rRangeString,fixStringGen,freezeStringGen,rDict[int(massPoint)],options.toys),options.dryRun)
-        exec_me('cd %s && combine -M MaxLikelihoodFit --robustFit=1 dijet_combine_%s_%s_lumi-%.3f_%s.txt -n %s_%s_lumi-%.3f_r-%.3f_%s_%s_%s --toysFile higgsCombine%s_%s_lumi-%.3f_r-%.3f_%s_%s_%s.GenerateOnly.mH120.123456.root -t %i %s %s %s --minimizerTolerance 0.001 --minimizerStrategy 2 --minos poi --saveWorkspace'%(options.outDir,model,massPoint,lumi,box,model,massPoint,lumi,rDict[int(massPoint)],box,options.genPdf,options.fitPdf,model,massPoint,lumi,rDict[int(massPoint)],box,options.genPdf,options.fitPdf,options.toys,rRangeString,fixStringFit,freezeStringFit),options.dryRun)
+        if options.step=="all" or options.step=="generator":
+            if (rDict[int(massPoint)]!=0):
+                exec_me('cd %s && combine -M GenerateOnly dijet_combine_%s_%s_lumi-%.3f_%s.txt -n %s_%s_lumi-%.3f_r-%.3f_%s_%s_%s %s %s %s --saveToys --toysFrequentist --bypassFrequentistFit --expectSignal %.3f -t %i'%(options.outDir,model,massPoint,lumi,box,model,massPoint,lumi,rDict[int(massPoint)],box,options.genPdf,options.fitPdf,rRangeString,fixStringGen,freezeStringGen,rDict[int(massPoint)],options.toys),options.dryRun)
+            else:
+                exec_me('cd %s && combine -M GenerateOnly dijet_combine_%s_%s_lumi-%.3f_%s.txt -n %s_%s_lumi-%.3f_r-%.3f_%s_%s_%s %s %s %s --saveToys --toysFrequentist --bypassFrequentistFit --expectSignal 1E-20 -t %i'%(options.outDir,model,massPoint,lumi,box,model,massPoint,lumi,rDict[int(massPoint)],box,options.genPdf,options.fitPdf,rRangeString,fixStringGen,freezeStringGen,options.toys),options.dryRun)
+        
+        if options.step=="all" or options.step=="fit":
+            exec_me('cd %s && combine -M MaxLikelihoodFit --robustFit=1 dijet_combine_%s_%s_lumi-%.3f_%s.txt -n %s_%s_lumi-%.3f_r-%.3f_%s_%s_%s --toysFile higgsCombine%s_%s_lumi-%.3f_r-%.3f_%s_%s_%s.GenerateOnly.mH120.123456.root -t %i %s %s %s  --saveWorkspace'%(options.outDir,model,massPoint,lumi,box,model,massPoint,lumi,rDict[int(massPoint)],box,options.genPdf,options.fitPdf,model,massPoint,lumi,rDict[int(massPoint)],box,options.genPdf,options.fitPdf,options.toys,rRangeString,fixStringFit,freezeStringFit),options.dryRun)
+        
+        ## --minimizerTolerance 9.99999975e-02 --minimizerStrategy 0 --minos poi
         
 #        exec_me('python python/WriteDataCard.py -m %s --mass %s -i %s -l %f -c %s -b %s -d %s %s %s %s %s --multi'%(model, massPoint, options.inputFitFile,1000*lumi,options.config,box,".",signalDsName,backgroundDsName[box],xsecString,signalSys),options.dryRun)
 #        exec_me('mv dijet_combine_%s_%s_lumi-%.3f_%s.* %s'%(model,massPoint,lumi,box,options.outDir),options.dryRun)
@@ -198,6 +208,7 @@ def main(options,args):
 
 if __name__ == '__main__':
     parser = OptionParser()
+    parser.noSignalSys=False
     parser.add_option('-c','--config',dest="config",type="string",default="config/dijet_bias.config",
                   help="Name of the config file to use")
     parser.add_option('-b','--box',dest="box", default="CaloTrijet2016",type="string",
@@ -232,6 +243,9 @@ if __name__ == '__main__':
                   help="load asymptotic cross section results file")
     parser.add_option('--queue',dest="queue",default=None,type="string",
                   help="submit on a T3 queue")
+    parser.add_option('--step',dest="step", default="all", choices=['all','generator','fit'],
+                  help="which step to run: all, generator, or fit")
+    parser.add_option("--no-signalSys", action="store_true", dest="noSignalSys")
 
     (options,args) = parser.parse_args()
     exec_me("mkdir -p %s"%options.outDir,options.dryRun)

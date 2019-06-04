@@ -182,7 +182,7 @@ def prob_mass(rootTree, var, outputFileName, acceptances):
             mjj         = dijet_mass
            
             
-            if isr_pt > 70 and jet2_pt>70 and jet1_pt>70  and abs(dijet_deta)<1.1 and abs(isr_eta)<2.5 and abs(jet1_eta)<2.5 and abs(jet2_eta)<2.5:
+            if isr_pt >68 jet2_pt>68 and jet1_pt>68  and abs(dijet_deta)<1.1 and abs(isr_eta)<2.5 and abs(jet1_eta)<2.5 and abs(jet2_eta)<2.5:
                 x1 = r.Gaus()
                 x2 = r.Gaus()
                 x3 = r.Gaus()
